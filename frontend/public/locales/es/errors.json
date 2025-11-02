@@ -1,0 +1,80 @@
+{
+  "errors": {
+    "title": "Error",
+    "general": "Ocurrió un error",
+    "network": "Error de Red",
+    "timeout": "Tiempo de Espera Agotado",
+    "notFound": "No Encontrado",
+    "unauthorized": "No Autorizado",
+    "forbidden": "Prohibido",
+    "serverError": "Error del Servidor",
+    "serviceUnavailable": "Servicio No Disponible",
+    "validationError": "Error de Validación",
+    "insufficientFunds": "Fondos Insuficientes",
+    "transactionFailed": "Transacción Fallida",
+    "walletError": "Error de Billetera",
+    "connectionError": "Error de Conexión",
+    "apiError": "Error de API",
+    "rateLimit": "Límite de Tasa Excedido",
+    "maintenance": "Mantenimiento del Sistema",
+    "deprecated": "Esta función está obsoleta"
+  },
+  "validation": {
+    "required": "Este campo es requerido",
+    "invalidEmail": "Dirección de correo inválida",
+    "invalidUrl": "URL inválida",
+    "invalidNumber": "Número inválido",
+    "invalidAddress": "Dirección inválida",
+    "invalidAmount": "Cantidad inválida",
+    "amountTooLow": "Cantidad demasiado baja",
+    "amountTooHigh": "Cantidad demasiado alta",
+    "insufficientBalance": "Saldo insuficiente",
+    "invalidSlippage": "Tolerancia de deslizamiento inválida",
+    "invalidDeadline": "Fecha límite inválida",
+    "invalidGasPrice": "Precio de gas inválido",
+    "invalidToken": "Token inválido",
+    "duplicateTransaction": "Transacción duplicada"
+  },
+  "wallet": {
+    "connectionFailed": "Falló la conexión de la billetera",
+    "userRejected": "Usuario rechazó la solicitud",
+    "networkMismatch": "Incompatibilidad de red",
+    "insufficientFunds": "Fondos insuficientes para la transacción",
+    "transactionRejected": "Transacción rechazada",
+    "gasTooLow": "Precio de gas demasiado bajo",
+    "nonceTooLow": "Nonce demasiado bajo",
+    "replacementUnderpriced": "Transacción de reemplazo subvalorada",
+    "executionReverted": "Ejecución de transacción revertida",
+    "outOfGas": "Sin gas"
+  },
+  "trading": {
+    "orderFailed": "Orden fallida",
+    "insufficientLiquidity": "Liquidez insuficiente",
+    "priceImpactTooHigh": "Impacto en precio demasiado alto",
+    "slippageExceeded": "Tolerancia de deslizamiento excedida",
+    "marketClosed": "Mercado cerrado",
+    "tradingDisabled": "Operaciones deshabilitadas",
+    "invalidOrder": "Orden inválida",
+    "orderExpired": "Orden expirada",
+    "positionLiquidated": "Posición liquidada"
+  },
+  "security": {
+    "suspiciousActivity": "Actividad sospechosa detectada",
+    "blockedAddress": "Dirección bloqueada",
+    "sanctionsViolation": "Violación de sanciones",
+    "unusualVolume": "Volumen de operaciones inusual detectado",
+    "multipleFailures": "Múltiples fallos de autenticación"
+  },
+  "system": {
+    "databaseError": "Error de base de datos",
+    "cacheError": "Error de caché",
+    "diskFull": "Disco lleno",
+    "memoryError": "Error de memoria",
+    "cpuOverload": "Sobrecarga de CPU",
+    "networkCongestion": "Congestión de red"
+  },
+  "retry": "Por favor intenta de nuevo",
+  "contactSupport": "Contacta soporte si el problema persiste",
+  "errorCode": "Código de Error: {{code}}",
+  "details": "Detalles del Error: {{details}}"
+}

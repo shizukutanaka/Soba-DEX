@@ -1,0 +1,153 @@
+/* ===== ATLAS TOGGLE COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-toggle-container {
+  display: inline-flex;
+}
+
+.atlas-toggle-label {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-150);
+  cursor: pointer;
+  user-select: none;
+}
+
+.atlas-toggle__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.atlas-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: all var(--transition-normal);
+}
+
+.atlas-toggle--sm {
+  width: 32px;
+  height: 18px;
+}
+
+.atlas-toggle--md {
+  width: 44px;
+  height: 24px;
+}
+
+.atlas-toggle--lg {
+  width: 56px;
+  height: 30px;
+}
+
+.atlas-toggle__track {
+  position: absolute;
+  inset: 0;
+  background: var(--neutral-400);
+  border-radius: var(--radius-round);
+  transition: all var(--transition-normal);
+}
+
+.atlas-toggle__thumb {
+  position: absolute;
+  background: var(--neutral-0);
+  border-radius: var(--radius-circle);
+  box-shadow: var(--shadow-100);
+  transition: all var(--transition-normal);
+}
+
+.atlas-toggle--sm .atlas-toggle__thumb {
+  width: 14px;
+  height: 14px;
+  top: 2px;
+  left: 2px;
+}
+
+.atlas-toggle--md .atlas-toggle__thumb {
+  width: 20px;
+  height: 20px;
+  top: 2px;
+  left: 2px;
+}
+
+.atlas-toggle--lg .atlas-toggle__thumb {
+  width: 26px;
+  height: 26px;
+  top: 2px;
+  left: 2px;
+}
+
+.atlas-toggle__input:focus-visible + .atlas-toggle {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.atlas-toggle--checked .atlas-toggle__track {
+  background: var(--brand-primary);
+}
+
+.atlas-toggle--checked.atlas-toggle--sm .atlas-toggle__thumb {
+  transform: translateX(14px);
+}
+
+.atlas-toggle--checked.atlas-toggle--md .atlas-toggle__thumb {
+  transform: translateX(20px);
+}
+
+.atlas-toggle--checked.atlas-toggle--lg .atlas-toggle__thumb {
+  transform: translateX(26px);
+}
+
+.atlas-toggle--disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.atlas-toggle--disabled .atlas-toggle__track {
+  background: var(--neutral-300);
+}
+
+.atlas-toggle__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-050);
+}
+
+.atlas-toggle__label-text {
+  font-size: var(--font-size-100);
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-1300);
+  line-height: var(--line-height-tight);
+}
+
+.atlas-toggle__helper {
+  font-size: var(--font-size-075);
+  color: var(--neutral-800);
+  line-height: var(--line-height-normal);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-toggle,
+  .atlas-toggle__track,
+  .atlas-toggle__thumb {
+    transition: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .atlas-toggle__track {
+    background: var(--neutral-600);
+  }
+
+  .atlas-toggle--checked .atlas-toggle__track {
+    background: var(--brand-secondary);
+  }
+}

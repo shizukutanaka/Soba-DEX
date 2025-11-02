@@ -1,0 +1,176 @@
+/* ===== ATLAS LOZENGE COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-lozenge {
+  /* Base styles */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  border-radius: var(--radius-round);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+/* Size variants */
+.atlas-lozenge--small {
+  font-size: var(--font-size-050);
+  padding: 2px var(--space-100);
+  min-height: 16px;
+}
+
+.atlas-lozenge--medium {
+  font-size: var(--font-size-075);
+  padding: 2px var(--space-150);
+  min-height: 20px;
+}
+
+/* Type variants */
+.atlas-lozenge--default {
+  background: var(--neutral-200);
+  color: var(--neutral-900);
+}
+
+.atlas-lozenge--success {
+  background: var(--success-100);
+  color: var(--success-800);
+}
+
+.atlas-lozenge--warning {
+  background: var(--warning-100);
+  color: var(--warning-800);
+}
+
+.atlas-lozenge--error {
+  background: var(--danger-100);
+  color: var(--danger-800);
+}
+
+.atlas-lozenge--info {
+  background: var(--info-100);
+  color: var(--info-800);
+}
+
+.atlas-lozenge--new {
+  background: var(--success-100);
+  color: var(--success-800);
+}
+
+.atlas-lozenge--removed {
+  background: var(--neutral-200);
+  color: var(--neutral-700);
+  text-decoration: line-through;
+}
+
+/* Subtle variants */
+.atlas-lozenge--subtle.atlas-lozenge--default {
+  background: rgba(9, 30, 66, 0.08);
+  color: var(--neutral-700);
+}
+
+.atlas-lozenge--subtle.atlas-lozenge--success {
+  background: rgba(0, 135, 90, 0.08);
+  color: var(--success-700);
+}
+
+.atlas-lozenge--subtle.atlas-lozenge--warning {
+  background: rgba(255, 171, 0, 0.08);
+  color: var(--warning-700);
+}
+
+.atlas-lozenge--subtle.atlas-lozenge--error {
+  background: rgba(201, 55, 44, 0.08);
+  color: var(--danger-700);
+}
+
+.atlas-lozenge--subtle.atlas-lozenge--info {
+  background: rgba(76, 154, 255, 0.08);
+  color: var(--info-700);
+}
+
+/* ===== DARK MODE ===== */
+@media (prefers-color-scheme: dark) {
+  .atlas-lozenge--default {
+    background: var(--neutral-400);
+    color: var(--neutral-900);
+  }
+
+  .atlas-lozenge--success {
+    background: rgba(0, 135, 90, 0.2);
+    color: var(--success-300);
+  }
+
+  .atlas-lozenge--warning {
+    background: rgba(255, 171, 0, 0.2);
+    color: var(--warning-300);
+  }
+
+  .atlas-lozenge--error {
+    background: rgba(201, 55, 44, 0.2);
+    color: var(--danger-300);
+  }
+
+  .atlas-lozenge--info {
+    background: rgba(76, 154, 255, 0.2);
+    color: var(--info-300);
+  }
+
+  .atlas-lozenge--new {
+    background: rgba(0, 135, 90, 0.2);
+    color: var(--success-300);
+  }
+
+  .atlas-lozenge--removed {
+    background: var(--neutral-400);
+    color: var(--neutral-300);
+  }
+
+  /* Subtle variants in dark mode */
+  .atlas-lozenge--subtle.atlas-lozenge--default {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--neutral-200);
+  }
+
+  .atlas-lozenge--subtle.atlas-lozenge--success {
+    background: rgba(0, 135, 90, 0.2);
+    color: var(--success-200);
+  }
+
+  .atlas-lozenge--subtle.atlas-lozenge--warning {
+    background: rgba(255, 171, 0, 0.2);
+    color: var(--warning-200);
+  }
+
+  .atlas-lozenge--subtle.atlas-lozenge--error {
+    background: rgba(201, 55, 44, 0.2);
+    color: var(--danger-200);
+  }
+
+  .atlas-lozenge--subtle.atlas-lozenge--info {
+    background: rgba(76, 154, 255, 0.2);
+    color: var(--info-200);
+  }
+}
+
+/* ===== HIGH CONTRAST MODE ===== */
+@media (prefers-contrast: high) {
+  .atlas-lozenge {
+    border: 1px solid currentColor;
+  }
+
+  .atlas-lozenge--subtle {
+    opacity: 0.8;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-lozenge {
+    transition: none;
+  }
+}

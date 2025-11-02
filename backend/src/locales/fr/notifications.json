@@ -1,0 +1,83 @@
+{
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Marquer Tout comme Lu",
+    "clearAll": "Effacer Tout",
+    "noNotifications": "Aucune notification",
+    "newNotifications": "Nouvelles notifications",
+    "all": "Tout",
+    "unread": "Non Lues",
+    "read": "Lues",
+    "settings": "Paramètres de Notifications",
+    "email": "Notifications par Email",
+    "push": "Notifications Push",
+    "sms": "Notifications SMS",
+    "sound": "Son",
+    "desktop": "Notifications Bureau"
+  },
+  "types": {
+    "success": "Succès",
+    "error": "Erreur",
+    "warning": "Avertissement",
+    "info": "Information",
+    "trade": "Échange",
+    "transaction": "Transaction",
+    "security": "Sécurité",
+    "system": "Système",
+    "price": "Alerte de Prix",
+    "liquidity": "Liquidité",
+    "staking": "Staking"
+  },
+  "messages": {
+    "walletConnected": "Portefeuille connecté avec succès",
+    "walletDisconnected": "Portefeuille déconnecté",
+    "orderPlaced": "Ordre passé avec succès",
+    "orderFilled": "Ordre exécuté: {{amount}} {{symbol}} à {{price}}",
+    "orderCancelled": "Ordre annulé",
+    "transactionSent": "Transaction envoyée",
+    "transactionConfirmed": "Transaction confirmée",
+    "transactionFailed": "Transaction échouée",
+    "priceAlert": "Alerte de prix: {{symbol}} a atteint {{price}}",
+    "liquidityAdded": "Liquidité ajoutée avec succès",
+    "liquidityRemoved": "Liquidité supprimée",
+    "rewardsClaimed": "Récompenses réclamées: {{amount}} {{symbol}}",
+    "stakeSuccessful": "Staking réussi",
+    "unstakeSuccessful": "Unstaking réussi",
+    "securityAlert": "Alerte de sécurité: {{message}}",
+    "systemMaintenance": "Maintenance système programmée",
+    "newListing": "Nouveau token listé: {{symbol}}",
+    "airdrop": "Airdrop reçu: {{amount}} {{symbol}}",
+    "forkDetected": "Fork détecté sur le réseau",
+    "gasPriceHigh": "Les prix du gas sont actuellement élevés",
+    "marketVolatility": "Haute volatilité de marché détectée",
+    "positionAlert": "Alerte de position: {{message}}"
+  },
+  "trading": {
+    "orderFilled": "Ordre exécuté",
+    "orderPartiallyFilled": "Ordre partiellement exécuté",
+    "orderExpired": "Ordre expiré",
+    "positionOpened": "Position ouverte",
+    "positionClosed": "Position fermée",
+    "stopLossTriggered": "Stop loss déclenché",
+    "takeProfitTriggered": "Take profit déclenché",
+    "marginCall": "Appel de marge",
+    "liquidationWarning": "Avertissement de liquidation"
+  },
+  "wallet": {
+    "balanceLow": "Avertissement de solde faible",
+    "largeTransaction": "Grosse transaction détectée",
+    "multipleTransactions": "Transactions multiples détectées",
+    "addressChange": "Adresse changée",
+    "approvalRequired": "Approbation requise",
+    "tokenReceived": "Token reçu: {{amount}} {{symbol}}",
+    "tokenSent": "Token envoyé: {{amount}} {{symbol}}"
+  },
+  "system": {
+    "updateAvailable": "Mise à jour disponible",
+    "maintenanceScheduled": "Maintenance programmée",
+    "serviceRestart": "Redémarrage de service requis",
+    "backupCompleted": "Sauvegarde terminée",
+    "securityUpdate": "Mise à jour de sécurité installée",
+    "performanceIssue": "Problème de performance détecté"
+  }
+}

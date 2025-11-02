@@ -1,0 +1,343 @@
+# ============================================================================
+# DEX Security Monitoring System - CD Pipeline
+# Continuous Deployment to production environment
+# ============================================================================
+
+name: CD Pipeline
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  NODE_VERSION: '18'
+
+jobs:
+  # ============================================================================
+  # Build and Push Docker Image
+  # ============================================================================
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile.production
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ steps.meta.outputs.tags }}
+          format: spdx-json
+          output-file: sbom.spdx.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v3
+        with:
+          name: sbom
+          path: sbom.spdx.json
+
+  # ============================================================================
+  # Deploy to Staging
+  # ============================================================================
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' || github.event.inputs.environment == 'staging'
+    environment:
+      name: staging
+      url: https://staging.security-monitor.example.com
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Set Kubernetes context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG_STAGING }}
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl set image deployment/security-monitor \
+            security-monitor=${{ needs.build.outputs.image-tag }} \
+            -n staging
+          kubectl rollout status deployment/security-monitor -n staging
+
+      - name: Run smoke tests
+        run: |
+          sleep 30
+          curl -f https://staging.security-monitor.example.com/health || exit 1
+          curl -f https://staging.security-monitor.example.com/metrics || exit 1
+
+      - name: Notify deployment
+        uses: 8398a7/action-slack@v3
+        if: always()
+        with:
+          status: ${{ job.status }}
+          text: 'Staging deployment: ${{ job.status }}'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ============================================================================
+  # Integration Tests on Staging
+  # ============================================================================
+  test-staging:
+    name: Integration Tests (Staging)
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./backend
+
+      - name: Run integration tests
+        env:
+          TEST_BASE_URL: https://staging.security-monitor.example.com
+        run: npm run test:staging
+        working-directory: ./backend
+
+      - name: Run load tests
+        run: |
+          npm install -g artillery
+          artillery run --target https://staging.security-monitor.example.com load-test.yml
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: staging-test-results
+          path: |
+            backend/test-results/
+            artillery-report-*.json
+
+  # ============================================================================
+  # Deploy to Production
+  # ============================================================================
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build, test-staging]
+    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.environment == 'production'
+    environment:
+      name: production
+      url: https://security-monitor.example.com
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Set Kubernetes context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG_PRODUCTION }}
+
+      - name: Create backup
+        run: |
+          kubectl exec -n production deployment/postgres -- \
+            pg_dump -U postgres security_monitor > backup-$(date +%Y%m%d-%H%M%S).sql
+
+      - name: Deploy to Kubernetes (Canary)
+        run: |
+          # Deploy canary with 10% traffic
+          kubectl set image deployment/security-monitor-canary \
+            security-monitor=${{ needs.build.outputs.image-tag }} \
+            -n production
+          kubectl rollout status deployment/security-monitor-canary -n production
+
+          # Wait and monitor
+          sleep 300
+
+      - name: Check canary metrics
+        run: |
+          # Check error rate, latency, etc.
+          ERROR_RATE=$(curl -s "http://prometheus:9090/api/v1/query?query=rate(http_requests_total{status=~\"5..\"}[5m])" | jq -r '.data.result[0].value[1]')
+          if (( $(echo "$ERROR_RATE > 0.01" | bc -l) )); then
+            echo "Error rate too high: $ERROR_RATE"
+            exit 1
+          fi
+
+      - name: Promote to full production
+        run: |
+          kubectl set image deployment/security-monitor \
+            security-monitor=${{ needs.build.outputs.image-tag }} \
+            -n production
+          kubectl rollout status deployment/security-monitor -n production
+
+      - name: Run smoke tests
+        run: |
+          sleep 30
+          curl -f https://security-monitor.example.com/health || exit 1
+          curl -f https://security-monitor.example.com/metrics || exit 1
+
+      - name: Create release notes
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const tag = context.ref.replace('refs/tags/', '');
+            const release = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              name: `Release ${tag}`,
+              body: `## Deployment\n\nImage: ${{ needs.build.outputs.image-tag }}\nDigest: ${{ needs.build.outputs.image-digest }}\n\n## Changes\n\nSee commit history for details.`,
+              draft: false,
+              prerelease: false
+            });
+
+      - name: Notify deployment
+        uses: 8398a7/action-slack@v3
+        if: always()
+        with:
+          status: ${{ job.status }}
+          text: 'Production deployment: ${{ job.status }}'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+
+  # ============================================================================
+  # Rollback on Failure
+  # ============================================================================
+  rollback:
+    name: Rollback Production
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    if: failure()
+    environment:
+      name: production
+    steps:
+      - name: Set Kubernetes context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG_PRODUCTION }}
+
+      - name: Rollback deployment
+        run: |
+          kubectl rollout undo deployment/security-monitor -n production
+          kubectl rollout status deployment/security-monitor -n production
+
+      - name: Notify rollback
+        uses: 8398a7/action-slack@v3
+        with:
+          status: 'warning'
+          text: 'Production deployment rolled back due to failure'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ============================================================================
+  # Post-Deployment Monitoring
+  # ============================================================================
+  monitor:
+    name: Post-Deployment Monitoring
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    if: success()
+    steps:
+      - name: Monitor for 15 minutes
+        run: |
+          echo "Monitoring deployment for 15 minutes..."
+          for i in {1..15}; do
+            sleep 60
+
+            # Check health endpoint
+            if ! curl -sf https://security-monitor.example.com/health; then
+              echo "Health check failed at minute $i"
+              exit 1
+            fi
+
+            # Check error rate
+            ERROR_RATE=$(curl -s "http://prometheus:9090/api/v1/query?query=rate(http_requests_total{status=~\"5..\"}[1m])" | jq -r '.data.result[0].value[1]')
+            echo "Minute $i - Error rate: $ERROR_RATE"
+
+            if (( $(echo "$ERROR_RATE > 0.01" | bc -l) )); then
+              echo "Error rate too high: $ERROR_RATE"
+              exit 1
+            fi
+          done
+
+          echo "Monitoring complete - deployment stable"
+
+      - name: Update deployment status
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'success',
+              description: 'Deployment monitoring complete',
+              context: 'deployment/monitor'
+            });

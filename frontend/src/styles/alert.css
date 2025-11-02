@@ -1,0 +1,200 @@
+/* ===== ATLAS ALERT COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-alert {
+  display: flex;
+  gap: var(--space-150);
+  padding: var(--space-200) var(--space-300);
+  border-radius: var(--radius-300);
+  border-left: 4px solid;
+  animation: atlas-alert-slide-in var(--transition-normal);
+}
+
+@keyframes atlas-alert-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== TYPE VARIANTS ===== */
+.atlas-alert--info {
+  background: var(--info-50);
+  border-left-color: var(--info-500);
+  color: var(--neutral-1300);
+}
+
+.atlas-alert--info .atlas-alert__icon {
+  color: var(--info-500);
+}
+
+.atlas-alert--success {
+  background: var(--success-50);
+  border-left-color: var(--success-500);
+  color: var(--neutral-1300);
+}
+
+.atlas-alert--success .atlas-alert__icon {
+  color: var(--success-500);
+}
+
+.atlas-alert--warning {
+  background: var(--warning-50);
+  border-left-color: var(--warning-500);
+  color: var(--neutral-1300);
+}
+
+.atlas-alert--warning .atlas-alert__icon {
+  color: var(--warning-700);
+}
+
+.atlas-alert--error {
+  background: var(--danger-50);
+  border-left-color: var(--danger-500);
+  color: var(--neutral-1300);
+}
+
+.atlas-alert--error .atlas-alert__icon {
+  color: var(--danger-600);
+}
+
+/* ===== ALERT ELEMENTS ===== */
+.atlas-alert__icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+
+.atlas-alert__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.atlas-alert__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.atlas-alert__title {
+  margin: 0 0 var(--space-075) 0;
+  font-size: var(--font-size-100);
+  font-weight: var(--font-weight-semibold);
+  color: var(--neutral-1300);
+  line-height: var(--line-height-tight);
+}
+
+.atlas-alert__message {
+  margin: 0;
+  font-size: var(--font-size-100);
+  font-weight: var(--font-weight-regular);
+  color: var(--neutral-900);
+  line-height: var(--line-height-normal);
+}
+
+.atlas-alert__actions {
+  margin-top: var(--space-150);
+  display: flex;
+  gap: var(--space-150);
+  flex-wrap: wrap;
+}
+
+.atlas-alert__dismiss {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-100);
+  color: var(--neutral-700);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.atlas-alert__dismiss:hover {
+  background: rgba(9, 30, 66, var(--opacity-hover));
+  color: var(--neutral-1300);
+}
+
+.atlas-alert__dismiss:focus-visible {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.atlas-alert__dismiss svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== BANNER VARIANT ===== */
+.atlas-banner {
+  border-radius: 0;
+  border-left: none;
+  border-top: 4px solid;
+  padding: var(--space-300) var(--space-400);
+}
+
+.atlas-banner.atlas-alert--info {
+  border-top-color: var(--info-500);
+}
+
+.atlas-banner.atlas-alert--success {
+  border-top-color: var(--success-500);
+}
+
+.atlas-banner.atlas-alert--warning {
+  border-top-color: var(--warning-500);
+}
+
+.atlas-banner.atlas-alert--error {
+  border-top-color: var(--danger-500);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .atlas-alert {
+    padding: var(--space-200);
+  }
+
+  .atlas-banner {
+    padding: var(--space-200) var(--space-300);
+  }
+
+  .atlas-alert__actions {
+    flex-direction: column;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-alert {
+    animation: none;
+  }
+}
+
+/* ===== DARK MODE ===== */
+@media (prefers-color-scheme: dark) {
+  .atlas-alert--info {
+    background: rgba(38, 132, 255, 0.12);
+  }
+
+  .atlas-alert--success {
+    background: rgba(54, 179, 126, 0.12);
+  }
+
+  .atlas-alert--warning {
+    background: rgba(255, 171, 0, 0.12);
+  }
+
+  .atlas-alert--error {
+    background: rgba(255, 86, 48, 0.12);
+  }
+}

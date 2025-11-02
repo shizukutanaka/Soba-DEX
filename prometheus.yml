@@ -1,0 +1,24 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'soba-dex'
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'python-services'
+    static_configs:
+      - targets:
+        - 'ml-models:8001'
+        - 'nlp-translation:8002'
+        - 'fraud-detection:8003'
+        - 'data-processing:8004'
+        - 'blockchain-intelligence:8005'
+    metrics_path: '/metrics'
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']

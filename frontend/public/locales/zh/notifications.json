@@ -1,0 +1,83 @@
+{
+  "notifications": {
+    "title": "通知",
+    "markAllRead": "全部标记为已读",
+    "clearAll": "清除所有",
+    "noNotifications": "无通知",
+    "newNotifications": "新通知",
+    "all": "全部",
+    "unread": "未读",
+    "read": "已读",
+    "settings": "通知设置",
+    "email": "邮件通知",
+    "push": "推送通知",
+    "sms": "短信通知",
+    "sound": "声音",
+    "desktop": "桌面通知"
+  },
+  "types": {
+    "success": "成功",
+    "error": "错误",
+    "warning": "警告",
+    "info": "信息",
+    "trade": "交易",
+    "transaction": "交易",
+    "security": "安全",
+    "system": "系统",
+    "price": "价格提醒",
+    "liquidity": "流动性",
+    "staking": "质押"
+  },
+  "messages": {
+    "walletConnected": "钱包连接成功",
+    "walletDisconnected": "钱包已断开",
+    "orderPlaced": "订单下达成功",
+    "orderFilled": "订单已成交：{{amount}} {{symbol}} @ {{price}}",
+    "orderCancelled": "订单已取消",
+    "transactionSent": "交易已发送",
+    "transactionConfirmed": "交易已确认",
+    "transactionFailed": "交易失败",
+    "priceAlert": "价格提醒：{{symbol}} 达到 {{price}}",
+    "liquidityAdded": "流动性添加成功",
+    "liquidityRemoved": "流动性已移除",
+    "rewardsClaimed": "奖励领取：{{amount}} {{symbol}}",
+    "stakeSuccessful": "质押成功",
+    "unstakeSuccessful": "取消质押成功",
+    "securityAlert": "安全提醒：{{message}}",
+    "systemMaintenance": "系统维护已安排",
+    "newListing": "新代币上市：{{symbol}}",
+    "airdrop": "空投接收：{{amount}} {{symbol}}",
+    "forkDetected": "网络上检测到分叉",
+    "gasPriceHigh": "燃料价格目前很高",
+    "marketVolatility": "检测到高市场波动性",
+    "positionAlert": "仓位提醒：{{message}}"
+  },
+  "trading": {
+    "orderFilled": "订单已成交",
+    "orderPartiallyFilled": "订单部分成交",
+    "orderExpired": "订单已过期",
+    "positionOpened": "仓位已开仓",
+    "positionClosed": "仓位已平仓",
+    "stopLossTriggered": "止损已触发",
+    "takeProfitTriggered": "止盈已触发",
+    "marginCall": "追加保证金",
+    "liquidationWarning": "清算警告"
+  },
+  "wallet": {
+    "balanceLow": "余额不足警告",
+    "largeTransaction": "检测到大额交易",
+    "multipleTransactions": "检测到多次交易",
+    "addressChange": "地址已更改",
+    "approvalRequired": "需要批准",
+    "tokenReceived": "代币接收：{{amount}} {{symbol}}",
+    "tokenSent": "代币发送：{{amount}} {{symbol}}"
+  },
+  "system": {
+    "updateAvailable": "有可用更新",
+    "maintenanceScheduled": "维护已安排",
+    "serviceRestart": "需要重启服务",
+    "backupCompleted": "备份完成",
+    "securityUpdate": "安全更新已安装",
+    "performanceIssue": "检测到性能问题"
+  }
+}

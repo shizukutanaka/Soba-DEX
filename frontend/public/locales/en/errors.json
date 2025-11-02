@@ -1,0 +1,80 @@
+{
+  "errors": {
+    "title": "Error",
+    "general": "An error occurred",
+    "network": "Network Error",
+    "timeout": "Request Timeout",
+    "notFound": "Not Found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "serverError": "Server Error",
+    "serviceUnavailable": "Service Unavailable",
+    "validationError": "Validation Error",
+    "insufficientFunds": "Insufficient Funds",
+    "transactionFailed": "Transaction Failed",
+    "walletError": "Wallet Error",
+    "connectionError": "Connection Error",
+    "apiError": "API Error",
+    "rateLimit": "Rate Limit Exceeded",
+    "maintenance": "System Maintenance",
+    "deprecated": "This feature is deprecated"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "invalidUrl": "Invalid URL",
+    "invalidNumber": "Invalid number",
+    "invalidAddress": "Invalid address",
+    "invalidAmount": "Invalid amount",
+    "amountTooLow": "Amount too low",
+    "amountTooHigh": "Amount too high",
+    "insufficientBalance": "Insufficient balance",
+    "invalidSlippage": "Invalid slippage tolerance",
+    "invalidDeadline": "Invalid deadline",
+    "invalidGasPrice": "Invalid gas price",
+    "invalidToken": "Invalid token",
+    "duplicateTransaction": "Duplicate transaction"
+  },
+  "wallet": {
+    "connectionFailed": "Failed to connect wallet",
+    "userRejected": "User rejected the request",
+    "networkMismatch": "Network mismatch",
+    "insufficientFunds": "Insufficient funds for transaction",
+    "transactionRejected": "Transaction rejected",
+    "gasTooLow": "Gas price too low",
+    "nonceTooLow": "Nonce too low",
+    "replacementUnderpriced": "Replacement transaction underpriced",
+    "executionReverted": "Transaction execution reverted",
+    "outOfGas": "Out of gas"
+  },
+  "trading": {
+    "orderFailed": "Order failed",
+    "insufficientLiquidity": "Insufficient liquidity",
+    "priceImpactTooHigh": "Price impact too high",
+    "slippageExceeded": "Slippage tolerance exceeded",
+    "marketClosed": "Market closed",
+    "tradingDisabled": "Trading disabled",
+    "invalidOrder": "Invalid order",
+    "orderExpired": "Order expired",
+    "positionLiquidated": "Position liquidated"
+  },
+  "security": {
+    "suspiciousActivity": "Suspicious activity detected",
+    "blockedAddress": "Address blocked",
+    "sanctionsViolation": "Sanctions violation",
+    "unusualVolume": "Unusual trading volume detected",
+    "multipleFailures": "Multiple authentication failures"
+  },
+  "system": {
+    "databaseError": "Database error",
+    "cacheError": "Cache error",
+    "diskFull": "Disk full",
+    "memoryError": "Memory error",
+    "cpuOverload": "CPU overload",
+    "networkCongestion": "Network congestion"
+  },
+  "retry": "Please try again",
+  "contactSupport": "Contact support if the problem persists",
+  "errorCode": "Error Code: {{code}}",
+  "details": "Error Details: {{details}}"
+}

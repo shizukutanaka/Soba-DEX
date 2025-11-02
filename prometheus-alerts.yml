@@ -1,0 +1,276 @@
+# Prometheus Alert Rules for Security Monitor
+
+groups:
+  - name: security_critical
+    interval: 30s
+    rules:
+      # Critical security incidents
+      - alert: CriticalSecurityIncident
+        expr: security_incidents_active{severity="CRITICAL"} > 0
+        for: 1m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Critical security incident detected"
+          description: "{{ $value }} critical security incidents are currently active"
+
+      # DDoS Attack Detection
+      - alert: DDoSAttackDetected
+        expr: rate(security_ddos_attacks_total[5m]) > 0.5
+        for: 2m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "DDoS attack detected"
+          description: "DDoS attacks detected at {{ $value }} per second"
+
+      # SQL Injection Spike
+      - alert: SQLInjectionSpike
+        expr: rate(security_sql_injection_total[5m]) > 1
+        for: 3m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "High rate of SQL injection attempts"
+          description: "SQL injection attempts: {{ $value }} per second"
+
+      # System Health Critical
+      - alert: SecuritySystemHealthCritical
+        expr: security_system_health < 30
+        for: 5m
+        labels:
+          severity: critical
+          category: system
+        annotations:
+          summary: "Security system health is critical"
+          description: "System health score is {{ $value }}/100"
+
+  - name: security_high
+    interval: 1m
+    rules:
+      # High Threat Detection Rate
+      - alert: HighThreatDetectionRate
+        expr: rate(security_threats_detected_total[5m]) > 2
+        for: 5m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "High threat detection rate"
+          description: "Threats detected at {{ $value }} per second"
+
+      # XSS Attack Spike
+      - alert: XSSAttackSpike
+        expr: rate(security_xss_attacks_total[5m]) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "Elevated XSS attack rate"
+          description: "XSS attacks: {{ $value }} per second"
+
+      # Brute Force Detected
+      - alert: BruteForceDetected
+        expr: rate(security_brute_force_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "Brute force attacks detected"
+          description: "Brute force attempts: {{ $value }} per second"
+
+      # High Error Rate
+      - alert: HighErrorRate
+        expr: security_error_rate > 10
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }}%"
+
+      # Advanced Threats
+      - alert: AdvancedThreatDetected
+        expr: |
+          rate(security_ldap_injection_total[5m]) > 0 or
+          rate(security_xxe_attacks_total[5m]) > 0 or
+          rate(security_ssrf_attacks_total[5m]) > 0 or
+          rate(security_prototype_pollution_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "Advanced threat detected"
+          description: "Advanced attack pattern detected"
+
+  - name: security_medium
+    interval: 2m
+    rules:
+      # Anomaly Detection
+      - alert: SecurityAnomalyDetected
+        expr: rate(security_anomalies_detected_total[10m]) > 0.1
+        for: 10m
+        labels:
+          severity: info
+          category: security
+        annotations:
+          summary: "Security anomalies detected"
+          description: "Anomalies: {{ $value }} per second"
+
+      # Blocked Requests Rising
+      - alert: BlockedRequestsRising
+        expr: rate(security_blocked_requests_total[10m]) > 1
+        for: 10m
+        labels:
+          severity: info
+          category: security
+        annotations:
+          summary: "High rate of blocked requests"
+          description: "Requests blocked: {{ $value }} per second"
+
+      # System Health Warning
+      - alert: SecuritySystemHealthLow
+        expr: security_system_health < 70
+        for: 10m
+        labels:
+          severity: info
+          category: system
+        annotations:
+          summary: "Security system health is low"
+          description: "System health score is {{ $value }}/100"
+
+  - name: performance
+    interval: 1m
+    rules:
+      # Slow Response Time
+      - alert: SlowResponseTime
+        expr: |
+          histogram_quantile(0.95,
+            rate(security_request_processing_seconds_bucket[5m])
+          ) > 1
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "Slow security processing"
+          description: "95th percentile response time: {{ $value }}s"
+
+      # High Request Rate
+      - alert: HighRequestRate
+        expr: security_request_rate > 1000
+        for: 5m
+        labels:
+          severity: info
+          category: performance
+        annotations:
+          summary: "Very high request rate"
+          description: "Request rate: {{ $value }} req/sec"
+
+      # Memory Usage High
+      - alert: HighMemoryUsage
+        expr: |
+          (security_event_map_size / 10000) * 100 > 90
+        for: 10m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "High memory usage in event map"
+          description: "Event map usage: {{ $value }}%"
+
+  - name: component_health
+    interval: 1m
+    rules:
+      # Component Down
+      - alert: SecurityComponentDown
+        expr: security_component_status == 0
+        for: 2m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "Security component is down"
+          description: "Component {{ $labels.component }} is not operational"
+
+      # Alert System Issues
+      - alert: AlertSystemIssues
+        expr: rate(security_alerts_sent_total[10m]) == 0 and security_threats_detected_total > 0
+        for: 10m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "Alert system may not be working"
+          description: "Threats detected but no alerts sent in 10 minutes"
+
+  - name: database
+    interval: 2m
+    rules:
+      # Database Connection Issues
+      - alert: DatabaseConnectionIssues
+        expr: up{job="postgres"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: infrastructure
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "Cannot connect to PostgreSQL database"
+
+      # Redis Connection Issues
+      - alert: RedisConnectionIssues
+        expr: up{job="redis"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          category: infrastructure
+        annotations:
+          summary: "Redis is down"
+          description: "Cannot connect to Redis cache"
+
+  - name: incident_management
+    interval: 1m
+    rules:
+      # Too Many Active Incidents
+      - alert: TooManyActiveIncidents
+        expr: sum(security_incidents_active) > 50
+        for: 5m
+        labels:
+          severity: warning
+          category: operations
+        annotations:
+          summary: "Too many active incidents"
+          description: "{{ $value }} active security incidents require attention"
+
+      # Incident Resolution Time High
+      - alert: SlowIncidentResolution
+        expr: |
+          histogram_quantile(0.95,
+            rate(security_incident_resolution_seconds_bucket[1h])
+          ) > 3600
+        for: 1h
+        labels:
+          severity: info
+          category: operations
+        annotations:
+          summary: "Incidents taking long to resolve"
+          description: "95th percentile resolution time: {{ $value }}s"
+
+      # High False Positive Rate
+      - alert: HighFalsePositiveRate
+        expr: security_false_positive_rate > 20
+        for: 30m
+        labels:
+          severity: info
+          category: quality
+        annotations:
+          summary: "High false positive rate"
+          description: "False positive rate: {{ $value }}%"

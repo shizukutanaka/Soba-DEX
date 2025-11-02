@@ -1,0 +1,437 @@
+# ============================================================================
+# Chaos Engineering - Resource Stress Experiments
+# Test system resilience under CPU, memory, and disk stress
+# ============================================================================
+
+---
+# Experiment 1: CPU Stress
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: cpu-stress
+  namespace: security-monitor
+spec:
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  stressors:
+    cpu:
+      workers: 2 # Number of CPU workers
+      load: 80 # 80% CPU load per worker
+  duration: '5m'
+
+---
+# Experiment 2: Memory Stress
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: memory-stress
+  namespace: security-monitor
+spec:
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  stressors:
+    memory:
+      workers: 1
+      size: '512MB' # Allocate 512MB
+  duration: '5m'
+
+---
+# Experiment 3: Combined CPU and Memory Stress
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: cpu-memory-stress
+  namespace: security-monitor
+spec:
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  stressors:
+    cpu:
+      workers: 2
+      load: 60
+    memory:
+      workers: 1
+      size: '256MB'
+  duration: '10m'
+  scheduler:
+    cron: '@daily' # Daily stress test
+
+---
+# Experiment 4: Disk I/O Stress
+apiVersion: chaos-mesh.org/v1alpha1
+kind: IOChaos
+metadata:
+  name: disk-io-stress
+  namespace: security-monitor
+spec:
+  action: mixed-all
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: postgres
+  volumePath: /var/lib/postgresql/data
+  path: /var/lib/postgresql/data/**/*
+  percent: 50 # Affect 50% of I/O operations
+  duration: '5m'
+  delay: '100ms' # Add 100ms delay to I/O
+  errno: 0 # No errors, just delay
+
+---
+# Experiment 5: Disk Read Latency
+apiVersion: chaos-mesh.org/v1alpha1
+kind: IOChaos
+metadata:
+  name: disk-read-latency
+  namespace: security-monitor
+spec:
+  action: latency
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: postgres
+  volumePath: /var/lib/postgresql/data
+  path: /var/lib/postgresql/data/**/*
+  delay: '200ms'
+  percent: 80
+  duration: '3m'
+  methods:
+    - read
+
+---
+# Experiment 6: Disk Write Latency
+apiVersion: chaos-mesh.org/v1alpha1
+kind: IOChaos
+metadata:
+  name: disk-write-latency
+  namespace: security-monitor
+spec:
+  action: latency
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: postgres
+  volumePath: /var/lib/postgresql/data
+  path: /var/lib/postgresql/data/**/*
+  delay: '300ms'
+  percent: 60
+  duration: '3m'
+  methods:
+    - write
+
+---
+# Experiment 7: Memory Leak Simulation
+apiVersion: v1
+kind: Pod
+metadata:
+  name: memory-leak-simulator
+  namespace: security-monitor
+  labels:
+    chaos-test: memory-leak
+spec:
+  restartPolicy: Never
+  containers:
+    - name: leaker
+      image: busybox
+      command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Simulating memory leak..."
+          # Allocate memory continuously
+          while true; do
+            dd if=/dev/zero of=/dev/null bs=1M count=100
+            sleep 1
+          done
+      resources:
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+
+---
+# Experiment 8: OOM (Out of Memory) Simulation
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: oom-simulation
+  namespace: security-monitor
+spec:
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  stressors:
+    memory:
+      workers: 1
+      size: '2GB' # Try to allocate more than pod limit
+      options:
+        - '--vm-hang=0' # Release memory immediately
+  duration: '2m'
+
+---
+# Experiment 9: Database CPU Stress
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: postgres-cpu-stress
+  namespace: security-monitor
+spec:
+  mode: all
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: postgres
+  stressors:
+    cpu:
+      workers: 4
+      load: 90
+  duration: '5m'
+  scheduler:
+    cron: '@weekly'
+
+---
+# Experiment 10: Redis Memory Stress
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: redis-memory-stress
+  namespace: security-monitor
+spec:
+  mode: all
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: redis
+  stressors:
+    memory:
+      workers: 2
+      size: '256MB'
+  duration: '5m'
+
+---
+# Experiment 11: Gradual Memory Increase (Stress Ramp)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: memory-ramp-stress
+  namespace: security-monitor
+  labels:
+    chaos-test: memory-ramp
+spec:
+  restartPolicy: Never
+  containers:
+    - name: ramp
+      image: polinux/stress
+      command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Starting gradual memory stress..."
+
+          # Start with 100MB
+          for MB in 100 200 300 400 500 600 700 800; do
+            echo "Allocating ${MB}MB..."
+            stress --vm 1 --vm-bytes ${MB}M --vm-hang 0 --timeout 30s
+            sleep 10
+          done
+
+          echo "Memory stress ramp complete"
+      resources:
+        limits:
+          memory: "1Gi"
+          cpu: "1000m"
+
+---
+# Experiment 12: CPU Spike Pattern
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cpu-spike-pattern
+  namespace: security-monitor
+  labels:
+    chaos-test: cpu-spike
+spec:
+  restartPolicy: Never
+  containers:
+    - name: spike
+      image: polinux/stress
+      command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Creating CPU spike pattern..."
+
+          # Create load spikes
+          for i in {1..10}; do
+            echo "Spike $i/10 - High load"
+            stress --cpu 4 --timeout 30s
+
+            echo "Spike $i/10 - Rest period"
+            sleep 30
+          done
+
+          echo "CPU spike pattern complete"
+      resources:
+        limits:
+          memory: "256Mi"
+          cpu: "2000m"
+
+---
+# Experiment 13: Disk Space Exhaustion
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disk-fill
+  namespace: security-monitor
+  labels:
+    chaos-test: disk-fill
+spec:
+  restartPolicy: Never
+  containers:
+    - name: filler
+      image: busybox
+      command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Filling disk space..."
+
+          # Fill disk to 80%
+          df -h /tmp
+          dd if=/dev/zero of=/tmp/largefile bs=1M count=800 || true
+          df -h /tmp
+
+          echo "Disk fill complete. Cleaning up..."
+          sleep 60
+          rm -f /tmp/largefile
+
+          echo "Cleanup complete"
+      volumeMounts:
+        - name: temp-volume
+          mountPath: /tmp
+  volumes:
+    - name: temp-volume
+      emptyDir:
+        sizeLimit: 1Gi
+
+---
+# Helper: Resource Monitoring Job
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: resource-stress-monitor
+  namespace: security-monitor
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: chaos-monitor-sa
+      containers:
+        - name: monitor
+          image: bitnami/kubectl:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "=== Resource Stress Monitoring ==="
+
+              for i in {1..60}; do
+                echo "--- Check $i/60 ---"
+
+                # Get pod resource usage
+                kubectl top pods -n security-monitor --no-headers | while read line; do
+                  POD=$(echo $line | awk '{print $1}')
+                  CPU=$(echo $line | awk '{print $2}')
+                  MEMORY=$(echo $line | awk '{print $3}')
+                  echo "Pod: $POD - CPU: $CPU, Memory: $MEMORY"
+                done
+
+                # Get node resource usage
+                kubectl top nodes --no-headers
+
+                # Check for OOMKilled pods
+                kubectl get pods -n security-monitor -o json | \
+                  jq -r '.items[] | select(.status.containerStatuses[]?.lastState.terminated.reason == "OOMKilled") | .metadata.name' | \
+                  while read pod; do
+                    echo "   OOMKilled detected: $pod"
+                  done
+
+                sleep 10
+              done
+
+              echo "=== Monitoring Complete ==="
+
+---
+# ServiceAccount for monitoring job
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: chaos-monitor-sa
+  namespace: security-monitor
+
+---
+# Role for monitoring
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: chaos-monitor-role
+  namespace: security-monitor
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "nodes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["pods", "nodes"]
+    verbs: ["get", "list"]
+
+---
+# RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: chaos-monitor-binding
+  namespace: security-monitor
+subjects:
+  - kind: ServiceAccount
+    name: chaos-monitor-sa
+    namespace: security-monitor
+roleRef:
+  kind: Role
+  name: chaos-monitor-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# ClusterRoleBinding for node metrics
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: chaos-monitor-cluster-binding
+subjects:
+  - kind: ServiceAccount
+    name: chaos-monitor-sa
+    namespace: security-monitor
+roleRef:
+  kind: ClusterRole
+  name: view
+  apiGroup: rbac.authorization.k8s.io

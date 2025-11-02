@@ -1,0 +1,243 @@
+/* ===== ATLAS TOAST COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-toast-container {
+  position: fixed;
+  top: var(--space-300);
+  right: var(--space-300);
+  z-index: var(--z-index-notification);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-150);
+  max-width: 420px;
+  pointer-events: none;
+}
+
+.atlas-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-150);
+  padding: var(--space-200);
+  background: var(--neutral-0);
+  border-radius: var(--radius-300);
+  box-shadow: var(--elevation-overlay);
+  border-left: 4px solid;
+  pointer-events: auto;
+  animation: atlas-toast-enter 0.3s var(--transition-normal);
+  min-width: 320px;
+  max-width: 420px;
+}
+
+.atlas-toast--exiting {
+  animation: atlas-toast-exit 0.3s var(--transition-normal) forwards;
+}
+
+/* ===== TYPE VARIANTS ===== */
+
+.atlas-toast--success {
+  border-left-color: var(--success-500);
+}
+
+.atlas-toast--success .atlas-toast__icon {
+  color: var(--success-500);
+}
+
+.atlas-toast--error {
+  border-left-color: var(--danger-500);
+}
+
+.atlas-toast--error .atlas-toast__icon {
+  color: var(--danger-500);
+}
+
+.atlas-toast--warning {
+  border-left-color: var(--warning-500);
+}
+
+.atlas-toast--warning .atlas-toast__icon {
+  color: var(--warning-500);
+}
+
+.atlas-toast--info {
+  border-left-color: var(--info-500);
+}
+
+.atlas-toast--info .atlas-toast__icon {
+  color: var(--info-500);
+}
+
+/* ===== TOAST ELEMENTS ===== */
+
+.atlas-toast__icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+
+.atlas-toast__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.atlas-toast__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.atlas-toast__message {
+  margin: 0;
+  font-size: var(--font-size-100);
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-1300);
+  line-height: var(--line-height-normal);
+  word-wrap: break-word;
+}
+
+.atlas-toast__dismiss {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-100);
+  color: var(--neutral-700);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.atlas-toast__dismiss:hover {
+  background: rgba(9, 30, 66, var(--opacity-hover));
+  color: var(--neutral-1300);
+}
+
+.atlas-toast__dismiss:active {
+  background: rgba(9, 30, 66, var(--opacity-active));
+}
+
+.atlas-toast__dismiss:focus-visible {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.atlas-toast__dismiss svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== ANIMATIONS ===== */
+
+@keyframes atlas-toast-enter {
+  from {
+    transform: translateX(calc(100% + var(--space-300)));
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes atlas-toast-exit {
+  from {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    max-height: 200px;
+    margin-bottom: var(--space-150);
+  }
+  to {
+    transform: translateX(calc(100% + var(--space-300))) scale(0.8);
+    opacity: 0;
+    max-height: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 640px) {
+  .atlas-toast-container {
+    top: auto;
+    bottom: var(--space-200);
+    left: var(--space-200);
+    right: var(--space-200);
+    max-width: none;
+  }
+
+  .atlas-toast {
+    min-width: auto;
+    max-width: none;
+  }
+
+  @keyframes atlas-toast-enter {
+    from {
+      transform: translateY(calc(100% + var(--space-300)));
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes atlas-toast-exit {
+    from {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(calc(100% + var(--space-300))) scale(0.9);
+      opacity: 0;
+    }
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-toast {
+    animation: none;
+  }
+
+  .atlas-toast--exiting {
+    animation: none;
+    opacity: 0;
+  }
+
+  @keyframes atlas-toast-enter {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes atlas-toast-exit {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+}
+
+/* ===== DARK MODE ===== */
+
+@media (prefers-color-scheme: dark) {
+  .atlas-toast {
+    background: var(--neutral-100);
+    box-shadow: var(--elevation-modal);
+  }
+
+  .atlas-toast__message {
+    color: var(--neutral-1400);
+  }
+}

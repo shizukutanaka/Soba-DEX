@@ -1,0 +1,43 @@
+{
+  "id": "example-trading-strategy",
+  "name": "Example Trading Strategy Plugin",
+  "version": "1.0.0",
+  "author": "Soba DEX Community",
+  "description": "Example plugin demonstrating custom trading strategy implementation",
+  "main": "index.js",
+  "engineVersion": "5.0.0",
+  "license": "MIT",
+  "repository": "https://github.com/soba-dex/plugin-example-strategy",
+  "keywords": ["trading", "strategy", "dca", "plugin"],
+  "config": {
+    "enabled": true,
+    "interval": 60000,
+    "maxTradeSize": "1000000000000000000"
+  },
+  "hooks": {
+    "swap:before": [
+      {
+        "method": "beforeSwap",
+        "priority": 10
+      }
+    ],
+    "swap:after": [
+      {
+        "method": "afterSwap",
+        "priority": 10
+      }
+    ],
+    "price:update": [
+      {
+        "method": "onPriceUpdate",
+        "priority": 5
+      }
+    ]
+  },
+  "permissions": [
+    "read:prices",
+    "read:orders",
+    "write:metrics"
+  ],
+  "dependencies": {}
+}

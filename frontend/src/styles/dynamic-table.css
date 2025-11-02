@@ -1,0 +1,286 @@
+/* ===== ATLAS DYNAMIC TABLE COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-dynamic-table {
+  /* Base styles */
+  width: 100%;
+  background: var(--neutral-0);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-200);
+  overflow: hidden;
+}
+
+.atlas-dynamic-table__container {
+  overflow-x: auto;
+}
+
+/* Header */
+.atlas-dynamic-table__header {
+  background: var(--neutral-50);
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.atlas-dynamic-table__row {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+}
+
+.atlas-dynamic-table__cell {
+  padding: var(--space-150) var(--space-200);
+  border-right: 1px solid var(--neutral-200);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0; /* Allow text truncation */
+}
+
+.atlas-dynamic-table__cell:last-child {
+  border-right: none;
+}
+
+.atlas-dynamic-table__cell--header {
+  font-weight: var(--font-weight-semibold);
+  color: var(--neutral-900);
+  background: var(--neutral-50);
+  position: relative;
+}
+
+.atlas-dynamic-table__cell--selection {
+  width: 48px;
+  flex: none;
+  justify-content: center;
+}
+
+/* Sortable headers */
+.atlas-dynamic-table__cell--sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+}
+
+.atlas-dynamic-table__cell--sortable:hover {
+  background: var(--neutral-100);
+}
+
+.atlas-dynamic-table__cell--sortable:focus {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: -1px;
+}
+
+.atlas-dynamic-table__cell-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.atlas-dynamic-table__sort-icon {
+  margin-left: var(--space-100);
+  opacity: 0.6;
+  font-size: 0.8em;
+}
+
+/* Filter inputs */
+.atlas-dynamic-table__filter {
+  margin-top: var(--space-100);
+  width: 100%;
+}
+
+.atlas-dynamic-table__filter .atlas-input {
+  width: 100%;
+  font-size: var(--font-size-075);
+}
+
+/* Body */
+.atlas-dynamic-table__body {
+  background: var(--neutral-0);
+}
+
+.atlas-dynamic-table__row:not(.atlas-dynamic-table__row--selected):hover {
+  background: var(--interaction-hovered);
+}
+
+/* Selected rows */
+.atlas-dynamic-table__row--selected {
+  background: var(--interaction-selected);
+}
+
+/* Loading state */
+.atlas-dynamic-table__loading {
+  padding: var(--space-400);
+  text-align: center;
+}
+
+/* Empty state */
+.atlas-dynamic-table__empty {
+  padding: var(--space-600) var(--space-400);
+  text-align: center;
+}
+
+/* Pagination */
+.atlas-dynamic-table__pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-200) var(--space-300);
+  border-top: 1px solid var(--neutral-200);
+  background: var(--neutral-50);
+  flex-wrap: wrap;
+  gap: var(--space-200);
+}
+
+.atlas-dynamic-table__pagination-info {
+  color: var(--neutral-700);
+  font-size: var(--font-size-100);
+}
+
+.atlas-dynamic-table__pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-150);
+}
+
+.atlas-dynamic-table__pagination-current {
+  color: var(--neutral-900);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-100);
+  margin: 0 var(--space-200);
+  white-space: nowrap;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .atlas-dynamic-table__cell {
+    padding: var(--space-100) var(--space-150);
+  }
+
+  .atlas-dynamic-table__cell--header {
+    font-size: var(--font-size-100);
+  }
+
+  .atlas-dynamic-table__pagination {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-150);
+  }
+
+  .atlas-dynamic-table__pagination-controls {
+    justify-content: center;
+  }
+
+  .atlas-dynamic-table__pagination-info {
+    text-align: center;
+  }
+}
+
+/* ===== DARK MODE ===== */
+@media (prefers-color-scheme: dark) {
+  .atlas-dynamic-table {
+    background: var(--neutral-100);
+    border-color: var(--neutral-300);
+  }
+
+  .atlas-dynamic-table__header {
+    background: var(--neutral-200);
+    border-bottom-color: var(--neutral-300);
+  }
+
+  .atlas-dynamic-table__cell--header {
+    color: var(--neutral-0);
+  }
+
+  .atlas-dynamic-table__cell--sortable:hover {
+    background: var(--neutral-300);
+  }
+
+  .atlas-dynamic-table__body {
+    background: var(--neutral-100);
+  }
+
+  .atlas-dynamic-table__row:not(.atlas-dynamic-table__row--selected):hover {
+    background: var(--interaction-hovered);
+  }
+
+  .atlas-dynamic-table__row--selected {
+    background: var(--interaction-selected);
+  }
+
+  .atlas-dynamic-table__pagination {
+    background: var(--neutral-200);
+    border-top-color: var(--neutral-300);
+  }
+
+  .atlas-dynamic-table__pagination-info {
+    color: var(--neutral-300);
+  }
+
+  .atlas-dynamic-table__pagination-current {
+    color: var(--neutral-0);
+  }
+}
+
+/* ===== HIGH CONTRAST MODE ===== */
+@media (prefers-contrast: high) {
+  .atlas-dynamic-table {
+    border-width: 2px;
+  }
+
+  .atlas-dynamic-table__cell {
+    border-right-width: 2px;
+  }
+
+  .atlas-dynamic-table__header {
+    border-bottom-width: 2px;
+  }
+
+  .atlas-dynamic-table__pagination {
+    border-top-width: 2px;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-dynamic-table__cell--sortable {
+    transition: none;
+  }
+}
+
+/* ===== FOCUS MANAGEMENT ===== */
+.atlas-dynamic-table__cell:focus {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: -1px;
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+.atlas-dynamic-table__container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.atlas-dynamic-table__container::-webkit-scrollbar-track {
+  background: var(--neutral-100);
+}
+
+.atlas-dynamic-table__container::-webkit-scrollbar-thumb {
+  background: var(--neutral-400);
+  border-radius: 4px;
+}
+
+.atlas-dynamic-table__container::-webkit-scrollbar-thumb:hover {
+  background: var(--neutral-500);
+}
+
+/* Dark mode scrollbars */
+@media (prefers-color-scheme: dark) {
+  .atlas-dynamic-table__container::-webkit-scrollbar-track {
+    background: var(--neutral-300);
+  }
+
+  .atlas-dynamic-table__container::-webkit-scrollbar-thumb {
+    background: var(--neutral-500);
+  }
+
+  .atlas-dynamic-table__container::-webkit-scrollbar-thumb:hover {
+    background: var(--neutral-400);
+  }
+}

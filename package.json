@@ -1,0 +1,92 @@
+{
+  "name": "soba",
+  "version": "3.9.0",
+  "description": "Soba - AI-Powered DEX Trading Platform with Frontend Integration & A/B Testing Framework",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend",
+    "contracts"
+  ],
+  "scripts": {
+    "preinstall": "node -e \"console.log('Installing Soba v3.9.0...')\"",
+    "install:all": "npm install && npm install --workspaces",
+
+    "dev": "concurrently -n backend,frontend \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm start",
+
+    "build": "npm run build:frontend && npm run build:contracts",
+    "build:frontend": "cd frontend && npm run build",
+    "build:contracts": "cd contracts && npm run compile",
+
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test -- --watchAll=false",
+    "test:coverage": "npm run test:backend -- --coverage && npm run test:frontend -- --coverage --watchAll=false",
+    "test:ci": "npm run test:backend -- --ci && npm run test:frontend -- --ci --watchAll=false",
+
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:fix": "npm run lint:backend -- --fix && npm run lint:frontend -- --fix",
+
+    "typecheck": "cd frontend && npm run typecheck",
+    "format": "prettier --write \"**/*.{js,ts,tsx,json,md}\" --ignore-path .gitignore",
+    "format:check": "prettier --check \"**/*.{js,ts,tsx,json,md}\" --ignore-path .gitignore",
+
+    "docker:build": "docker-compose -f docker-compose-prod.yml build",
+    "docker:up": "docker-compose -f docker-compose-prod.yml up -d",
+    "docker:down": "docker-compose -f docker-compose-prod.yml down",
+    "docker:logs": "docker-compose -f docker-compose-prod.yml logs -f",
+    "docker:restart": "npm run docker:down && npm run docker:up",
+
+    "start:prod": "npm run build && npm run docker:up",
+    "stop:prod": "npm run docker:down",
+    "restart:prod": "npm run docker:restart",
+
+    "health": "curl -sf http://localhost:3001/health || echo 'Backend unhealthy'",
+    "health:frontend": "curl -sf http://localhost:3000 || echo 'Frontend unreachable'",
+
+    "clean": "rm -rf node_modules backend/node_modules frontend/node_modules contracts/node_modules",
+    "clean:build": "rm -rf frontend/build backend/dist contracts/artifacts",
+    "clean:all": "npm run clean && npm run clean:build",
+
+    "setup": "npm run install:all",
+    "setup:dev": "npm run setup && npm run build:contracts",
+    "validate": "npm run typecheck && npm run lint && npm run test:ci",
+
+    "audit:all": "npm audit && cd backend && npm audit && cd ../frontend && npm audit",
+    "audit:fix": "npm audit fix && cd backend && npm audit fix && cd ../frontend && npm audit fix",
+    "outdated": "npm outdated && cd backend && npm outdated && cd ../frontend && npm outdated",
+
+    "deps:maintain": "node scripts/dependency-maintenance.js",
+    "deps:audit": "npm run audit:all",
+    "deps:update": "npm run deps:maintain",
+
+    "docs": "echo 'Documentation available in docs/ directory'",
+    "changelog": "cat CHANGELOG.md"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prettier": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "dex",
+    "defi",
+    "blockchain",
+    "ethereum",
+    "web3",
+    "trading",
+    "cryptocurrency"
+  ],
+  "license": "MIT"
+}

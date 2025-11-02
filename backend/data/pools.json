@@ -1,0 +1,10 @@
+{
+  "ETH-USDC": {
+    "tokenA": "ETH",
+    "tokenB": "USDC",
+    "reserveA": 1000001,
+    "reserveB": 999999.003000994,
+    "totalSupply": 1000000,
+    "fees": 0.003
+  }
+}

@@ -1,0 +1,91 @@
+/* ===== ATLAS INLINE DIALOG COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-inline-dialog {
+  /* Base styles */
+  background: var(--neutral-0);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-200);
+  box-shadow: var(--elevation-overlay);
+  max-width: 320px;
+  min-width: 200px;
+  opacity: 0;
+  transform: scale(0.9) translateY(-8px);
+  animation: atlas-inline-dialog-enter var(--transition-normal) ease-out forwards;
+  z-index: var(--z-index-popover);
+}
+
+.atlas-inline-dialog__content {
+  padding: var(--space-300);
+  color: var(--neutral-1000);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-normal);
+}
+
+/* Placement variants */
+.atlas-inline-dialog--top {
+  transform-origin: bottom center;
+}
+
+.atlas-inline-dialog--bottom {
+  transform-origin: top center;
+}
+
+.atlas-inline-dialog--left {
+  transform-origin: right center;
+}
+
+.atlas-inline-dialog--right {
+  transform-origin: left center;
+}
+
+/* Trigger styles */
+.atlas-inline-dialog-trigger {
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* Animations */
+@keyframes atlas-inline-dialog-enter {
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ===== DARK MODE ===== */
+@media (prefers-color-scheme: dark) {
+  .atlas-inline-dialog {
+    background: var(--neutral-100);
+    border-color: var(--neutral-300);
+    color: var(--neutral-0);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .atlas-inline-dialog {
+    max-width: calc(100vw - var(--space-400));
+    min-width: calc(100vw - var(--space-600));
+  }
+
+  .atlas-inline-dialog__content {
+    padding: var(--space-200);
+  }
+}
+
+/* ===== HIGH CONTRAST MODE ===== */
+@media (prefers-contrast: high) {
+  .atlas-inline-dialog {
+    border-width: 2px;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-inline-dialog {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

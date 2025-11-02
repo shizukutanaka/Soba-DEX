@@ -1,0 +1,516 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: soba
+  labels:
+    environment: production
+    security: restricted
+
+---
+# ConfigMap for application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: soba-config
+  namespace: soba
+data:
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  RATE_LIMIT_WINDOW: "60000"
+  RATE_LIMIT_MAX: "100"
+  CACHE_TTL: "300"
+  WS_HEARTBEAT_INTERVAL: "30000"
+  MAX_CONNECTIONS: "10000"
+  HEALTH_CHECK_INTERVAL: "30000"
+
+---
+# Secret for sensitive data
+apiVersion: v1
+kind: Secret
+metadata:
+  name: soba-secrets
+  namespace: soba
+type: Opaque
+stringData:
+  JWT_SECRET: "your-256-bit-jwt-secret-here"
+  ENCRYPTION_KEY: "your-aes-256-encryption-key"
+  DATABASE_URL: "postgresql://user:pass@postgres-service:5432/soba_db"
+  REDIS_URL: "redis://redis-service:6379"
+
+---
+# Backend Deployment with High Availability
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: soba-backend
+  namespace: soba
+  labels:
+    app: soba-backend
+    tier: backend
+spec:
+  replicas: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: soba-backend
+  template:
+    metadata:
+      labels:
+        app: soba-backend
+        version: v1
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - soba-backend
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - name: backend
+        image: soba/backend:latest
+        ports:
+        - containerPort: 3001
+          protocol: TCP
+        - containerPort: 3002
+          protocol: TCP
+        envFrom:
+        - configMapRef:
+            name: soba-config
+        - secretRef:
+            name: soba-secrets
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /api/health/live
+            port: 3001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/health/ready
+            port: 3001
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: cache
+          mountPath: /app/cache
+      volumes:
+      - name: logs
+        emptyDir: {}
+      - name: cache
+        emptyDir: {}
+
+---
+# Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: soba-frontend
+  namespace: soba
+  labels:
+    app: soba-frontend
+    tier: frontend
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: soba-frontend
+  template:
+    metadata:
+      labels:
+        app: soba-frontend
+        version: v1
+    spec:
+      containers:
+      - name: frontend
+        image: soba/frontend:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+# Redis Deployment for Caching
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: soba
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        volumeMounts:
+        - name: redis-storage
+          mountPath: /data
+      volumes:
+      - name: redis-storage
+        persistentVolumeClaim:
+          claimName: redis-pvc
+
+---
+# PostgreSQL StatefulSet for Database
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: soba
+spec:
+  serviceName: postgres-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:14-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: "soba_db"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 50Gi
+
+---
+# Backend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: soba-backend-service
+  namespace: soba
+  labels:
+    app: soba-backend
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 3001
+    targetPort: 3001
+    protocol: TCP
+  - name: websocket
+    port: 3002
+    targetPort: 3002
+    protocol: TCP
+  selector:
+    app: soba-backend
+  sessionAffinity: ClientIP
+
+---
+# Frontend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: soba-frontend-service
+  namespace: soba
+  labels:
+    app: soba-frontend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: soba-frontend
+
+---
+# Redis Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: soba
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: redis
+
+---
+# PostgreSQL Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: soba
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: postgres
+
+---
+# Ingress Controller with TLS
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: soba-ingress
+  namespace: soba
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/websocket-services: "soba-backend-service"
+spec:
+  tls:
+  - hosts:
+    - soba.yourdomain.com
+    - api.soba.yourdomain.com
+    secretName: soba-tls-secret
+  rules:
+  - host: soba.yourdomain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: soba-frontend-service
+            port:
+              number: 80
+  - host: api.soba.yourdomain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: soba-backend-service
+            port:
+              number: 3001
+      - path: /ws
+        pathType: Prefix
+        backend:
+          service:
+            name: soba-backend-service
+            port:
+              number: 3002
+
+---
+# HorizontalPodAutoscaler for Backend
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: soba-backend-hpa
+  namespace: soba
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: soba-backend
+  minReplicas: 5
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+# HorizontalPodAutoscaler for Frontend
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: soba-frontend-hpa
+  namespace: soba
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: soba-frontend
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 75
+
+---
+# PodDisruptionBudget for Backend
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: soba-backend-pdb
+  namespace: soba
+spec:
+  minAvailable: 3
+  selector:
+    matchLabels:
+      app: soba-backend
+
+---
+# NetworkPolicy for Security
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: soba-network-policy
+  namespace: soba
+spec:
+  podSelector:
+    matchLabels:
+      app: soba-backend
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: soba-frontend
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 3001
+    - protocol: TCP
+      port: 3002
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: redis
+    - podSelector:
+        matchLabels:
+          app: postgres
+    ports:
+    - protocol: TCP
+      port: 6379
+    - protocol: TCP
+      port: 5432
+
+---
+# PersistentVolumeClaim for Redis
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  namespace: soba
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+# Secret for PostgreSQL
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+  namespace: soba
+type: Opaque
+stringData:
+  username: "sobaadmin"
+  password: "your-secure-postgres-password"

@@ -1,0 +1,436 @@
+// Prisma Schema for Soba DEX
+// Database: PostgreSQL 14+
+// Version: 1.0.0
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "windows", "linux-musl"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// User & Authentication
+// ============================================================================
+
+model User {
+  id            String   @id @default(cuid())
+  address       String   @unique // Ethereum wallet address
+  role          Role     @default(USER)
+
+  // Profile
+  username      String?  @unique
+  email         String?  @unique
+  avatar        String?
+  bio           String?
+
+  // Settings
+  preferences   Json?    // User preferences as JSON
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastLoginAt   DateTime?
+
+  // Relations
+  sessions      Session[]
+  apiKeys       ApiKey[]
+  transactions  Transaction[]
+  portfolios    Portfolio[]
+  priceAlerts   PriceAlert[]
+  gasAlerts     GasAlert[]
+
+  @@index([address])
+  @@index([email])
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+// ============================================================================
+// Sessions & API Keys
+// ============================================================================
+
+model Session {
+  id          String   @id @default(cuid())
+  token       String   @unique
+  userId      String
+
+  // Metadata
+  userAgent   String?
+  ipAddress   String?
+
+  // Status
+  isActive    Boolean  @default(true)
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  lastAccess  DateTime @default(now())
+  expiresAt   DateTime
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model ApiKey {
+  id            String   @id @default(cuid())
+  key           String   @unique // Hashed API key
+  fingerprint   String   @unique // First 12 chars for identification
+  userId        String
+
+  // Configuration
+  label         String?
+  permissions   String[] // Array of permission strings
+
+  // IP restrictions
+  allowedIps    String[] // Empty = no restriction
+
+  // Rate limiting
+  rateLimit     Int?     // Requests per window
+  rateLimitWindow Int?   // Window in milliseconds
+
+  // Usage tracking
+  requestCount  Int      @default(0)
+  lastUsed      DateTime?
+  lastIp        String?
+
+  // Status
+  isActive      Boolean  @default(true)
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  expiresAt     DateTime
+
+  // Relations
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([key])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("api_keys")
+}
+
+// ============================================================================
+// Transactions
+// ============================================================================
+
+model Transaction {
+  id            String            @id @default(cuid())
+  hash          String            @unique // Transaction hash
+  userId        String
+
+  // Transaction details
+  type          TransactionType
+  status        TransactionStatus @default(PENDING)
+
+  // Token information
+  tokenIn       String?
+  tokenOut      String?
+  amountIn      Decimal?          @db.Decimal(78, 18) // Support for 18 decimals
+  amountOut     Decimal?          @db.Decimal(78, 18)
+
+  // Gas information
+  gasPrice      Decimal?          @db.Decimal(78, 18)
+  gasUsed       BigInt?
+  gasCost       Decimal?          @db.Decimal(78, 18)
+
+  // Blockchain
+  blockNumber   BigInt?
+  blockHash     String?
+
+  // Metadata
+  metadata      Json?             // Additional data
+  errorMessage  String?
+
+  // Timestamps
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  confirmedAt   DateTime?
+
+  // Relations
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([hash])
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+  @@map("transactions")
+}
+
+enum TransactionType {
+  SWAP
+  ADD_LIQUIDITY
+  REMOVE_LIQUIDITY
+  APPROVE
+  TRANSFER
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  CANCELLED
+}
+
+// ============================================================================
+// Portfolio
+// ============================================================================
+
+model Portfolio {
+  id            String   @id @default(cuid())
+  userId        String
+  address       String   // Wallet address for this portfolio
+
+  // Portfolio metadata
+  name          String?
+  description   String?
+  isDefault     Boolean  @default(false)
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  holdings      PortfolioHolding[]
+  snapshots     PortfolioSnapshot[]
+
+  @@unique([userId, address])
+  @@index([userId])
+  @@index([address])
+  @@map("portfolios")
+}
+
+model PortfolioHolding {
+  id            String   @id @default(cuid())
+  portfolioId   String
+
+  // Token information
+  tokenSymbol   String
+  tokenAddress  String
+  tokenDecimals Int      @default(18)
+
+  // Holdings
+  balance       Decimal  @db.Decimal(78, 18)
+
+  // Valuation (cached)
+  priceUsd      Decimal? @db.Decimal(18, 8)
+  valueUsd      Decimal? @db.Decimal(18, 8)
+
+  // Performance (cached)
+  change24h     Decimal? @db.Decimal(18, 8)
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  portfolio     Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@unique([portfolioId, tokenAddress])
+  @@index([portfolioId])
+  @@index([tokenAddress])
+  @@map("portfolio_holdings")
+}
+
+model PortfolioSnapshot {
+  id            String   @id @default(cuid())
+  portfolioId   String
+
+  // Snapshot data
+  totalValueUsd Decimal  @db.Decimal(18, 8)
+  holdings      Json     // Snapshot of holdings at this time
+
+  // Timestamp
+  createdAt     DateTime @default(now())
+
+  // Relations
+  portfolio     Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@index([portfolioId])
+  @@index([createdAt])
+  @@map("portfolio_snapshots")
+}
+
+// ============================================================================
+// Prices & Market Data
+// ============================================================================
+
+model PriceHistory {
+  id            String   @id @default(cuid())
+
+  // Pair information
+  tokenPair     String   // e.g., "ETH-USDC"
+
+  // Price data
+  price         Decimal  @db.Decimal(18, 8)
+  high24h       Decimal? @db.Decimal(18, 8)
+  low24h        Decimal? @db.Decimal(18, 8)
+  volume24h     Decimal? @db.Decimal(18, 8)
+
+  // Change
+  priceChange24h Decimal? @db.Decimal(18, 8)
+
+  // Source
+  source        String   @default("oracle")
+
+  // Timestamp
+  timestamp     DateTime @default(now())
+
+  @@index([tokenPair])
+  @@index([timestamp])
+  @@map("price_history")
+}
+
+model PriceAlert {
+  id            String       @id @default(cuid())
+  userId        String
+
+  // Alert configuration
+  tokenPair     String
+  targetPrice   Decimal      @db.Decimal(18, 8)
+  condition     PriceCondition
+
+  // Notification settings
+  notificationMethods String[] // ["browser", "email", "webhook"]
+  webhookUrl    String?
+
+  // Status
+  status        AlertStatus  @default(ACTIVE)
+  enabled       Boolean      @default(true)
+
+  // Trigger information
+  triggeredAt   DateTime?
+  triggeredPrice Decimal?    @db.Decimal(18, 8)
+
+  // Timestamps
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenPair])
+  @@index([status])
+  @@map("price_alerts")
+}
+
+enum PriceCondition {
+  ABOVE
+  BELOW
+}
+
+enum AlertStatus {
+  ACTIVE
+  TRIGGERED
+  PAUSED
+  CANCELLED
+}
+
+// ============================================================================
+// Gas & Network
+// ============================================================================
+
+model GasHistory {
+  id            String   @id @default(cuid())
+
+  // Gas prices (in Gwei)
+  slow          Decimal  @db.Decimal(18, 8)
+  standard      Decimal  @db.Decimal(18, 8)
+  fast          Decimal  @db.Decimal(18, 8)
+  instant       Decimal  @db.Decimal(18, 8)
+
+  // Network info
+  congestion    String?  // "low", "medium", "high"
+  baseFee       Decimal? @db.Decimal(18, 8)
+
+  // Source
+  source        String   @default("oracle")
+
+  // Timestamp
+  timestamp     DateTime @default(now())
+
+  @@index([timestamp])
+  @@map("gas_history")
+}
+
+model GasAlert {
+  id            String       @id @default(cuid())
+  userId        String
+
+  // Alert configuration
+  gasSpeed      String       // "slow", "standard", "fast", "instant"
+  threshold     Decimal      @db.Decimal(18, 8) // Gwei
+  condition     PriceCondition
+
+  // Notification settings
+  notificationMethods String[]
+  webhookUrl    String?
+
+  // Status
+  status        AlertStatus  @default(ACTIVE)
+  enabled       Boolean      @default(true)
+
+  // Trigger information
+  triggeredAt   DateTime?
+  triggeredGasPrice Decimal? @db.Decimal(18, 8)
+
+  // Timestamps
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@map("gas_alerts")
+}
+
+// ============================================================================
+// Audit & Logging
+// ============================================================================
+
+model AuditLog {
+  id            String   @id @default(cuid())
+
+  // User information
+  userId        String?
+  ipAddress     String?
+  userAgent     String?
+
+  // Action details
+  action        String   // e.g., "LOGIN", "CREATE_API_KEY", "EXECUTE_SWAP"
+  resource      String?  // Resource type
+  resourceId    String?  // Resource ID
+
+  // Request details
+  method        String?  // HTTP method
+  path          String?  // Request path
+  statusCode    Int?
+
+  // Additional data
+  metadata      Json?
+
+  // Timestamp
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

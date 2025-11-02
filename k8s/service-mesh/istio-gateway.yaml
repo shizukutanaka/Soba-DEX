@@ -1,0 +1,523 @@
+# ============================================================================
+# Istio Service Mesh - API Gateway Configuration
+# Advanced traffic management, security, and observability
+# ============================================================================
+#
+# Prerequisites:
+# 1. Install Istio: curl -L https://istio.io/downloadIstio | sh -
+# 2. Install Istio control plane: istioctl install --set profile=production
+# 3. Enable automatic sidecar injection: kubectl label namespace security-monitor istio-injection=enabled
+
+---
+# Gateway - Entry point for external traffic
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: security-monitor-gateway
+  namespace: security-monitor
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    # HTTP Server (with redirect to HTTPS)
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "security-monitor.example.com"
+        - "api.security-monitor.example.com"
+      tls:
+        httpsRedirect: true
+
+    # HTTPS Server
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      hosts:
+        - "security-monitor.example.com"
+        - "api.security-monitor.example.com"
+      tls:
+        mode: SIMPLE
+        credentialName: security-monitor-tls-cert
+
+    # Metrics Server (Prometheus)
+    - port:
+        number: 9090
+        name: prometheus
+        protocol: HTTP
+      hosts:
+        - "metrics.security-monitor.example.com"
+
+---
+# VirtualService - Routing rules for API Gateway
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: security-monitor-routes
+  namespace: security-monitor
+spec:
+  hosts:
+    - "security-monitor.example.com"
+    - "api.security-monitor.example.com"
+  gateways:
+    - security-monitor-gateway
+  http:
+    # Health Check Endpoint (no auth required)
+    - name: health-check
+      match:
+        - uri:
+            exact: /health
+        - uri:
+            prefix: /health/
+      route:
+        - destination:
+            host: security-monitor-service
+            port:
+              number: 3000
+      timeout: 5s
+      retries:
+        attempts: 3
+        perTryTimeout: 2s
+
+    # API v1 Routes
+    - name: api-v1
+      match:
+        - uri:
+            prefix: /api/v1/
+      route:
+        - destination:
+            host: security-monitor-service
+            port:
+              number: 3000
+            subset: v1
+          weight: 100
+      timeout: 30s
+      retries:
+        attempts: 3
+        perTryTimeout: 10s
+        retryOn: 5xx,reset,connect-failure,refused-stream
+
+    # API v2 Routes (canary deployment)
+    - name: api-v2-canary
+      match:
+        - uri:
+            prefix: /api/v2/
+      route:
+        - destination:
+            host: security-monitor-service
+            port:
+              number: 3000
+            subset: v2
+          weight: 10  # 10% traffic to v2
+        - destination:
+            host: security-monitor-service
+            port:
+              number: 3000
+            subset: v1
+          weight: 90  # 90% traffic to v1
+      timeout: 30s
+
+    # Events API with rate limiting
+    - name: events-api
+      match:
+        - uri:
+            prefix: /api/events
+      route:
+        - destination:
+            host: security-monitor-service
+            port:
+              number: 3000
+      timeout: 15s
+      retries:
+        attempts: 2
+        perTryTimeout: 5s
+
+    # Incidents API
+    - name: incidents-api
+      match:
+        - uri:
+            prefix: /api/incidents
+      route:
+        - destination:
+            host: security-monitor-service
+            port:
+              number: 3000
+      timeout: 20s
+
+    # ML Prediction API (longer timeout)
+    - name: ml-api
+      match:
+        - uri:
+            prefix: /api/ml/
+      route:
+        - destination:
+            host: security-monitor-service
+            port:
+              number: 3000
+      timeout: 60s
+      retries:
+        attempts: 1
+
+    # Threat Intelligence API (with circuit breaker)
+    - name: threat-intelligence-api
+      match:
+        - uri:
+            prefix: /api/threat-intelligence/
+      route:
+        - destination:
+            host: security-monitor-service
+            port:
+              number: 3000
+      timeout: 10s
+      retries:
+        attempts: 2
+        perTryTimeout: 5s
+
+    # Metrics endpoint (Prometheus)
+    - name: metrics
+      match:
+        - uri:
+            exact: /metrics
+      route:
+        - destination:
+            host: security-monitor-service
+            port:
+              number: 3000
+      timeout: 10s
+
+    # Default route (404 for unmatched)
+    - name: default
+      route:
+        - destination:
+            host: security-monitor-service
+            port:
+              number: 3000
+
+---
+# DestinationRule - Load balancing and circuit breaker
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: security-monitor-destination
+  namespace: security-monitor
+spec:
+  host: security-monitor-service
+  trafficPolicy:
+    # Load Balancing Strategy
+    loadBalancer:
+      consistentHash:
+        httpCookie:
+          name: session-cookie
+          ttl: 3600s
+
+    # Connection Pool Settings
+    connectionPool:
+      tcp:
+        maxConnections: 100
+        connectTimeout: 10s
+        tcpKeepalive:
+          time: 300s
+          interval: 60s
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+
+    # Circuit Breaker
+    outlierDetection:
+      consecutiveErrors: 5
+      interval: 30s
+      baseEjectionTime: 60s
+      maxEjectionPercent: 50
+      minHealthPercent: 40
+
+    # TLS Settings
+    tls:
+      mode: ISTIO_MUTUAL
+
+  # Subsets for version-based routing
+  subsets:
+    - name: v1
+      labels:
+        version: v1
+      trafficPolicy:
+        connectionPool:
+          http:
+            maxRequestsPerConnection: 10
+
+    - name: v2
+      labels:
+        version: v2
+      trafficPolicy:
+        connectionPool:
+          http:
+            maxRequestsPerConnection: 10
+
+---
+# RequestAuthentication - JWT validation
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: security-monitor-jwt
+  namespace: security-monitor
+spec:
+  selector:
+    matchLabels:
+      app: security-monitor
+  jwtRules:
+    - issuer: "https://security-monitor.example.com"
+      jwksUri: "https://security-monitor.example.com/.well-known/jwks.json"
+      audiences:
+        - "security-monitor-api"
+      forwardOriginalToken: true
+
+---
+# AuthorizationPolicy - Access control
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: security-monitor-authz
+  namespace: security-monitor
+spec:
+  selector:
+    matchLabels:
+      app: security-monitor
+
+  # Default: Deny all
+  action: DENY
+  rules:
+    - from:
+        - source:
+            notNamespaces: ["security-monitor"]
+
+  ---
+
+# Allow health checks from anywhere
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-health-checks
+  namespace: security-monitor
+spec:
+  selector:
+    matchLabels:
+      app: security-monitor
+  action: ALLOW
+  rules:
+    - to:
+        - operation:
+            paths: ["/health", "/health/live", "/health/ready"]
+
+---
+# Allow authenticated API requests
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-authenticated-api
+  namespace: security-monitor
+spec:
+  selector:
+    matchLabels:
+      app: security-monitor
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            requestPrincipals: ["*"]
+      to:
+        - operation:
+            paths: ["/api/*"]
+
+---
+# Allow metrics scraping from Prometheus
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-prometheus-scraping
+  namespace: security-monitor
+spec:
+  selector:
+    matchLabels:
+      app: security-monitor
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            namespaces: ["monitoring"]
+            principals: ["cluster.local/ns/monitoring/sa/prometheus"]
+      to:
+        - operation:
+            paths: ["/metrics"]
+
+---
+# PeerAuthentication - mTLS enforcement
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: security-monitor-mtls
+  namespace: security-monitor
+spec:
+  selector:
+    matchLabels:
+      app: security-monitor
+  mtls:
+    mode: STRICT
+
+---
+# Telemetry - Custom metrics and tracing
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: security-monitor-telemetry
+  namespace: security-monitor
+spec:
+  selector:
+    matchLabels:
+      app: security-monitor
+
+  # Metrics configuration
+  metrics:
+    - providers:
+        - name: prometheus
+      overrides:
+        - match:
+            metric: ALL_METRICS
+          tagOverrides:
+            response_code:
+              value: "response.code"
+            request_path:
+              value: "request.path"
+
+  # Tracing configuration
+  tracing:
+    - providers:
+        - name: jaeger
+      randomSamplingPercentage: 10.0  # Sample 10% of requests
+      customTags:
+        attack_type:
+          literal:
+            value: "unknown"
+        severity:
+          literal:
+            value: "unknown"
+
+  # Access logging
+  accessLogging:
+    - providers:
+        - name: envoy
+      filter:
+        expression: "response.code >= 400"  # Log only errors
+
+---
+# ServiceEntry - External service access (Threat Intelligence APIs)
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: external-threat-intel-apis
+  namespace: security-monitor
+spec:
+  hosts:
+    - "api.abuseipdb.com"
+    - "api.virustotal.com"
+    - "api.shodan.io"
+  ports:
+    - number: 443
+      name: https
+      protocol: HTTPS
+  location: MESH_EXTERNAL
+  resolution: DNS
+
+---
+# VirtualService for external APIs with retry and timeout
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: external-threat-intel
+  namespace: security-monitor
+spec:
+  hosts:
+    - "api.abuseipdb.com"
+    - "api.virustotal.com"
+    - "api.shodan.io"
+  http:
+    - timeout: 10s
+      retries:
+        attempts: 3
+        perTryTimeout: 3s
+        retryOn: 5xx,reset,connect-failure,refused-stream
+      route:
+        - destination:
+            host: api.abuseipdb.com
+          weight: 100
+
+---
+# DestinationRule for external APIs with circuit breaker
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: external-threat-intel-cb
+  namespace: security-monitor
+spec:
+  host: "*.abuseipdb.com"
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 10
+      http:
+        http1MaxPendingRequests: 10
+        maxRequestsPerConnection: 5
+    outlierDetection:
+      consecutiveErrors: 3
+      interval: 30s
+      baseEjectionTime: 120s
+
+---
+# EnvoyFilter - Custom rate limiting
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: rate-limit-filter
+  namespace: security-monitor
+spec:
+  workloadSelector:
+    labels:
+      app: security-monitor
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: SIDECAR_INBOUND
+        listener:
+          filterChain:
+            filter:
+              name: envoy.filters.network.http_connection_manager
+              subFilter:
+                name: envoy.filters.http.router
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: envoy.filters.http.local_ratelimit
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
+            stat_prefix: http_local_rate_limiter
+            token_bucket:
+              max_tokens: 100
+              tokens_per_fill: 100
+              fill_interval: 60s
+            filter_enabled:
+              runtime_key: local_rate_limit_enabled
+              default_value:
+                numerator: 100
+                denominator: HUNDRED
+            filter_enforced:
+              runtime_key: local_rate_limit_enforced
+              default_value:
+                numerator: 100
+                denominator: HUNDRED
+            response_headers_to_add:
+              - append: false
+                header:
+                  key: x-local-rate-limit
+                  value: "true"

@@ -1,0 +1,83 @@
+{
+  "notifications": {
+    "title": "सूचनाएं",
+    "markAllRead": "सभी को पढ़ा हुआ चिह्नित करें",
+    "clearAll": "सभी साफ करें",
+    "noNotifications": "कोई सूचना नहीं",
+    "newNotifications": "नई सूचनाएं",
+    "all": "सभी",
+    "unread": "अपठित",
+    "read": "पढ़ा हुआ",
+    "settings": "सूचना सेटिंग्स",
+    "email": "ईमेल सूचनाएं",
+    "push": "पुश सूचनाएं",
+    "sms": "SMS सूचनाएं",
+    "sound": "ध्वनि",
+    "desktop": "डेस्कटॉप सूचनाएं"
+  },
+  "types": {
+    "success": "सफलता",
+    "error": "त्रुटि",
+    "warning": "चेतावनी",
+    "info": "जानकारी",
+    "trade": "ट्रेड",
+    "transaction": "लेन-देन",
+    "security": "सुरक्षा",
+    "system": "सिस्टम",
+    "price": "कीमत अलर्ट",
+    "liquidity": "लिक्विडिटी",
+    "staking": "स्टेकिंग"
+  },
+  "messages": {
+    "walletConnected": "वॉलेट सफलतापूर्वक कनेक्ट हो गया",
+    "walletDisconnected": "वॉलेट डिस्कनेक्ट हो गया",
+    "orderPlaced": "ऑर्डर सफलतापूर्वक दिया गया",
+    "orderFilled": "ऑर्डर पूरा हुआ: {{amount}} {{symbol}} @ {{price}}",
+    "orderCancelled": "ऑर्डर रद्द किया गया",
+    "transactionSent": "लेन-देन भेजा गया",
+    "transactionConfirmed": "लेन-देन पुष्टि की गई",
+    "transactionFailed": "लेन-देन विफल",
+    "priceAlert": "कीमत अलर्ट: {{symbol}} {{price}} पर पहुंच गया",
+    "liquidityAdded": "लिक्विडिटी सफलतापूर्वक जोड़ी गई",
+    "liquidityRemoved": "लिक्विडिटी हटा दी गई",
+    "rewardsClaimed": "पुरस्कार प्राप्त: {{amount}} {{symbol}}",
+    "stakeSuccessful": "स्टेकिंग सफल",
+    "unstakeSuccessful": "अनस्टेकिंग सफल",
+    "securityAlert": "सुरक्षा अलर्ट: {{message}}",
+    "systemMaintenance": "सिस्टम रखरखाव निर्धारित",
+    "newListing": "नया टोकन सूचीबद्ध: {{symbol}}",
+    "airdrop": "एयरड्रॉप प्राप्त: {{amount}} {{symbol}}",
+    "forkDetected": "नेटवर्क में फोर्क का पता चला",
+    "gasPriceHigh": "गैस कीमतें वर्तमान में अधिक हैं",
+    "marketVolatility": "उच्च बाजार अस्थिरता का पता चला",
+    "positionAlert": "पोजीशन अलर्ट: {{message}}"
+  },
+  "trading": {
+    "orderFilled": "ऑर्डर पूरा हुआ",
+    "orderPartiallyFilled": "ऑर्डर आंशिक रूप से पूरा हुआ",
+    "orderExpired": "ऑर्डर समाप्त",
+    "positionOpened": "पोजीशन खुली",
+    "positionClosed": "पोजीशन बंद",
+    "stopLossTriggered": "स्टॉप लॉस ट्रिगर हुआ",
+    "takeProfitTriggered": "टेक प्रॉफिट ट्रिगर हुआ",
+    "marginCall": "मार्जिन कॉल",
+    "liquidationWarning": "लिक्विडेशन चेतावनी"
+  },
+  "wallet": {
+    "balanceLow": "कम बैलेंस चेतावनी",
+    "largeTransaction": "बड़ी लेन-देन का पता चला",
+    "multipleTransactions": "एकाधिक लेन-देन का पता चला",
+    "addressChange": "पता बदल गया",
+    "approvalRequired": "अनुमोदन आवश्यक",
+    "tokenReceived": "टोकन प्राप्त: {{amount}} {{symbol}}",
+    "tokenSent": "टोकन भेजा गया: {{amount}} {{symbol}}"
+  },
+  "system": {
+    "updateAvailable": "अपडेट उपलब्ध",
+    "maintenanceScheduled": "रखरखाव निर्धारित",
+    "serviceRestart": "सेवा पुनः आरंभ आवश्यक",
+    "backupCompleted": "बैकअप पूरा",
+    "securityUpdate": "सुरक्षा अपडेट इंस्टॉल किया गया",
+    "performanceIssue": "परफॉर्मेंस समस्या का पता चला"
+  }
+}

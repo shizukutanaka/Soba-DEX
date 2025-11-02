@@ -1,0 +1,144 @@
+# Prometheus configuration for DEX monitoring
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'dex-production'
+    replica: 'prometheus-01'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - "rules/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 5s
+    metrics_path: /metrics
+
+  # Node Exporter (System metrics)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 10s
+    metrics_path: /metrics
+
+  # cAdvisor (Container metrics)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    scrape_interval: 10s
+    metrics_path: /metrics
+
+  # Backend API Services
+  - job_name: 'dex-backend'
+    static_configs:
+      - targets: ['backend:3001']
+    scrape_interval: 5s
+    metrics_path: /metrics
+    scrape_timeout: 10s
+
+  # WebSocket Service
+  - job_name: 'dex-websocket'
+    static_configs:
+      - targets: ['websocket:3002']
+    scrape_interval: 5s
+    metrics_path: /metrics
+
+  # PostgreSQL Database
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    scrape_interval: 10s
+    metrics_path: /metrics
+
+  # Redis Cache
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 10s
+    metrics_path: /metrics
+
+  # Nginx Web Server
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:80']
+    scrape_interval: 10s
+    metrics_path: /nginx_status
+
+  # Ethereum Node Metrics (if running own node)
+  - job_name: 'ethereum-node'
+    static_configs:
+      - targets: ['eth-node:8545']
+    scrape_interval: 30s
+    metrics_path: /debug/metrics/prometheus
+    scrape_timeout: 10s
+
+  # Blackbox Exporter for endpoint monitoring
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+        - https://dex.example.com
+        - https://dex.example.com/api/health
+        - https://dex.example.com/api/pairs
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+
+  # Custom DEX Metrics
+  - job_name: 'dex-metrics'
+    static_configs:
+      - targets: ['backend:3001']
+    metrics_path: /api/metrics
+    scrape_interval: 5s
+    params:
+      format: ['prometheus']
+
+  # Smart Contract Monitoring
+  - job_name: 'contract-monitor'
+    static_configs:
+      - targets: ['contract-monitor:8080']
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # Security Scanner Metrics
+  - job_name: 'security-scanner'
+    static_configs:
+      - targets: ['security-scanner:9090']
+    scrape_interval: 60s
+    metrics_path: /metrics
+
+# Remote write configuration for long-term storage
+remote_write:
+  - url: "https://prometheus-remote-write.example.com/api/v1/write"
+    basic_auth:
+      username: "prometheus"
+      password: "your-remote-write-password"
+    queue_config:
+      max_samples_per_send: 1000
+      max_shards: 200
+      capacity: 2500
+
+# Remote read configuration
+remote_read:
+  - url: "https://prometheus-remote-read.example.com/api/v1/read"
+    basic_auth:
+      username: "prometheus"
+      password: "your-remote-read-password"

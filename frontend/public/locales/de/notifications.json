@@ -1,0 +1,83 @@
+{
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "markAllRead": "Alle als Gelesen Markieren",
+    "clearAll": "Alle Löschen",
+    "noNotifications": "Keine Benachrichtigungen",
+    "newNotifications": "Neue Benachrichtigungen",
+    "all": "Alle",
+    "unread": "Ungelesen",
+    "read": "Gelesen",
+    "settings": "Benachrichtigungseinstellungen",
+    "email": "E-Mail-Benachrichtigungen",
+    "push": "Push-Benachrichtigungen",
+    "sms": "SMS-Benachrichtigungen",
+    "sound": "Ton",
+    "desktop": "Desktop-Benachrichtigungen"
+  },
+  "types": {
+    "success": "Erfolg",
+    "error": "Fehler",
+    "warning": "Warnung",
+    "info": "Information",
+    "trade": "Handel",
+    "transaction": "Transaktion",
+    "security": "Sicherheit",
+    "system": "System",
+    "price": "Preisalarm",
+    "liquidity": "Liquidität",
+    "staking": "Staking"
+  },
+  "messages": {
+    "walletConnected": "Wallet erfolgreich verbunden",
+    "walletDisconnected": "Wallet getrennt",
+    "orderPlaced": "Order erfolgreich platziert",
+    "orderFilled": "Order ausgeführt: {{amount}} {{symbol}} bei {{price}}",
+    "orderCancelled": "Order abgebrochen",
+    "transactionSent": "Transaktion gesendet",
+    "transactionConfirmed": "Transaktion bestätigt",
+    "transactionFailed": "Transaktion fehlgeschlagen",
+    "priceAlert": "Preisalarm: {{symbol}} hat {{price}} erreicht",
+    "liquidityAdded": "Liquidität erfolgreich hinzugefügt",
+    "liquidityRemoved": "Liquidität entfernt",
+    "rewardsClaimed": "Belohnungen beansprucht: {{amount}} {{symbol}}",
+    "stakeSuccessful": "Staking erfolgreich",
+    "unstakeSuccessful": "Unstaking erfolgreich",
+    "securityAlert": "Sicherheitsalarm: {{message}}",
+    "systemMaintenance": "Systemwartung geplant",
+    "newListing": "Neuer Token gelistet: {{symbol}}",
+    "airdrop": "Airdrop erhalten: {{amount}} {{symbol}}",
+    "forkDetected": "Fork im Netzwerk erkannt",
+    "gasPriceHigh": "Gas-Preise sind derzeit hoch",
+    "marketVolatility": "Hohe Marktvolatilität erkannt",
+    "positionAlert": "Positionalarm: {{message}}"
+  },
+  "trading": {
+    "orderFilled": "Order ausgeführt",
+    "orderPartiallyFilled": "Order teilweise ausgeführt",
+    "orderExpired": "Order abgelaufen",
+    "positionOpened": "Position eröffnet",
+    "positionClosed": "Position geschlossen",
+    "stopLossTriggered": "Stop-Loss ausgelöst",
+    "takeProfitTriggered": "Take-Profit ausgelöst",
+    "marginCall": "Margin Call",
+    "liquidationWarning": "Liquidationswarnung"
+  },
+  "wallet": {
+    "balanceLow": "Warnung niedriges Guthaben",
+    "largeTransaction": "Große Transaktion erkannt",
+    "multipleTransactions": "Mehrfache Transaktionen erkannt",
+    "addressChange": "Adresse geändert",
+    "approvalRequired": "Genehmigung erforderlich",
+    "tokenReceived": "Token erhalten: {{amount}} {{symbol}}",
+    "tokenSent": "Token gesendet: {{amount}} {{symbol}}"
+  },
+  "system": {
+    "updateAvailable": "Update verfügbar",
+    "maintenanceScheduled": "Wartung geplant",
+    "serviceRestart": "Service-Neustart erforderlich",
+    "backupCompleted": "Backup abgeschlossen",
+    "securityUpdate": "Sicherheitsupdate installiert",
+    "performanceIssue": "Leistungsproblem erkannt"
+  }
+}

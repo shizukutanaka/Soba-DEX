@@ -1,0 +1,195 @@
+/**
+ * Spinner Component Styles
+ * Following Atlassian Design System principles
+ */
+
+@import './tokens.css';
+
+/* Main Spinner Container */
+.atlas-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* SVG Container */
+.atlas-spinner__svg {
+  display: block;
+  animation: atlas-spinner-rotate 1.4s linear infinite;
+}
+
+/* Circle */
+.atlas-spinner__circle {
+  stroke: currentColor;
+  stroke-dasharray: 80px, 200px;
+  stroke-dashoffset: 0;
+  stroke-linecap: round;
+  animation: atlas-spinner-dash 1.4s ease-in-out infinite;
+}
+
+/* Size Variants */
+.atlas-spinner--sm {
+  width: 16px;
+  height: 16px;
+}
+
+.atlas-spinner--sm .atlas-spinner__svg {
+  width: 16px;
+  height: 16px;
+}
+
+.atlas-spinner--md {
+  width: 24px;
+  height: 24px;
+}
+
+.atlas-spinner--md .atlas-spinner__svg {
+  width: 24px;
+  height: 24px;
+}
+
+.atlas-spinner--lg {
+  width: 40px;
+  height: 40px;
+}
+
+.atlas-spinner--lg .atlas-spinner__svg {
+  width: 40px;
+  height: 40px;
+}
+
+.atlas-spinner--xl {
+  width: 64px;
+  height: 64px;
+}
+
+.atlas-spinner--xl .atlas-spinner__svg {
+  width: 64px;
+  height: 64px;
+}
+
+/* Color Variants */
+.atlas-spinner--primary {
+  color: var(--brand-primary);
+}
+
+.atlas-spinner--secondary {
+  color: var(--neutral-600);
+}
+
+.atlas-spinner--light {
+  color: var(--neutral-0);
+}
+
+.atlas-spinner--dark {
+  color: var(--neutral-1300);
+}
+
+/* Animations */
+@keyframes atlas-spinner-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes atlas-spinner-dash {
+  0% {
+    stroke-dasharray: 1px, 200px;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 100px, 200px;
+    stroke-dashoffset: -15px;
+  }
+  100% {
+    stroke-dasharray: 100px, 200px;
+    stroke-dashoffset: -125px;
+  }
+}
+
+/* Inline Spinner */
+.atlas-inline-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+
+.atlas-inline-spinner__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: atlas-spinner-rotate 1.4s linear infinite;
+}
+
+.atlas-inline-spinner__circle {
+  stroke: currentColor;
+  stroke-dasharray: 80px, 200px;
+  stroke-dashoffset: 0;
+  stroke-linecap: round;
+  animation: atlas-spinner-dash 1.4s ease-in-out infinite;
+}
+
+/* Screen Reader Only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .atlas-spinner--primary {
+    color: var(--brand-400);
+  }
+
+  .atlas-spinner--secondary {
+    color: var(--neutral-400);
+  }
+
+  .atlas-spinner--light {
+    color: var(--neutral-0);
+  }
+
+  .atlas-spinner--dark {
+    color: var(--neutral-100);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-spinner__svg,
+  .atlas-inline-spinner__svg {
+    animation: atlas-spinner-rotate 2s linear infinite;
+  }
+
+  .atlas-spinner__circle,
+  .atlas-inline-spinner__circle {
+    animation: none;
+    stroke-dasharray: 80px, 200px;
+  }
+}
+
+/* Performance Optimization */
+.atlas-spinner,
+.atlas-inline-spinner {
+  will-change: transform;
+}
+
+.atlas-spinner__svg,
+.atlas-inline-spinner__svg {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}

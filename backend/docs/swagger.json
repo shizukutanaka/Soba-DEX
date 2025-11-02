@@ -1,0 +1,418 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "DEX Platform API",
+    "version": "1.0.0",
+    "description": "Comprehensive API documentation for the DEX/DeFi platform",
+    "contact": {
+      "name": "API Support",
+      "email": "support@soba.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000",
+      "description": "Development server"
+    },
+    {
+      "url": "https://api.soba.com",
+      "description": "Production server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "apiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "code": {
+            "type": "string",
+            "description": "Error code"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Error timestamp"
+          }
+        }
+      },
+      "HealthStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "healthy",
+              "degraded",
+              "unhealthy"
+            ]
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "services": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "responseTime": {
+                  "type": "number"
+                },
+                "lastCheck": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SecurityStats": {
+        "type": "object",
+        "properties": {
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "blockedRequests": {
+                "type": "number"
+              },
+              "suspiciousActivity": {
+                "type": "number"
+              },
+              "maliciousAttempts": {
+                "type": "number"
+              },
+              "securityScans": {
+                "type": "number"
+              }
+            }
+          },
+          "blockedIPs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ip": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "blockedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "expiresAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      },
+      "PerformanceMetrics": {
+        "type": "object",
+        "properties": {
+          "responseTime": {
+            "type": "object",
+            "properties": {
+              "avg": {
+                "type": "number"
+              },
+              "min": {
+                "type": "number"
+              },
+              "max": {
+                "type": "number"
+              },
+              "p95": {
+                "type": "number"
+              }
+            }
+          },
+          "memoryUsage": {
+            "type": "object",
+            "properties": {
+              "used": {
+                "type": "number"
+              },
+              "total": {
+                "type": "number"
+              },
+              "percentage": {
+                "type": "number"
+              }
+            }
+          },
+          "requestCount": {
+            "type": "number"
+          },
+          "errorRate": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "responses": {
+      "HealthResponse": {
+        "description": "Service health status",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "healthy",
+                    "degraded",
+                    "unhealthy"
+                  ]
+                },
+                "timestamp": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "uptime": {
+                  "type": "number"
+                },
+                "version": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "TradingPair": {
+        "description": "Trading pair information",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "symbol": {
+                  "type": "string",
+                  "example": "ETH/USDT"
+                },
+                "baseAsset": {
+                  "type": "string",
+                  "example": "ETH"
+                },
+                "quoteAsset": {
+                  "type": "string",
+                  "example": "USDT"
+                },
+                "price": {
+                  "type": "number",
+                  "example": 2000.5
+                },
+                "change24h": {
+                  "type": "number",
+                  "example": 5.23
+                },
+                "volume24h": {
+                  "type": "number",
+                  "example": 1000000
+                },
+                "high24h": {
+                  "type": "number",
+                  "example": 2100
+                },
+                "low24h": {
+                  "type": "number",
+                  "example": 1900
+                },
+                "isActive": {
+                  "type": "boolean"
+                },
+                "lastUpdated": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Health",
+      "description": "Health monitoring and system status endpoints"
+    },
+    {
+      "name": "Security",
+      "description": "Security monitoring and management endpoints"
+    },
+    {
+      "name": "Performance",
+      "description": "Performance metrics and monitoring"
+    },
+    {
+      "name": "System",
+      "description": "System information and diagnostics"
+    },
+    {
+      "name": "DEX",
+      "description": "Decentralized exchange functionality"
+    }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Basic health check",
+        "description": "Returns the basic health status of the API service",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/HealthResponse"
+          }
+        }
+      }
+    },
+    "/api/pairs": {
+      "get": {
+        "summary": "Get all trading pairs",
+        "description": "Retrieve comprehensive information about all available trading pairs",
+        "tags": [
+          "DEX"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of trading pairs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/responses/TradingPair"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orderbook/{pair}": {
+      "get": {
+        "summary": "Get order book for trading pair",
+        "description": "Retrieve the current order book (bids and asks) for a specific trading pair",
+        "tags": [
+          "DEX"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pair",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "ETH-USDT"
+            },
+            "description": "Trading pair in format TOKEN1-TOKEN2"
+          },
+          {
+            "in": "query",
+            "name": "depth",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Number of price levels to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order book data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pair": {
+                      "type": "string",
+                      "example": "ETH-USDT"
+                    },
+                    "bids": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "example": [
+                          2000.5,
+                          1.5
+                        ]
+                      }
+                    },
+                    "asks": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "example": [
+                          2001,
+                          2
+                        ]
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pair format"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  }
+}

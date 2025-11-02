@@ -1,0 +1,82 @@
+{
+  "trading": {
+    "title": "Handel",
+    "description": "Professionelle Handelsoberfläche für DeFi-Märkte",
+    "marketData": "Marktdaten",
+    "orderBook": "Orderbuch",
+    "priceChart": "Preisdiagramm",
+    "recentTrades": "Kürzliche Trades",
+    "tradeHistory": "Handelsverlauf",
+    "openOrders": "Offene Orders",
+    "orderHistory": "Orderverlauf",
+    "positions": "Positionen",
+    "portfolio": "Portfolio"
+  },
+  "markets": {
+    "title": "Märkte",
+    "search": "Märkte suchen...",
+    "filter": "Märkte filtern",
+    "sortBy": "Sortieren nach",
+    "volume24h": "24h Volumen",
+    "priceChange": "Preisänderung",
+    "marketCap": "Marktkapitalisierung",
+    "allMarkets": "Alle Märkte",
+    "favorites": "Favoriten",
+    "gainers": "Gewinner",
+    "losers": "Verlierer",
+    "newListings": "Neue Listings"
+  },
+  "orders": {
+    "buy": "Kaufen",
+    "sell": "Verkaufen",
+    "limit": "Limit Order",
+    "market": "Market Order",
+    "stop": "Stop Order",
+    "stopLimit": "Stop-Limit Order",
+    "orderType": "Ordertyp",
+    "amount": "Betrag",
+    "price": "Preis",
+    "total": "Gesamt",
+    "placeOrder": "Order Platzieren",
+    "cancelOrder": "Order Abbrechen",
+    "orderPlaced": "Order erfolgreich platziert",
+    "orderCancelled": "Order abgebrochen",
+    "insufficientBalance": "Unzureichendes Guthaben",
+    "priceImpact": "Preiseinfluss",
+    "minimumReceived": "Minimum Empfangen",
+    "slippageTolerance": "Slippage-Toleranz"
+  },
+  "chart": {
+    "timeframe": "Zeitrahmen",
+    "indicators": "Indikatoren",
+    "drawingTools": "Zeichenwerkzeuge",
+    "fullscreen": "Vollbild",
+    "price": "Preis",
+    "volume": "Volumen",
+    "time": "Zeit",
+    "open": "Eröffnung",
+    "high": "Hoch",
+    "low": "Tief",
+    "close": "Schluss"
+  },
+  "liquidity": {
+    "title": "Liquidität",
+    "addLiquidity": "Liquidität Hinzufügen",
+    "removeLiquidity": "Liquidität Entfernen",
+    "yourLiquidity": "Ihre Liquidität",
+    "poolShare": "Pool-Anteil",
+    "apy": "APY",
+    "rewards": "Belohnungen",
+    "impermanentLoss": "Risiko Temporären Verlusts"
+  },
+  "staking": {
+    "title": "Staking",
+    "stake": "Staking",
+    "unstake": "Unstaking",
+    "claimRewards": "Belohnungen Beanspruchen",
+    "stakingApy": "Staking APY",
+    "totalStaked": "Gesamt Gestaked",
+    "yourStake": "Ihr Stake",
+    "rewardsEarned": "Verdiente Belohnungen"
+  }
+}

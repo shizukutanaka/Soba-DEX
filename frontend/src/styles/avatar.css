@@ -1,0 +1,255 @@
+/**
+ * Avatar Component Styles
+ * Following Atlassian Design System principles
+ */
+
+@import './tokens.css';
+
+/* Avatar Container */
+.atlas-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  user-select: none;
+  overflow: hidden;
+}
+
+/* Avatar Inner Container */
+.atlas-avatar__container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--neutral-200);
+  color: var(--neutral-700);
+  font-weight: 600;
+  overflow: hidden;
+}
+
+/* Size Variants */
+.atlas-avatar--xs {
+  width: 24px;
+  height: 24px;
+}
+
+.atlas-avatar--xs .atlas-avatar__container {
+  font-size: var(--font-size-75);
+}
+
+.atlas-avatar--sm {
+  width: 32px;
+  height: 32px;
+}
+
+.atlas-avatar--sm .atlas-avatar__container {
+  font-size: var(--font-size-100);
+}
+
+.atlas-avatar--md {
+  width: 40px;
+  height: 40px;
+}
+
+.atlas-avatar--md .atlas-avatar__container {
+  font-size: var(--font-size-100);
+}
+
+.atlas-avatar--lg {
+  width: 64px;
+  height: 64px;
+}
+
+.atlas-avatar--lg .atlas-avatar__container {
+  font-size: var(--font-size-300);
+}
+
+.atlas-avatar--xl {
+  width: 96px;
+  height: 96px;
+}
+
+.atlas-avatar--xl .atlas-avatar__container {
+  font-size: var(--font-size-500);
+}
+
+/* Shape Variants */
+.atlas-avatar--circle,
+.atlas-avatar--circle .atlas-avatar__container {
+  border-radius: 50%;
+}
+
+.atlas-avatar--square,
+.atlas-avatar--square .atlas-avatar__container {
+  border-radius: var(--space-050);
+}
+
+/* Image */
+.atlas-avatar__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Initials */
+.atlas-avatar__initials {
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* Icon */
+.atlas-avatar__icon {
+  width: 60%;
+  height: 60%;
+  fill: currentColor;
+}
+
+/* Status Indicator */
+.atlas-avatar--with-status {
+  position: relative;
+}
+
+.atlas-avatar__status {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 25%;
+  height: 25%;
+  min-width: 8px;
+  min-height: 8px;
+  border-radius: 50%;
+  border: 2px solid var(--neutral-0);
+  box-sizing: content-box;
+}
+
+.atlas-avatar__status--online {
+  background: var(--success-500);
+}
+
+.atlas-avatar__status--offline {
+  background: var(--neutral-400);
+}
+
+.atlas-avatar__status--away {
+  background: var(--warning-500);
+}
+
+.atlas-avatar__status--busy {
+  background: var(--danger-500);
+}
+
+/* Avatar Group */
+.atlas-avatar-group {
+  display: inline-flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  padding-left: var(--space-100);
+}
+
+.atlas-avatar-group .atlas-avatar {
+  margin-left: calc(var(--space-100) * -1);
+  border: 2px solid var(--neutral-0);
+  box-sizing: content-box;
+}
+
+.atlas-avatar-group--xs .atlas-avatar {
+  margin-left: calc(var(--space-075) * -1);
+}
+
+.atlas-avatar-group--sm .atlas-avatar {
+  margin-left: calc(var(--space-075) * -1);
+}
+
+.atlas-avatar-group--md .atlas-avatar {
+  margin-left: calc(var(--space-100) * -1);
+}
+
+.atlas-avatar-group--lg .atlas-avatar {
+  margin-left: calc(var(--space-150) * -1);
+}
+
+.atlas-avatar-group--xl .atlas-avatar {
+  margin-left: calc(var(--space-200) * -1);
+}
+
+/* Overflow Avatar */
+.atlas-avatar--overflow {
+  background: var(--neutral-200);
+  color: var(--neutral-700);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.atlas-avatar--overflow:hover {
+  background: var(--neutral-300);
+  transform: scale(1.05);
+}
+
+/* Hover Effect on Group */
+.atlas-avatar-group .atlas-avatar {
+  transition: transform var(--transition-normal);
+}
+
+.atlas-avatar-group .atlas-avatar:hover {
+  transform: translateY(-2px);
+  z-index: 1;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .atlas-avatar__container {
+    background: var(--neutral-700);
+    color: var(--neutral-200);
+  }
+
+  .atlas-avatar__status {
+    border-color: var(--neutral-1300);
+  }
+
+  .atlas-avatar-group .atlas-avatar {
+    border-color: var(--neutral-1300);
+  }
+
+  .atlas-avatar--overflow {
+    background: var(--neutral-700);
+    color: var(--neutral-200);
+  }
+
+  .atlas-avatar--overflow:hover {
+    background: var(--neutral-600);
+  }
+}
+
+/* Accessibility */
+.atlas-avatar:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-avatar--overflow,
+  .atlas-avatar-group .atlas-avatar {
+    transition: none;
+  }
+
+  .atlas-avatar--overflow:hover,
+  .atlas-avatar-group .atlas-avatar:hover {
+    transform: none;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .atlas-avatar-group {
+    padding-left: var(--space-075);
+  }
+
+  .atlas-avatar-group .atlas-avatar {
+    margin-left: calc(var(--space-075) * -1);
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "trading": {
+    "title": "ट्रेडिंग",
+    "description": "DeFi बाजारों के लिए पेशेवर ट्रेडिंग इंटरफेस",
+    "marketData": "बाजार डेटा",
+    "orderBook": "ऑर्डर बुक",
+    "priceChart": "कीमत चार्ट",
+    "recentTrades": "हाल के ट्रेड",
+    "tradeHistory": "ट्रेड इतिहास",
+    "openOrders": "खुले ऑर्डर",
+    "orderHistory": "ऑर्डर इतिहास",
+    "positions": "पोजीशन",
+    "portfolio": "पोर्टफोलियो"
+  },
+  "markets": {
+    "title": "बाजार",
+    "search": "बाजार खोजें...",
+    "filter": "बाजार फिल्टर करें",
+    "sortBy": "इसके अनुसार क्रमित करें",
+    "volume24h": "24 घंटे का वॉल्यूम",
+    "priceChange": "कीमत परिवर्तन",
+    "marketCap": "बाजार पूंजीकरण",
+    "allMarkets": "सभी बाजार",
+    "favorites": "पसंदीदा",
+    "gainers": "मुनाफा करने वाले",
+    "losers": "नुकसान करने वाले",
+    "newListings": "नई लिस्टिंग"
+  },
+  "orders": {
+    "buy": "खरीदें",
+    "sell": "बेचें",
+    "limit": "लिमिट ऑर्डर",
+    "market": "मार्केट ऑर्डर",
+    "stop": "स्टॉप ऑर्डर",
+    "stopLimit": "स्टॉप लिमिट ऑर्डर",
+    "orderType": "ऑर्डर प्रकार",
+    "amount": "राशि",
+    "price": "कीमत",
+    "total": "कुल",
+    "placeOrder": "ऑर्डर दें",
+    "cancelOrder": "ऑर्डर रद्द करें",
+    "orderPlaced": "ऑर्डर सफलतापूर्वक दिया गया",
+    "orderCancelled": "ऑर्डर रद्द किया गया",
+    "insufficientBalance": "अपर्याप्त बैलेंस",
+    "priceImpact": "कीमत प्रभाव",
+    "minimumReceived": "न्यूनतम प्राप्त",
+    "slippageTolerance": "स्लिपेज सहनशीलता"
+  },
+  "chart": {
+    "timeframe": "समय सीमा",
+    "indicators": "संकेतक",
+    "drawingTools": "ड्राइंग टूल",
+    "fullscreen": "फुलस्क्रीन",
+    "price": "कीमत",
+    "volume": "वॉल्यूम",
+    "time": "समय",
+    "open": "खुला",
+    "high": "उच्च",
+    "low": "निम्न",
+    "close": "बंद"
+  },
+  "liquidity": {
+    "title": "लिक्विडिटी",
+    "addLiquidity": "लिक्विडिटी जोड़ें",
+    "removeLiquidity": "लिक्विडिटी हटाएं",
+    "yourLiquidity": "आपकी लिक्विडिटी",
+    "poolShare": "पूल हिस्सा",
+    "apy": "APY",
+    "rewards": "पुरस्कार",
+    "impermanentLoss": "अस्थायी हानि जोखिम"
+  },
+  "staking": {
+    "title": "स्टेकिंग",
+    "stake": "स्टेक",
+    "unstake": "अनस्टेक",
+    "claimRewards": "पुरस्कार प्राप्त करें",
+    "stakingApy": "स्टेकिंग APY",
+    "totalStaked": "कुल स्टेक",
+    "yourStake": "आपका स्टेक",
+    "rewardsEarned": "अर्जित पुरस्कार"
+  }
+}

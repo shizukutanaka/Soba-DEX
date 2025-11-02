@@ -1,0 +1,80 @@
+{
+  "errors": {
+    "title": "त्रुटि",
+    "general": "एक त्रुटि हुई है",
+    "network": "नेटवर्क त्रुटि",
+    "timeout": "अनुरोध समय समाप्त",
+    "notFound": "नहीं मिला",
+    "unauthorized": "अनधिकृत",
+    "forbidden": "निषिद्ध",
+    "serverError": "सर्वर त्रुटि",
+    "serviceUnavailable": "सेवा उपलब्ध नहीं",
+    "validationError": "सत्यापन त्रुटि",
+    "insufficientFunds": "अपर्याप्त धन",
+    "transactionFailed": "लेन-देन विफल",
+    "walletError": "वॉलेट त्रुटि",
+    "connectionError": "कनेक्शन त्रुटि",
+    "apiError": "API त्रुटि",
+    "rateLimit": "दर सीमा पार",
+    "maintenance": "सिस्टम रखरखाव",
+    "deprecated": "यह सुविधा बहिष्कृत है"
+  },
+  "validation": {
+    "required": "यह क्षेत्र आवश्यक है",
+    "invalidEmail": "अमान्य ईमेल पता",
+    "invalidUrl": "अमान्य URL",
+    "invalidNumber": "अमान्य संख्या",
+    "invalidAddress": "अमान्य पता",
+    "invalidAmount": "अमान्य राशि",
+    "amountTooLow": "राशि बहुत कम",
+    "amountTooHigh": "राशि बहुत अधिक",
+    "insufficientBalance": "अपर्याप्त बैलेंस",
+    "invalidSlippage": "अमान्य स्लिपेज सहनशीलता",
+    "invalidDeadline": "अमान्य समय सीमा",
+    "invalidGasPrice": "अमान्य गैस मूल्य",
+    "invalidToken": "अमान्य टोकन",
+    "duplicateTransaction": "डुप्लिकेट लेन-देन"
+  },
+  "wallet": {
+    "connectionFailed": "वॉलेट कनेक्शन विफल",
+    "userRejected": "उपयोगकर्ता ने अनुरोध अस्वीकार कर दिया",
+    "networkMismatch": "नेटवर्क बेमेल",
+    "insufficientFunds": "लेन-देन के लिए अपर्याप्त धन",
+    "transactionRejected": "लेन-देन अस्वीकार किया गया",
+    "gasTooLow": "गैस मूल्य बहुत कम",
+    "nonceTooLow": "Nonce बहुत कम",
+    "replacementUnderpriced": "रिप्लेसमेंट लेन-देन कम मूल्य वाला",
+    "executionReverted": "लेन-देन निष्पादन वापस लिया गया",
+    "outOfGas": "गैस खत्म"
+  },
+  "trading": {
+    "orderFailed": "ऑर्डर विफल",
+    "insufficientLiquidity": "अपर्याप्त लिक्विडिटी",
+    "priceImpactTooHigh": "कीमत प्रभाव बहुत अधिक",
+    "slippageExceeded": "स्लिपेज सहनशीलता पार हो गई",
+    "marketClosed": "बाजार बंद",
+    "tradingDisabled": "ट्रेडिंग अक्षम",
+    "invalidOrder": "अमान्य ऑर्डर",
+    "orderExpired": "ऑर्डर समाप्त",
+    "positionLiquidated": "पोजीशन लिक्विडेट"
+  },
+  "security": {
+    "suspiciousActivity": "संदिग्ध गतिविधि का पता चला",
+    "blockedAddress": "पता ब्लॉक किया गया",
+    "sanctionsViolation": "प्रतिबंध उल्लंघन",
+    "unusualVolume": "असामान्य ट्रेडिंग वॉल्यूम का पता चला",
+    "multipleFailures": "एकाधिक प्रमाणीकरण विफलताएं"
+  },
+  "system": {
+    "databaseError": "डेटाबेस त्रुटि",
+    "cacheError": "कैश त्रुटि",
+    "diskFull": "डिस्क भरी हुई",
+    "memoryError": "मेमोरी त्रुटि",
+    "cpuOverload": "CPU ओवरलोड",
+    "networkCongestion": "नेटवर्क भीड़"
+  },
+  "retry": "कृपया पुनः प्रयास करें",
+  "contactSupport": "यदि समस्या बनी रहती है तो सहायता से संपर्क करें",
+  "errorCode": "त्रुटि कोड: {{code}}",
+  "details": "त्रुटि विवरण: {{details}}"
+}

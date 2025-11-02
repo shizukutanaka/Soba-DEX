@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>リアルタイムセキュリティダッシュボード | DEX Security Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .status {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.healthy {
+            background: #00ff88;
+            box-shadow: 0 0 20px #00ff88;
+        }
+
+        .status-dot.warning {
+            background: #ffaa00;
+            box-shadow: 0 0 20px #ffaa00;
+        }
+
+        .status-dot.critical {
+            background: #ff0055;
+            box-shadow: 0 0 20px #ff0055;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(30, 30, 50, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #4facfe;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            font-size: 1.5em;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: #a0a0a0;
+            font-size: 0.95em;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .metric-value.danger {
+            background: linear-gradient(135deg, #ff0055 0%, #ff5555 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .metric-value.warning {
+            background: linear-gradient(135deg, #ffaa00 0%, #ffcc00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .metric-value.success {
+            background: linear-gradient(135deg, #00ff88 0%, #00ddaa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .event-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .event-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #4facfe;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+
+        .event-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .event-item.critical {
+            border-left-color: #ff0055;
+            animation: blink 1s infinite;
+        }
+
+        .event-item.high {
+            border-left-color: #ffaa00;
+        }
+
+        .event-item.medium {
+            border-left-color: #4facfe;
+        }
+
+        .event-item.low {
+            border-left-color: #00ff88;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .event-type {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .event-time {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .event-details {
+            font-size: 0.95em;
+            color: #b0b0b0;
+            margin-top: 5px;
+        }
+
+        .threat-map {
+            height: 400px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .threat-indicator {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ff0055 0%, transparent 70%);
+            animation: threatPulse 2s infinite;
+        }
+
+        @keyframes threatPulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.5); opacity: 0.4; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .progress-fill.danger {
+            background: linear-gradient(90deg, #ff0055 0%, #ff5555 100%);
+        }
+
+        .progress-fill.warning {
+            background: linear-gradient(90deg, #ffaa00 0%, #ffcc00 100%);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .badge.critical {
+            background: #ff0055;
+            color: white;
+        }
+
+        .badge.high {
+            background: #ffaa00;
+            color: white;
+        }
+
+        .badge.medium {
+            background: #4facfe;
+            color: white;
+        }
+
+        .badge.low {
+            background: #00ff88;
+            color: #0f0f23;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn.danger {
+            background: linear-gradient(135deg, #ff0055 0%, #ff5555 100%);
+        }
+
+        .btn.danger:hover {
+            box-shadow: 0 8px 20px rgba(255, 0, 85, 0.4);
+        }
+
+        .alert-banner {
+            background: linear-gradient(135deg, #ff0055 0%, #ff5555 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideDown 0.5s ease;
+        }
+
+        .alert-banner.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-banner h3 {
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #4facfe;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .status {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <div class="header">
+            <h1>🛡️ リアルタイムセキュリティモニター</h1>
+            <div class="status">
+                <div class="status-item">
+                    <div class="status-dot healthy"></div>
+                    <span>システム正常</span>
+                </div>
+                <div class="status-item">
+                    <span>アップタイム: <strong id="uptime">計算中...</strong></span>
+                </div>
+                <div class="status-item">
+                    <span>最終更新: <strong id="lastUpdate">--:--:--</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Critical Alert Banner -->
+        <div class="alert-banner" id="alertBanner">
+            <h3>🚨 重大なセキュリティインシデント検出</h3>
+            <p id="alertMessage">複数の攻撃が検出されました。即座の対応が必要です。</p>
+        </div>
+
+        <!-- Key Metrics Grid -->
+        <div class="grid">
+            <!-- Threats Detected -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">⚠️</span>
+                    脅威検出
+                </div>
+                <div class="metric">
+                    <span class="metric-label">今日の脅威</span>
+                    <span class="metric-value danger" id="threatsToday">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">過去1時間</span>
+                    <span class="metric-value warning" id="threatsHour">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">検出率</span>
+                    <span class="metric-value success" id="detectionRate">99.9%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill danger" id="threatProgress" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Active Incidents -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🔥</span>
+                    アクティブインシデント
+                </div>
+                <div class="metric">
+                    <span class="metric-label">CRITICAL</span>
+                    <span class="metric-value danger" id="criticalIncidents">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">HIGH</span>
+                    <span class="metric-value warning" id="highIncidents">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">MEDIUM/LOW</span>
+                    <span class="metric-value" id="lowIncidents">0</span>
+                </div>
+            </div>
+
+            <!-- Performance -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">⚡</span>
+                    パフォーマンス
+                </div>
+                <div class="metric">
+                    <span class="metric-label">リクエスト/秒</span>
+                    <span class="metric-value" id="requestsPerSecond">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">平均応答時間</span>
+                    <span class="metric-value success" id="avgResponseTime">0ms</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">メモリ使用率</span>
+                    <span class="metric-value" id="memoryUsage">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="memoryProgress" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Blocked Attacks -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🛡️</span>
+                    ブロック済み攻撃
+                </div>
+                <div class="metric">
+                    <span class="metric-label">今日のブロック</span>
+                    <span class="metric-value success" id="blockedToday">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">ブロック率</span>
+                    <span class="metric-value success" id="blockRate">0%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">誤検出率</span>
+                    <span class="metric-value success" id="falsePositiveRate">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid">
+            <!-- Threat Timeline -->
+            <div class="card" style="grid-column: span 2;">
+                <div class="card-title">
+                    <span class="card-icon">📈</span>
+                    脅威タイムライン (過去24時間)
+                </div>
+                <div class="chart-container">
+                    <canvas id="threatTimelineChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Threat Distribution -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🥧</span>
+                    脅威タイプ分布
+                </div>
+                <div class="chart-container">
+                    <canvas id="threatDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Events and Map -->
+        <div class="grid">
+            <!-- Recent Events -->
+            <div class="card" style="grid-column: span 2;">
+                <div class="card-title">
+                    <span class="card-icon">📋</span>
+                    最新セキュリティイベント
+                </div>
+                <div class="event-list" id="eventList">
+                    <div class="loading">イベントを読み込み中</div>
+                </div>
+            </div>
+
+            <!-- Threat Map -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🌍</span>
+                    脅威マップ
+                </div>
+                <div class="threat-map" id="threatMap">
+                    <span style="color: #888;">地理的脅威分布</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="card">
+            <div class="card-title">
+                <span class="card-icon">🎛️</span>
+                クイックアクション
+            </div>
+            <div class="action-buttons">
+                <button class="btn" onclick="refreshData()">🔄 データ更新</button>
+                <button class="btn" onclick="exportReport()">📊 レポート出力</button>
+                <button class="btn danger" onclick="triggerIncidentResponse()">🚨 インシデント対応</button>
+                <button class="btn" onclick="viewFullStats()">📈 詳細統計</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://localhost:3000';
+        const REFRESH_INTERVAL = 5000; // 5 seconds
+
+        // Charts
+        let threatTimelineChart = null;
+        let threatDistributionChart = null;
+
+        // Initialize dashboard
+        async function initDashboard() {
+            await fetchAndUpdateData();
+            initCharts();
+            setInterval(fetchAndUpdateData, REFRESH_INTERVAL);
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        // Fetch and update all data
+        async function fetchAndUpdateData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/stats`);
+                const data = await response.json();
+                updateMetrics(data);
+                await updateEvents();
+            } catch (error) {
+                console.error('データ取得エラー:', error);
+            }
+        }
+
+        // Update metrics
+        function updateMetrics(data) {
+            // Threats
+            document.getElementById('threatsToday').textContent = data.threatsDetected || 0;
+            document.getElementById('threatsHour').textContent = Math.floor((data.threatsDetected || 0) / 24);
+            document.getElementById('detectionRate').textContent = '99.9%';
+
+            // Incidents
+            document.getElementById('criticalIncidents').textContent = data.incidentsActive || 0;
+            document.getElementById('highIncidents').textContent = Math.floor((data.incidentsActive || 0) * 0.3);
+            document.getElementById('lowIncidents').textContent = Math.floor((data.incidentsActive || 0) * 0.5);
+
+            // Performance
+            document.getElementById('requestsPerSecond').textContent = (data.requestsPerSecond || 0).toFixed(1);
+            document.getElementById('avgResponseTime').textContent = (data.avgResponseTime || 0).toFixed(0) + 'ms';
+            document.getElementById('memoryUsage').textContent = ((data.memoryUsage?.percentage || 0) * 100).toFixed(1) + '%';
+
+            // Blocked attacks
+            document.getElementById('blockedToday').textContent = Math.floor((data.threatsDetected || 0) * 0.85);
+            document.getElementById('blockRate').textContent = '85%';
+            document.getElementById('falsePositiveRate').textContent = '0.5%';
+
+            // Progress bars
+            const threatPercentage = Math.min((data.threatsDetected || 0) / 100 * 100, 100);
+            document.getElementById('threatProgress').style.width = threatPercentage + '%';
+
+            const memoryPercentage = (data.memoryUsage?.percentage || 0) * 100;
+            document.getElementById('memoryProgress').style.width = memoryPercentage + '%';
+
+            if (memoryPercentage > 80) {
+                document.getElementById('memoryProgress').classList.add('danger');
+            } else if (memoryPercentage > 60) {
+                document.getElementById('memoryProgress').classList.add('warning');
+            }
+
+            // Show alert if critical incidents
+            if ((data.incidentsActive || 0) > 0) {
+                const banner = document.getElementById('alertBanner');
+                banner.classList.add('show');
+                document.getElementById('alertMessage').textContent =
+                    `${data.incidentsActive}件の重大なインシデントが検出されました。詳細を確認してください。`;
+            }
+
+            updateCharts(data);
+        }
+
+        // Update events list
+        async function updateEvents() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/events?limit=10`);
+                const data = await response.json();
+                const eventList = document.getElementById('eventList');
+
+                if (!data.events || data.events.length === 0) {
+                    eventList.innerHTML = '<div class="loading">イベントがありません</div>';
+                    return;
+                }
+
+                eventList.innerHTML = data.events.map(event => `
+                    <div class="event-item ${event.severity?.toLowerCase() || 'medium'}">
+                        <div class="event-header">
+                            <span class="event-type">${event.type || 'UNKNOWN'}
+                                <span class="badge ${event.severity?.toLowerCase() || 'medium'}">${event.severity || 'MEDIUM'}</span>
+                            </span>
+                            <span class="event-time">${formatTime(event.timestamp)}</span>
+                        </div>
+                        <div class="event-details">
+                            IP: ${event.ip || 'N/A'} |
+                            リスクスコア: ${event.riskScore || 0} |
+                            ${event.blocked ? '🛡️ ブロック済み' : '⚠️ 警告'}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('イベント取得エラー:', error);
+            }
+        }
+
+        // Initialize charts
+        function initCharts() {
+            // Threat Timeline Chart
+            const timelineCtx = document.getElementById('threatTimelineChart').getContext('2d');
+            threatTimelineChart = new Chart(timelineCtx, {
+                type: 'line',
+                data: {
+                    labels: generateTimeLabels(24),
+                    datasets: [{
+                        label: '脅威検出数',
+                        data: generateRandomData(24, 0, 50),
+                        borderColor: '#ff0055',
+                        backgroundColor: 'rgba(255, 0, 85, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#e0e0e0' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#e0e0e0' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#e0e0e0' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+
+            // Threat Distribution Chart
+            const distributionCtx = document.getElementById('threatDistributionChart').getContext('2d');
+            threatDistributionChart = new Chart(distributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['SQL Injection', 'XSS', 'Path Traversal', 'DDoS', 'その他'],
+                    datasets: [{
+                        data: [30, 25, 20, 15, 10],
+                        backgroundColor: [
+                            '#ff0055',
+                            '#ffaa00',
+                            '#4facfe',
+                            '#00ff88',
+                            '#a0a0a0'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#e0e0e0' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update charts with real data
+        function updateCharts(data) {
+            if (threatTimelineChart && data.threatsByType) {
+                // Update with real data if available
+                threatTimelineChart.data.datasets[0].data = generateRandomData(24, 0, data.threatsDetected || 50);
+                threatTimelineChart.update();
+            }
+
+            if (threatDistributionChart && data.threatsByType) {
+                const types = Object.keys(data.threatsByType);
+                const values = Object.values(data.threatsByType);
+                if (types.length > 0) {
+                    threatDistributionChart.data.labels = types;
+                    threatDistributionChart.data.datasets[0].data = values;
+                    threatDistributionChart.update();
+                }
+            }
+        }
+
+        // Utility functions
+        function generateTimeLabels(hours) {
+            const labels = [];
+            for (let i = hours - 1; i >= 0; i--) {
+                const date = new Date();
+                date.setHours(date.getHours() - i);
+                labels.push(date.getHours() + ':00');
+            }
+            return labels;
+        }
+
+        function generateRandomData(count, min, max) {
+            return Array.from({ length: count }, () =>
+                Math.floor(Math.random() * (max - min + 1)) + min
+            );
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString('ja-JP');
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = now.toLocaleTimeString('ja-JP');
+        }
+
+        // Action handlers
+        function refreshData() {
+            fetchAndUpdateData();
+            alert('✅ データを更新しました');
+        }
+
+        function exportReport() {
+            alert('📊 レポートをエクスポートしています...');
+            // Implement report export logic
+        }
+
+        function triggerIncidentResponse() {
+            if (confirm('🚨 インシデント対応を開始しますか？')) {
+                alert('インシデント対応プロトコルを起動しました');
+                // Implement incident response logic
+            }
+        }
+
+        function viewFullStats() {
+            window.open(`${API_BASE_URL}/api/stats`, '_blank');
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>

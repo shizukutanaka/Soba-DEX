@@ -1,0 +1,550 @@
+/**
+ * Mobile Optimization CSS for Soba DEX
+ * Follows Apple and Google's mobile UI/UX guidelines
+ * - Touch targets: Minimum 44x44px (Apple) / 48x48px (Google)
+ * - Font size: Minimum 16px to prevent zoom on iOS
+ * - Mobile-first responsive design
+ */
+
+/* ==========================================================================
+   Base Mobile Styles
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* Typography */
+  body {
+    font-size: 16px; /* Prevents iOS auto-zoom */
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+
+  /* Form Elements - Prevent iOS zoom */
+  input,
+  select,
+  textarea,
+  button {
+    font-size: 16px; /* Critical for iOS */
+  }
+
+  /* Touch Targets - Minimum Size */
+  button,
+  a,
+  .clickable,
+  .touchable {
+    min-height: 44px; /* Apple recommendation */
+    min-width: 44px;
+    padding: 0.75rem 1rem;
+  }
+
+  /* Container Adjustments */
+  .app {
+    padding: 0;
+  }
+
+  .main-content {
+    padding: 1rem;
+    margin: 0;
+  }
+
+  /* Header & Navigation */
+  .app-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .app-footer {
+    padding: 1rem;
+    font-size: 0.875rem;
+  }
+
+  /* Cards & Panels */
+  .card,
+  .panel {
+    border-radius: 12px;
+    margin-bottom: 1rem;
+  }
+
+  /* Modals - Full Screen on Mobile */
+  .modal {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  .modal-content {
+    border-radius: 0;
+    height: 100%;
+  }
+
+  /* Tables - Scroll Horizontally */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 600px;
+  }
+
+  /* Images - Responsive */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* ==========================================================================
+   Component-Specific Mobile Styles
+   ========================================================================== */
+
+/* Trading View */
+@media (max-width: 768px) {
+  .trading-view {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .trading-chart {
+    height: 300px;
+    min-height: 300px;
+  }
+
+  .order-book,
+  .trade-history {
+    max-height: 250px;
+    overflow-y: auto;
+  }
+
+  .trading-form {
+    padding: 1rem;
+  }
+
+  .price-display {
+    font-size: 1.5rem;
+  }
+}
+
+/* Swap Panel */
+@media (max-width: 768px) {
+  .swap-panel {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .token-input {
+    padding: 1rem;
+    font-size: 1.125rem;
+  }
+
+  .swap-button {
+    width: 100%;
+    min-height: 52px;
+    font-size: 1.0625rem;
+    font-weight: 600;
+  }
+
+  .swap-details {
+    font-size: 0.875rem;
+  }
+}
+
+/* Liquidity Panel */
+@media (max-width: 768px) {
+  .liquidity-panel {
+    padding: 1rem;
+  }
+
+  .liquidity-inputs {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .pool-info {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .add-liquidity-button,
+  .remove-liquidity-button {
+    width: 100%;
+    min-height: 52px;
+  }
+}
+
+/* Wallet Connect */
+@media (max-width: 768px) {
+  .wallet-connect-enhanced .wallet-dropdown {
+    left: 0;
+    right: 0;
+    min-width: auto;
+    max-width: calc(100vw - 2rem);
+  }
+
+  .wallet-providers {
+    grid-template-columns: 1fr;
+  }
+
+  .wallet-provider-button {
+    padding: 1rem;
+  }
+
+  .provider-icon {
+    font-size: 1.5rem;
+  }
+
+  .wallet-info-card {
+    min-width: auto;
+    width: 100%;
+  }
+}
+
+/* Transaction Tracker */
+@media (max-width: 768px) {
+  .transaction-tracker {
+    padding: 1.25rem;
+    max-width: 100%;
+  }
+
+  .tracker-title {
+    font-size: 1.125rem;
+  }
+
+  .step-circle {
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
+  }
+
+  .hash-value {
+    font-size: 0.8125rem;
+  }
+
+  .explorer-link {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Chain Switcher */
+@media (max-width: 768px) {
+  .chain-dropdown {
+    left: 0;
+    right: 0;
+    min-width: auto;
+    max-width: calc(100vw - 2rem);
+  }
+
+  .chain-option {
+    padding: 0.875rem;
+  }
+
+  .chain-option-logo {
+    font-size: 1.5rem;
+    min-width: 28px;
+  }
+
+  .chain-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .chain-stats .stat:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Portfolio */
+@media (max-width: 768px) {
+  .portfolio {
+    padding: 1rem;
+  }
+
+  .portfolio-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .portfolio-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .asset-list {
+    overflow-x: auto;
+  }
+
+  .asset-card {
+    min-width: 280px;
+  }
+}
+
+/* Price Alerts */
+@media (max-width: 768px) {
+  .price-alerts {
+    padding: 1rem;
+  }
+
+  .alert-form {
+    flex-direction: column;
+  }
+
+  .alert-form input,
+  .alert-form select {
+    width: 100%;
+  }
+
+  .alert-list {
+    gap: 0.75rem;
+  }
+
+  .alert-card {
+    padding: 0.875rem;
+  }
+}
+
+/* Navigation Tabs */
+@media (max-width: 768px) {
+  .navigation-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+
+  .navigation-tabs::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+
+  .tab-button {
+    white-space: nowrap;
+    min-width: 80px;
+  }
+}
+
+/* ==========================================================================
+   Mobile-Specific Utilities
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* Hide on Mobile */
+  .hide-mobile {
+    display: none !important;
+  }
+
+  /* Show only on Mobile */
+  .show-mobile {
+    display: block !important;
+  }
+
+  /* Full Width on Mobile */
+  .mobile-full-width {
+    width: 100% !important;
+  }
+
+  /* Stack Columns on Mobile */
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+
+  /* Spacing Adjustments */
+  .mobile-spacing-sm {
+    gap: 0.5rem !important;
+  }
+
+  .mobile-spacing-md {
+    gap: 1rem !important;
+  }
+
+  .mobile-spacing-lg {
+    gap: 1.5rem !important;
+  }
+
+  /* Text Sizes */
+  .mobile-text-sm {
+    font-size: 0.875rem !important;
+  }
+
+  .mobile-text-md {
+    font-size: 1rem !important;
+  }
+
+  .mobile-text-lg {
+    font-size: 1.125rem !important;
+  }
+}
+
+/* ==========================================================================
+   Tablet Optimization (769px - 1024px)
+   ========================================================================== */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .main-content {
+    padding: 1.5rem;
+  }
+
+  .grid-2-col {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .grid-3-col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .trading-view {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* ==========================================================================
+   Landscape Mobile (480px - 768px)
+   ========================================================================== */
+
+@media (min-width: 480px) and (max-width: 768px) and (orientation: landscape) {
+  .trading-chart {
+    height: 250px;
+  }
+
+  .modal {
+    max-height: 90vh;
+    border-radius: 16px;
+    margin: auto;
+  }
+
+  .grid-mobile-landscape {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ==========================================================================
+   Small Mobile (< 375px)
+   ========================================================================== */
+
+@media (max-width: 374px) {
+  body {
+    font-size: 14px;
+  }
+
+  .main-content {
+    padding: 0.75rem;
+  }
+
+  button,
+  .button {
+    font-size: 0.875rem;
+    padding: 0.625rem 0.875rem;
+  }
+
+  .card-header h2,
+  .card-header h3 {
+    font-size: 1rem;
+  }
+
+  .swap-panel,
+  .liquidity-panel {
+    padding: 0.875rem;
+  }
+
+  .token-input {
+    font-size: 1rem;
+  }
+}
+
+/* ==========================================================================
+   Performance Optimizations
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* Reduce animations on mobile for better performance */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* GPU Acceleration for Smooth Scrolling */
+  .scroll-container {
+    -webkit-overflow-scrolling: touch;
+    transform: translateZ(0);
+    will-change: scroll-position;
+  }
+
+  /* Optimize Repaints */
+  .animated-element {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+}
+
+/* ==========================================================================
+   Accessibility Enhancements
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* Larger Focus Indicators */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible {
+    outline: 3px solid #667eea;
+    outline-offset: 3px;
+  }
+
+  /* Better Contrast for Small Screens */
+  .text-secondary {
+    color: #4b5563;
+  }
+
+  /* Readable Line Heights */
+  p,
+  li,
+  .text-content {
+    line-height: 1.6;
+  }
+}
+
+/* ==========================================================================
+   Safe Area Support (iPhone X+)
+   ========================================================================== */
+
+@supports (padding: max(0px)) {
+  @media (max-width: 768px) {
+    body {
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+
+    .app-header {
+      padding-top: max(12px, env(safe-area-inset-top));
+    }
+
+    .fixed-bottom {
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+  }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+
+@media print {
+  .hide-print {
+    display: none !important;
+  }
+
+  body {
+    font-size: 12pt;
+    color: black;
+    background: white;
+  }
+
+  .card,
+  .panel {
+    border: 1px solid #000;
+    page-break-inside: avoid;
+  }
+}

@@ -1,0 +1,101 @@
+# Sample SLO Configuration for Soba DEX
+# Copy this file to slo.yml and customize for your environment
+
+# API Availability SLO
+- name: api-availability
+  description: API must be available 99.9% of the time
+  objective: 99.9  # Target percentage
+  window: 30d      # Rolling 30-day window
+  indicator:
+    type: availability
+    successCriteria:
+      statusCodes: [200, 201, 204, 304]
+  alerting:
+    - threshold: 50   # Alert when 50% of error budget consumed
+      severity: warning
+      channels: [console]
+    - threshold: 90   # Critical alert at 90%
+      severity: critical
+      channels: [console, email]
+
+# API Latency SLO (P95)
+- name: api-latency-p95
+  description: 95% of API requests complete within 500ms
+  objective: 95
+  window: 30d
+  indicator:
+    type: latency
+    threshold: 500    # milliseconds
+    percentile: 95
+  alerting:
+    - threshold: 70
+      severity: warning
+      channels: [console]
+    - threshold: 95
+      severity: critical
+      channels: [console, email]
+
+# Error Rate SLO
+- name: api-error-rate
+  description: Error rate must stay below 1%
+  objective: 99      # 99% success rate = 1% error rate
+  window: 7d         # Weekly window
+  indicator:
+    type: error_rate
+    threshold: 1      # 1% error rate threshold
+  alerting:
+    - threshold: 50
+      severity: warning
+      channels: [console]
+
+# Gas Price Service Availability
+- name: gas-service-availability
+  description: Gas price service uptime SLO
+  objective: 99.5
+  window: 30d
+  indicator:
+    type: availability
+  alerting:
+    - threshold: 80
+      severity: critical
+      channels: [console, email]
+
+# Token Price Service Latency
+- name: token-price-latency
+  description: Token price queries P99 under 1 second
+  objective: 99
+  window: 7d
+  indicator:
+    type: latency
+    threshold: 1000   # 1 second
+    percentile: 99
+  alerting:
+    - threshold: 70
+      severity: warning
+      channels: [console]
+
+# WebSocket Service Availability
+- name: websocket-availability
+  description: WebSocket service uptime
+  objective: 99.0
+  window: 7d
+  indicator:
+    type: availability
+  alerting:
+    - threshold: 60
+      severity: warning
+      channels: [console]
+
+# Database Query Performance
+- name: database-query-latency
+  description: Database queries P95 under 100ms
+  objective: 95
+  window: 24h        # Daily window
+  indicator:
+    type: latency
+    threshold: 100
+    percentile: 95
+  alerting:
+    - threshold: 80
+      severity: warning
+      channels: [console]

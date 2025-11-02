@@ -1,0 +1,82 @@
+{
+  "trading": {
+    "title": "トレーディング",
+    "description": "DeFi市場のためのプロフェッショナルトレーディングインターフェース",
+    "marketData": "市場データ",
+    "orderBook": "注文簿",
+    "priceChart": "価格チャート",
+    "recentTrades": "最近の取引",
+    "tradeHistory": "取引履歴",
+    "openOrders": "未決済注文",
+    "orderHistory": "注文履歴",
+    "positions": "ポジション",
+    "portfolio": "ポートフォリオ"
+  },
+  "markets": {
+    "title": "市場",
+    "search": "市場を検索...",
+    "filter": "市場をフィルター",
+    "sortBy": "ソート順",
+    "volume24h": "24時間取引量",
+    "priceChange": "価格変動",
+    "marketCap": "時価総額",
+    "allMarkets": "すべての市場",
+    "favorites": "お気に入り",
+    "gainers": "上昇銘柄",
+    "losers": "下落銘柄",
+    "newListings": "新規上場"
+  },
+  "orders": {
+    "buy": "買う",
+    "sell": "売る",
+    "limit": "指値注文",
+    "market": "成行注文",
+    "stop": "ストップ注文",
+    "stopLimit": "ストップ指値注文",
+    "orderType": "注文タイプ",
+    "amount": "数量",
+    "price": "価格",
+    "total": "合計",
+    "placeOrder": "注文する",
+    "cancelOrder": "注文をキャンセル",
+    "orderPlaced": "注文が正常に発注されました",
+    "orderCancelled": "注文がキャンセルされました",
+    "insufficientBalance": "残高不足",
+    "priceImpact": "価格影響",
+    "minimumReceived": "最低受取量",
+    "slippageTolerance": "スリッページ許容度"
+  },
+  "chart": {
+    "timeframe": "時間枠",
+    "indicators": "インジケーター",
+    "drawingTools": "描画ツール",
+    "fullscreen": "全画面",
+    "price": "価格",
+    "volume": "取引量",
+    "time": "時間",
+    "open": "始値",
+    "high": "高値",
+    "low": "安値",
+    "close": "終値"
+  },
+  "liquidity": {
+    "title": "流動性",
+    "addLiquidity": "流動性を追加",
+    "removeLiquidity": "流動性を削除",
+    "yourLiquidity": "あなたの流動性",
+    "poolShare": "プールシェア",
+    "apy": "年利回り",
+    "rewards": "報酬",
+    "impermanentLoss": "インパーマネントロスリスク"
+  },
+  "staking": {
+    "title": "ステーキング",
+    "stake": "ステーク",
+    "unstake": "アンステーク",
+    "claimRewards": "報酬を請求",
+    "stakingApy": "ステーキング年利回り",
+    "totalStaked": "総ステーク量",
+    "yourStake": "あなたのステーク",
+    "rewardsEarned": "獲得報酬"
+  }
+}

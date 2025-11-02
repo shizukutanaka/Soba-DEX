@@ -1,0 +1,174 @@
+# ============================================================================
+# PostgreSQL StatefulSet with TimescaleDB
+# ============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: security-monitor
+  labels:
+    app: postgres
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgres
+  clusterIP: None
+  selector:
+    app: postgres
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: security-monitor
+spec:
+  serviceName: postgres-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: timescale/timescaledb:latest-pg14
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: security-monitor-config
+                  key: DB_NAME
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: security-monitor-config
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: security-monitor-secrets
+                  key: DB_PASSWORD
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+            - name: init-scripts
+              mountPath: /docker-entrypoint-initdb.d
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "1"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pg_isready -U postgres
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pg_isready -U postgres
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: init-scripts
+          configMap:
+            name: postgres-init-scripts
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 50Gi
+        storageClassName: standard
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-scripts
+  namespace: security-monitor
+data:
+  init-db.sql: |
+    -- Enable required extensions
+    CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;
+    CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
+
+    -- Create security_events table
+    CREATE TABLE IF NOT EXISTS security_events (
+        id VARCHAR(255) PRIMARY KEY,
+        type VARCHAR(100) NOT NULL,
+        severity VARCHAR(20) DEFAULT 'MEDIUM',
+        ip VARCHAR(45),
+        url TEXT,
+        user_agent TEXT,
+        timestamp BIGINT NOT NULL,
+        risk_score INTEGER DEFAULT 0,
+        threat_level VARCHAR(20) DEFAULT 'LOW',
+        blocked BOOLEAN DEFAULT FALSE,
+        details JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- Create hypertable for time-series data
+    SELECT create_hypertable('security_events', 'timestamp',
+        chunk_time_interval => 86400000,
+        if_not_exists => TRUE);
+
+    -- Create indexes
+    CREATE INDEX IF NOT EXISTS idx_events_timestamp ON security_events(timestamp DESC);
+    CREATE INDEX IF NOT EXISTS idx_events_ip ON security_events(ip);
+    CREATE INDEX IF NOT EXISTS idx_events_type ON security_events(type);
+    CREATE INDEX IF NOT EXISTS idx_events_severity ON security_events(severity);
+
+    -- Create incidents table
+    CREATE TABLE IF NOT EXISTS incidents (
+        id VARCHAR(255) PRIMARY KEY,
+        severity VARCHAR(20) NOT NULL,
+        status VARCHAR(50) DEFAULT 'ACTIVE',
+        title VARCHAR(500),
+        description TEXT,
+        created_at BIGINT NOT NULL,
+        updated_at BIGINT,
+        resolved_at BIGINT,
+        assigned_to VARCHAR(255),
+        tags JSONB,
+        metadata JSONB
+    );
+
+    -- Create threat_intelligence table
+    CREATE TABLE IF NOT EXISTS threat_intelligence (
+        id SERIAL PRIMARY KEY,
+        ip VARCHAR(45) NOT NULL,
+        domain VARCHAR(255),
+        hash VARCHAR(255),
+        source VARCHAR(100) NOT NULL,
+        threat_type VARCHAR(100),
+        confidence_score INTEGER,
+        first_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        is_active BOOLEAN DEFAULT TRUE,
+        metadata JSONB,
+        UNIQUE(ip, source)
+    );

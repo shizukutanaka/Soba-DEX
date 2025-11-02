@@ -1,0 +1,225 @@
+# ============================================================================
+# Chaos Engineering - Pod Failure Experiments
+# Test system resilience when pods randomly fail
+# ============================================================================
+#
+# Prerequisites:
+# - Chaos Mesh installed: kubectl apply -f https://mirrors.chaos-mesh.org/latest/crd.yaml
+# - Chaos Mesh operator: kubectl apply -f https://mirrors.chaos-mesh.org/latest/chaos-mesh.yaml
+#
+# Alternative: Litmus Chaos
+# - kubectl apply -f https://litmuschaos.github.io/litmus/litmus-operator-v1.13.8.yaml
+
+---
+# Experiment 1: Random Pod Kill
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-kill-random
+  namespace: security-monitor
+spec:
+  action: pod-kill
+  mode: one # Kill one pod at a time
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  scheduler:
+    cron: '@every 10m' # Every 10 minutes
+  duration: '30s'
+
+---
+# Experiment 2: Pod Failure (makes pod return error)
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-failure
+  namespace: security-monitor
+spec:
+  action: pod-failure
+  mode: fixed
+  value: '1' # Affect 1 pod
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  duration: '5m'
+  scheduler:
+    cron: '@hourly'
+
+---
+# Experiment 3: Container Kill
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: container-kill
+  namespace: security-monitor
+spec:
+  action: container-kill
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  containerNames:
+    - security-monitor
+  duration: '1m'
+  scheduler:
+    cron: '@every 30m'
+
+---
+# Experiment 4: PostgreSQL Pod Kill
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: postgres-pod-kill
+  namespace: security-monitor
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: postgres
+  scheduler:
+    cron: '@daily' # Daily at midnight
+  duration: '10s'
+
+---
+# Experiment 5: Redis Pod Kill
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: redis-pod-kill
+  namespace: security-monitor
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: redis
+  scheduler:
+    cron: '@daily'
+  duration: '10s'
+
+---
+# Experiment 6: Multiple Pod Failures (Percentage-based)
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-failure-percentage
+  namespace: security-monitor
+spec:
+  action: pod-failure
+  mode: fixed-percent
+  value: '30' # Affect 30% of pods
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  duration: '2m'
+  scheduler:
+    cron: '@weekly' # Weekly stress test
+
+---
+# Experiment 7: Pod Restart Loop (Simulates CrashLoopBackOff)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: chaos-restart-tester
+  namespace: security-monitor
+  labels:
+    chaos-test: restart-loop
+spec:
+  restartPolicy: Always
+  containers:
+    - name: crasher
+      image: busybox
+      command: ['sh', '-c', 'echo Starting... && sleep 5 && exit 1']
+      resources:
+        limits:
+          memory: "64Mi"
+          cpu: "100m"
+
+---
+# Experiment 8: Graceful Shutdown Test
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-graceful-shutdown
+  namespace: security-monitor
+spec:
+  action: pod-kill
+  mode: one
+  gracePeriod: 30 # 30 second graceful shutdown
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  duration: '1m'
+
+---
+# Experiment 9: All Pods Kill (DANGEROUS - Use with caution)
+# Commented out by default - only use in isolated test environments
+# apiVersion: chaos-mesh.org/v1alpha1
+# kind: PodChaos
+# metadata:
+#   name: pod-kill-all
+#   namespace: security-monitor
+# spec:
+#   action: pod-kill
+#   mode: all
+#   selector:
+#     namespaces:
+#       - security-monitor
+#     labelSelectors:
+#       app: security-monitor
+#   duration: '30s'
+
+---
+# Helper: Chaos Experiment Monitor Job
+# Monitors system health during chaos experiments
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: chaos-monitor
+  namespace: security-monitor
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: monitor
+          image: curlimages/curl:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Starting chaos experiment monitoring..."
+
+              for i in $(seq 1 60); do
+                echo "Check $i/60"
+
+                # Check health endpoint
+                HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://security-monitor-service:3000/health)
+                echo "Health check: $HTTP_CODE"
+
+                if [ "$HTTP_CODE" != "200" ] && [ "$HTTP_CODE" != "503" ]; then
+                  echo "WARNING: Unexpected health status: $HTTP_CODE"
+                fi
+
+                # Check if pods are running
+                kubectl get pods -n security-monitor -l app=security-monitor
+
+                sleep 10
+              done
+
+              echo "Monitoring complete"

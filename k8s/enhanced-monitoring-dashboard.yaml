@@ -1,0 +1,567 @@
+/**
+ * Enhanced Grafana Dashboard Configuration for DEX Platform
+ *
+ * Advanced monitoring dashboard with:
+ * - Real-time performance metrics
+ * - Predictive analytics
+ * - Custom business metrics
+ * - User behavior analytics
+ * - Blockchain performance monitoring
+ * - AI/ML model performance tracking
+ * - Quantum computing metrics
+ * - Multi-dimensional alerting
+ *
+ * @version 6.0.0
+ */
+
+# Advanced Grafana Dashboard with Business Intelligence
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: dex-platform
+data:
+  dex-performance-dashboard.json: |
+    {
+      "dashboard": {
+        "title": "DEX Platform Performance Dashboard",
+        "tags": ["dex", "performance", "business"],
+        "timezone": "UTC",
+        "panels": [
+          {
+            "title": "Real-time TPS & Throughput",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "sum(rate(dex_transactions_total[5m]))",
+                "legendFormat": "TPS"
+              },
+              {
+                "expr": "sum(rate(dex_volume_usd_total[5m]))",
+                "legendFormat": "Volume/min"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "steps": [
+                    { "color": "green", "value": null },
+                    { "color": "yellow", "value": 1000 },
+                    { "color": "red", "value": 5000 }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "title": "Response Time Distribution",
+            "type": "heatmap",
+            "targets": [
+              {
+                "expr": "sum(rate(http_request_duration_seconds_bucket[5m])) by (le)",
+                "format": "heatmap",
+                "legendFormat": "{{le}}"
+              }
+            ],
+            "heatmap": {},
+            "yAxis": {
+              "unit": "s"
+            }
+          },
+          {
+            "title": "Error Rate by Service",
+            "type": "bargauge",
+            "targets": [
+              {
+                "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) by (service) / sum(rate(http_requests_total[5m])) by (service)",
+                "legendFormat": "{{service}}"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "thresholds": {
+                  "steps": [
+                    { "color": "green", "value": null },
+                    { "color": "yellow", "value": 0.01 },
+                    { "color": "red", "value": 0.05 }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "title": "Blockchain Network Performance",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "avg(blockchain_block_time_seconds)",
+                "legendFormat": "Block Time"
+              },
+              {
+                "expr": "avg(blockchain_gas_price_gwei)",
+                "legendFormat": "Gas Price"
+              },
+              {
+                "expr": "sum(blockchain_pending_transactions)",
+                "legendFormat": "Pending Txs"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                }
+              }
+            }
+          },
+          {
+            "title": "AI/ML Model Performance",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "avg(ai_model_accuracy)",
+                "legendFormat": "Model Accuracy"
+              },
+              {
+                "expr": "avg(ai_prediction_confidence)",
+                "legendFormat": "Prediction Confidence"
+              },
+              {
+                "expr": "sum(rate(ai_predictions_total[5m]))",
+                "legendFormat": "Predictions/min"
+              }
+            ]
+          },
+          {
+            "title": "Liquidity Pool Health",
+            "type": "gauge",
+            "targets": [
+              {
+                "expr": "avg(amm_pool_liquidity_usd)",
+                "legendFormat": "Pool Liquidity"
+              },
+              {
+                "expr": "avg(amm_impermanent_loss_ratio)",
+                "legendFormat": "IL Ratio"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "min": 0,
+                "max": 1000000,
+                "thresholds": {
+                  "steps": [
+                    { "color": "red", "value": null },
+                    { "color": "yellow", "value": 10000 },
+                    { "color": "green", "value": 100000 }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "title": "User Engagement Metrics",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "sum(active_users_gauge)",
+                "legendFormat": "Active Users"
+              },
+              {
+                "expr": "avg(session_duration_seconds)",
+                "legendFormat": "Avg Session"
+              },
+              {
+                "expr": "sum(daily_active_addresses)",
+                "legendFormat": "DAU"
+              }
+            ]
+          },
+          {
+            "title": "Quantum Computing Performance",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "avg(quantum_circuit_fidelity)",
+                "legendFormat": "Circuit Fidelity"
+              },
+              {
+                "expr": "avg(quantum_coherence_time_ms)",
+                "legendFormat": "Coherence Time"
+              },
+              {
+                "expr": "sum(quantum_error_correction_rate)",
+                "legendFormat": "Error Correction"
+              }
+            ]
+          }
+        ],
+        "time": {
+          "from": "now-6h",
+          "to": "now"
+        },
+        "refresh": "30s"
+      }
+    }
+
+  dex-business-intelligence.json: |
+    {
+      "dashboard": {
+        "title": "Business Intelligence Dashboard",
+        "tags": ["business", "analytics", "trading"],
+        "panels": [
+          {
+            "title": "Revenue & Profit Analysis",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "sum(rate(dex_fees_usd_total[1h]))",
+                "legendFormat": "Fee Revenue"
+              },
+              {
+                "expr": "sum(dex_profit_margin_ratio)",
+                "legendFormat": "Profit Margin"
+              }
+            ],
+            "yAxes": [
+              { "label": "USD", "unit": "currencyUSD" },
+              { "label": "Ratio", "unit": "percent" }
+            ]
+          },
+          {
+            "title": "Market Share by Token",
+            "type": "piechart",
+            "targets": [
+              {
+                "expr": "sum(rate(trading_volume_usd_total[1d])) by (token)",
+                "legendFormat": "{{token}}"
+              }
+            ]
+          },
+          {
+            "title": "User Growth & Retention",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "sum(daily_new_users)",
+                "legendFormat": "New Users"
+              },
+              {
+                "expr": "sum(user_retention_rate)",
+                "legendFormat": "Retention Rate"
+              }
+            ]
+          },
+          {
+            "title": "Geographic Distribution",
+            "type": "geomap",
+            "targets": [
+              {
+                "expr": "sum(active_users_gauge) by (country)",
+                "legendFormat": "{{country}}"
+              }
+            ]
+          },
+          {
+            "title": "Social Sentiment Impact",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "avg(social_sentiment_score)",
+                "legendFormat": "Social Sentiment"
+              },
+              {
+                "expr": "sum(social_volume)",
+                "legendFormat": "Social Volume"
+              }
+            ]
+          }
+        ]
+      }
+    }
+
+  dex-alerting-dashboard.json: |
+    {
+      "dashboard": {
+        "title": "Alerting & Incident Dashboard",
+        "tags": ["alerts", "incidents", "monitoring"],
+        "panels": [
+          {
+            "title": "Active Alerts",
+            "type": "alertlist",
+            "options": {
+              "showOptions": "current",
+              "maxItems": 20,
+              "sortOrder": 1
+            }
+          },
+          {
+            "title": "Alert History",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "sum(changes(alerts_active_total[5m]))",
+                "legendFormat": "Alert Changes"
+              }
+            ]
+          },
+          {
+            "title": "System Health Score",
+            "type": "gauge",
+            "targets": [
+              {
+                "expr": "100 - (sum(alerts_critical_total) * 10 + sum(alerts_warning_total) * 2)",
+                "legendFormat": "Health Score"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "min": 0,
+                "max": 100,
+                "thresholds": {
+                  "steps": [
+                    { "color": "red", "value": null },
+                    { "color": "yellow", "value": 80 },
+                    { "color": "green", "value": 95 }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+
+---
+# Enhanced Grafana Data Sources
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: dex-platform
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+        isDefault: true
+        editable: false
+      - name: DEX Metrics
+        type: prometheus
+        access: proxy
+        url: http://dex-metrics-service.dex-platform.svc.cluster.local:9090
+        editable: false
+      - name: Blockchain Metrics
+        type: prometheus
+        access: proxy
+        url: http://blockchain-metrics.dex-platform.svc.cluster.local:9090
+        editable: false
+      - name: AI/ML Metrics
+        type: prometheus
+        access: proxy
+        url: http://ai-metrics.dex-platform.svc.cluster.local:9090
+        editable: false
+
+---
+# Grafana Alerting Rules
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-alert-rules
+  namespace: dex-platform
+data:
+  alert-rules.yaml: |
+    groups:
+      - name: DEX Platform Alerts
+        rules:
+          - alert: HighErrorRate
+            expr: |
+              sum(rate(http_requests_total{status=~\"5..\"}[5m])) by (service)
+              / sum(rate(http_requests_total[5m])) by (service) > 0.05
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "High error rate detected on {{ $labels.service }}"
+              description: "Error rate is {{ $value }}% on {{ $labels.service }}"
+
+          - alert: HighLatency
+            expr: |
+              histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service)) > 2
+            for: 3m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High latency detected on {{ $labels.service }}"
+              description: "95th percentile latency is {{ $value }}s on {{ $labels.service }}"
+
+          - alert: LowLiquidity
+            expr: |
+              avg(amm_pool_liquidity_usd) by (pool) < 1000
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Low liquidity in {{ $labels.pool }}"
+              description: "Pool liquidity dropped below $1000"
+
+          - alert: AIModelDegradation
+            expr: |
+              avg(ai_model_accuracy) by (model) < 0.8
+            for: 15m
+            labels:
+              severity: warning
+            annotations:
+              summary: "AI model accuracy degraded for {{ $labels.model }}"
+              description: "Model accuracy is {{ $value }}%"
+
+          - alert: QuantumErrorRate
+            expr: |
+              avg(quantum_error_rate) > 0.01
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "High quantum error rate detected"
+              description: "Quantum error rate is {{ $value }}%"
+
+---
+# Enhanced Grafana Deployment with High Availability
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-enhanced
+  namespace: dex-platform
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: grafana-enhanced
+  template:
+    metadata:
+      labels:
+        app: grafana-enhanced
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana:10.2.0
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GF_SECURITY_ADMIN_USER
+          value: "admin"
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grafana-secrets
+              key: admin-password
+        - name: GF_USERS_ALLOW_SIGN_UP
+          value: "false"
+        - name: GF_INSTALL_PLUGINS
+          value: "grafana-piechart-panel,grafana-worldmap-panel,grafana-clock-panel"
+        - name: GF_LOG_LEVEL
+          value: "warn"
+        - name: GF_SERVER_ROOT_URL
+          value: "https://monitoring.dex-platform.com"
+        volumeMounts:
+        - name: dashboards
+          mountPath: /var/lib/grafana/dashboards
+        - name: datasources
+          mountPath: /etc/grafana/provisioning/datasources
+        - name: dashboards-config
+          mountPath: /etc/grafana/provisioning/dashboards
+        - name: alert-rules
+          mountPath: /etc/grafana/provisioning/alerting
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+      volumes:
+      - name: dashboards
+        configMap:
+          name: grafana-dashboards
+      - name: datasources
+        configMap:
+          name: grafana-datasources
+      - name: dashboards-config
+        configMap:
+          name: grafana-dashboard-config
+      - name: alert-rules
+        configMap:
+          name: grafana-alert-rules
+
+---
+# Grafana Service with Load Balancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-enhanced-service
+  namespace: dex-platform
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  - port: 443
+    targetPort: 3000
+    protocol: TCP
+    name: https
+  selector:
+    app: grafana-enhanced
+
+---
+# Prometheus Rules for DEX Metrics
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: dex-platform
+data:
+  dex-rules.yaml: |
+    groups:
+      - name: dex_business_metrics
+        rules:
+          - record: dex_tps_5m
+            expr: sum(rate(dex_transactions_total[5m]))
+          - record: dex_volume_1h
+            expr: sum(increase(dex_volume_usd_total[1h]))
+          - record: dex_error_rate_5m
+            expr: |
+              sum(rate(http_requests_total{status=~\"5..\"}[5m]))
+              / sum(rate(http_requests_total[5m]))
+          - record: dex_avg_response_time_5m
+            expr: |
+              sum(rate(http_request_duration_seconds_sum[5m]))
+              / sum(rate(http_request_duration_seconds_count[5m]))
+          - record: dex_liquidity_utilization
+            expr: |
+              sum(amm_pool_liquidity_usd)
+              / sum(amm_total_liquidity_usd)
+          - record: dex_user_engagement_score
+            expr: |
+              (sum(active_users_gauge) * 0.4)
+              + (avg(session_duration_seconds) * 0.3)
+              + (sum(daily_active_addresses) * 0.3)

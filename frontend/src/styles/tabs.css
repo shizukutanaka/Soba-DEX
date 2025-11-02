@@ -1,0 +1,260 @@
+/**
+ * Tabs Component Styles
+ * Following Atlassian Design System principles
+ */
+
+@import './tokens.css';
+
+/* Container */
+.atlas-tabs {
+  display: inline-flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.atlas-tabs--full-width {
+  width: 100%;
+}
+
+/* Tab List */
+.atlas-tabs__list {
+  display: flex;
+  gap: var(--space-050);
+  border-bottom: 2px solid var(--neutral-200);
+  position: relative;
+}
+
+.atlas-tabs--full-width .atlas-tabs__list {
+  width: 100%;
+}
+
+/* Tab Button */
+.atlas-tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-100);
+  padding: var(--space-150) var(--space-200);
+  border: none;
+  background: transparent;
+  color: var(--neutral-800);
+  font-size: var(--font-size-100);
+  font-weight: 500;
+  line-height: 1.5;
+  cursor: pointer;
+  position: relative;
+  transition: all var(--transition-normal);
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+
+.atlas-tabs--full-width .atlas-tabs__tab {
+  flex: 1;
+  justify-content: center;
+}
+
+/* Size Variants */
+.atlas-tabs--sm .atlas-tabs__tab {
+  padding: var(--space-100) var(--space-150);
+  font-size: var(--font-size-75);
+  gap: var(--space-075);
+}
+
+.atlas-tabs--lg .atlas-tabs__tab {
+  padding: var(--space-200) var(--space-300);
+  font-size: var(--font-size-200);
+  gap: var(--space-150);
+}
+
+/* Tab States */
+.atlas-tabs__tab:hover:not(.atlas-tabs__tab--disabled) {
+  color: var(--brand-primary);
+  background: var(--neutral-50);
+}
+
+.atlas-tabs__tab:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+  border-radius: var(--space-050);
+}
+
+.atlas-tabs__tab--active {
+  color: var(--brand-primary);
+  border-bottom-color: var(--brand-primary);
+}
+
+.atlas-tabs__tab--disabled {
+  color: var(--neutral-400);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Icon */
+.atlas-tabs__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.atlas-tabs--sm .atlas-tabs__icon {
+  width: 16px;
+  height: 16px;
+}
+
+.atlas-tabs--lg .atlas-tabs__icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* Badge */
+.atlas-tabs__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--space-075);
+  background: var(--neutral-200);
+  color: var(--neutral-900);
+  font-size: var(--font-size-75);
+  font-weight: 600;
+  border-radius: 10px;
+  line-height: 1;
+}
+
+.atlas-tabs__tab--active .atlas-tabs__badge {
+  background: var(--brand-primary);
+  color: var(--neutral-0);
+}
+
+/* Enclosed Variant */
+.atlas-tabs--enclosed .atlas-tabs__list {
+  gap: var(--space-025);
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.atlas-tabs--enclosed .atlas-tabs__tab {
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: var(--space-100) var(--space-100) 0 0;
+  margin-bottom: -1px;
+}
+
+.atlas-tabs--enclosed .atlas-tabs__tab--active {
+  background: var(--neutral-0);
+  border-color: var(--neutral-200);
+  border-bottom: 1px solid var(--neutral-0);
+}
+
+.atlas-tabs--enclosed .atlas-tabs__tab:hover:not(.atlas-tabs__tab--disabled) {
+  background: var(--neutral-50);
+  border-color: var(--neutral-300);
+}
+
+/* Pills Variant */
+.atlas-tabs--pills .atlas-tabs__list {
+  border-bottom: none;
+  gap: var(--space-100);
+}
+
+.atlas-tabs--pills .atlas-tabs__tab {
+  border: none;
+  border-radius: var(--space-100);
+  margin-bottom: 0;
+}
+
+.atlas-tabs--pills .atlas-tabs__tab--active {
+  background: var(--brand-primary);
+  color: var(--neutral-0);
+  border-bottom: none;
+}
+
+.atlas-tabs--pills .atlas-tabs__tab--active .atlas-tabs__badge {
+  background: var(--neutral-0);
+  color: var(--brand-primary);
+}
+
+.atlas-tabs--pills .atlas-tabs__tab:hover:not(.atlas-tabs__tab--disabled) {
+  background: var(--neutral-100);
+}
+
+.atlas-tabs--pills .atlas-tabs__tab--active:hover {
+  background: var(--brand-600);
+}
+
+/* Tab Panel */
+.atlas-tab-panel {
+  padding: var(--space-200) 0;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .atlas-tabs__list {
+    border-bottom-color: var(--neutral-700);
+  }
+
+  .atlas-tabs__tab {
+    color: var(--neutral-200);
+  }
+
+  .atlas-tabs__tab:hover:not(.atlas-tabs__tab--disabled) {
+    color: var(--brand-400);
+    background: var(--neutral-800);
+  }
+
+  .atlas-tabs__tab--active {
+    color: var(--brand-400);
+    border-bottom-color: var(--brand-400);
+  }
+
+  .atlas-tabs__badge {
+    background: var(--neutral-700);
+    color: var(--neutral-100);
+  }
+
+  .atlas-tabs__tab--active .atlas-tabs__badge {
+    background: var(--brand-400);
+    color: var(--neutral-1300);
+  }
+
+  .atlas-tabs--enclosed .atlas-tabs__list {
+    border-bottom-color: var(--neutral-700);
+  }
+
+  .atlas-tabs--enclosed .atlas-tabs__tab--active {
+    background: var(--neutral-1300);
+    border-color: var(--neutral-700);
+    border-bottom-color: var(--neutral-1300);
+  }
+
+  .atlas-tabs--pills .atlas-tabs__tab--active {
+    background: var(--brand-400);
+    color: var(--neutral-1300);
+  }
+
+  .atlas-tabs--pills .atlas-tabs__tab:hover:not(.atlas-tabs__tab--disabled) {
+    background: var(--neutral-800);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .atlas-tabs__list {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .atlas-tabs__tab {
+    flex-shrink: 0;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-tabs__tab {
+    transition: none;
+  }
+}

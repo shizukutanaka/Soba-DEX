@@ -1,0 +1,82 @@
+{
+  "trading": {
+    "title": "Échange",
+    "description": "Interface d'échange professionnelle pour les marchés DeFi",
+    "marketData": "Données de Marché",
+    "orderBook": "Carnet d'Ordres",
+    "priceChart": "Graphique de Prix",
+    "recentTrades": "Échanges Récents",
+    "tradeHistory": "Historique d'Échange",
+    "openOrders": "Ordres Ouverts",
+    "orderHistory": "Historique des Ordres",
+    "positions": "Positions",
+    "portfolio": "Portefeuille"
+  },
+  "markets": {
+    "title": "Marchés",
+    "search": "Rechercher des marchés...",
+    "filter": "Filtrer les marchés",
+    "sortBy": "Trier par",
+    "volume24h": "Volume 24h",
+    "priceChange": "Changement de Prix",
+    "marketCap": "Capitalisation Boursière",
+    "allMarkets": "Tous les Marchés",
+    "favorites": "Favoris",
+    "gainers": "Gagnants",
+    "losers": "Perdants",
+    "newListings": "Nouvelles Cotations"
+  },
+  "orders": {
+    "buy": "Acheter",
+    "sell": "Vendre",
+    "limit": "Ordre Limite",
+    "market": "Ordre de Marché",
+    "stop": "Ordre Stop",
+    "stopLimit": "Ordre Stop Limite",
+    "orderType": "Type d'Ordre",
+    "amount": "Montant",
+    "price": "Prix",
+    "total": "Total",
+    "placeOrder": "Placer un Ordre",
+    "cancelOrder": "Annuler l'Ordre",
+    "orderPlaced": "Ordre placé avec succès",
+    "orderCancelled": "Ordre annulé",
+    "insufficientBalance": "Solde insuffisant",
+    "priceImpact": "Impact sur le Prix",
+    "minimumReceived": "Minimum Reçu",
+    "slippageTolerance": "Tolérance de Glissement"
+  },
+  "chart": {
+    "timeframe": "Période",
+    "indicators": "Indicateurs",
+    "drawingTools": "Outils de Dessin",
+    "fullscreen": "Plein Écran",
+    "price": "Prix",
+    "volume": "Volume",
+    "time": "Temps",
+    "open": "Ouverture",
+    "high": "Plus Haut",
+    "low": "Plus Bas",
+    "close": "Fermeture"
+  },
+  "liquidity": {
+    "title": "Liquidité",
+    "addLiquidity": "Ajouter de la Liquidité",
+    "removeLiquidity": "Retirer de la Liquidité",
+    "yourLiquidity": "Votre Liquidité",
+    "poolShare": "Part du Pool",
+    "apy": "APY",
+    "rewards": "Récompenses",
+    "impermanentLoss": "Risque de Perte Impermanente"
+  },
+  "staking": {
+    "title": "Staking",
+    "stake": "Staking",
+    "unstake": "Unstaking",
+    "claimRewards": "Réclamer Récompenses",
+    "stakingApy": "APY de Staking",
+    "totalStaked": "Total Staké",
+    "yourStake": "Votre Stake",
+    "rewardsEarned": "Récompenses Gagnées"
+  }
+}

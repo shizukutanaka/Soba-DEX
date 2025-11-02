@@ -1,0 +1,261 @@
+/* ===== ATLAS INPUT COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-075);
+  width: auto;
+}
+
+.atlas-input-container--full {
+  width: 100%;
+}
+
+/* ===== LABEL ===== */
+.atlas-input-label {
+  display: block;
+  font-size: var(--font-size-100);
+  font-weight: var(--font-weight-semibold);
+  color: var(--neutral-1100);
+  line-height: var(--line-height-tight);
+}
+
+.atlas-input-required {
+  color: var(--danger-500);
+  margin-left: var(--space-050);
+  font-weight: var(--font-weight-bold);
+}
+
+/* ===== INPUT WRAPPER ===== */
+.atlas-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--neutral-0);
+  border: var(--input-border-width) solid var(--input-border-color);
+  border-radius: var(--radius-200);
+  transition: all var(--transition-normal);
+}
+
+.atlas-input-wrapper:hover:not(.atlas-input-wrapper--disabled) {
+  border-color: var(--neutral-500);
+}
+
+.atlas-input-wrapper:focus-within {
+  border-color: var(--input-border-color-focus);
+  box-shadow: 0 0 0 1px var(--input-border-color-focus);
+}
+
+/* Size Variants */
+.atlas-input-wrapper--sm {
+  height: 32px;
+  padding: 0 var(--space-100);
+}
+
+.atlas-input-wrapper--md {
+  height: var(--input-height);
+  padding: 0 var(--space-150);
+}
+
+.atlas-input-wrapper--lg {
+  height: 48px;
+  padding: 0 var(--space-200);
+}
+
+/* With Icons */
+.atlas-input-wrapper--with-icon-before {
+  padding-left: var(--space-100);
+}
+
+.atlas-input-wrapper--with-icon-after {
+  padding-right: var(--space-100);
+}
+
+/* Error State */
+.atlas-input-wrapper--error {
+  border-color: var(--input-border-color-error);
+  background: var(--danger-50);
+}
+
+.atlas-input-wrapper--error:focus-within {
+  border-color: var(--input-border-color-error);
+  box-shadow: 0 0 0 1px var(--input-border-color-error);
+}
+
+/* Disabled State */
+.atlas-input-wrapper--disabled {
+  background: var(--neutral-100);
+  border-color: var(--neutral-200);
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+}
+
+/* ===== INPUT FIELD ===== */
+.atlas-input {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-100);
+  font-weight: var(--font-weight-regular);
+  color: var(--neutral-1300);
+  line-height: var(--line-height-normal);
+  padding: 0;
+}
+
+.atlas-input::placeholder {
+  color: var(--neutral-600);
+  opacity: 1;
+}
+
+.atlas-input:disabled {
+  cursor: not-allowed;
+  color: var(--neutral-700);
+}
+
+.atlas-input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 100px var(--neutral-0) inset;
+  -webkit-text-fill-color: var(--neutral-1300);
+}
+
+/* Remove number input spinners */
+.atlas-input[type='number']::-webkit-inner-spin-button,
+.atlas-input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.atlas-input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+/* ===== ICONS ===== */
+.atlas-input-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--neutral-700);
+  width: 20px;
+  height: 20px;
+}
+
+.atlas-input-icon--before {
+  margin-right: var(--space-100);
+}
+
+.atlas-input-icon--after {
+  margin-left: var(--space-100);
+}
+
+.atlas-input-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.atlas-input-wrapper--error .atlas-input-icon {
+  color: var(--danger-500);
+}
+
+/* ===== HELPER TEXT ===== */
+.atlas-input-helper {
+  margin: 0;
+  font-size: var(--font-size-075);
+  color: var(--neutral-800);
+  line-height: var(--line-height-normal);
+}
+
+/* ===== ERROR MESSAGE ===== */
+.atlas-input-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-075);
+  margin: 0;
+  font-size: var(--font-size-075);
+  font-weight: var(--font-weight-medium);
+  color: var(--danger-600);
+  line-height: var(--line-height-normal);
+}
+
+.atlas-input-error-icon {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+}
+
+/* ===== INPUT ADDON ===== */
+.atlas-input-addon {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-150);
+  background: var(--neutral-100);
+  color: var(--neutral-900);
+  font-size: var(--font-size-100);
+  font-weight: var(--font-weight-medium);
+  border: var(--input-border-width) solid var(--input-border-color);
+  white-space: nowrap;
+}
+
+.atlas-input-addon--before {
+  border-right: none;
+  border-radius: var(--radius-200) 0 0 var(--radius-200);
+}
+
+.atlas-input-addon--after {
+  border-left: none;
+  border-radius: 0 var(--radius-200) var(--radius-200) 0;
+}
+
+.atlas-input-addon + .atlas-input-wrapper {
+  border-left: none;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.atlas-input-wrapper + .atlas-input-addon {
+  border-left: none;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* ===== INPUT GROUP ===== */
+.atlas-input-group {
+  display: flex;
+  width: 100%;
+}
+
+.atlas-input-group .atlas-input-wrapper {
+  flex: 1;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .atlas-input-wrapper--lg {
+    height: var(--input-height);
+    padding: 0 var(--space-150);
+  }
+}
+
+/* ===== HIGH CONTRAST MODE ===== */
+@media (prefers-contrast: high) {
+  .atlas-input-wrapper {
+    border-width: 2px;
+  }
+
+  .atlas-input-wrapper:focus-within {
+    outline: 2px solid var(--input-border-color-focus);
+    outline-offset: 2px;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-input-wrapper {
+    transition: none;
+  }
+}

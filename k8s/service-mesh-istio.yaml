@@ -1,0 +1,436 @@
+/**
+ * Istio Service Mesh Configuration
+ *
+ * Advanced service mesh for DEX platform microservices:
+ * - Intelligent traffic management
+ * - Security policies and encryption
+ * - Observability and monitoring
+ * - Circuit breaker and retry policies
+ * - Rate limiting and quotas
+ * - Multi-cluster support
+ * - Chaos engineering integration
+ *
+ * @version 6.0.0
+ */
+
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: dex-istio-install
+  namespace: istio-system
+spec:
+  meshConfig:
+    defaultConfig:
+      concurrency: 2
+      proxyMetadata:
+        BOOTSTRAP_XDS_AGENT: true
+        ISTIO_META_DNS_AUTO_ALLOCATE: true
+      proxyInit:
+        resources:
+          limits:
+            cpu: 100m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 10Mi
+    enablePrometheusMerge: true
+    enableTracing: true
+    defaultServiceExportTo:
+    - "."
+    defaultVirtualServiceExportTo:
+    - "."
+    defaultDestinationRuleExportTo:
+    - "."
+
+---
+# Gateway configuration for external traffic
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: dex-gateway
+  namespace: dex-platform
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "api.dex-platform.com"
+    - "app.dex-platform.com"
+    - "mobile.dex-platform.com"
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    hosts:
+    - "api.dex-platform.com"
+    - "app.dex-platform.com"
+    - "mobile.dex-platform.com"
+    tls:
+      mode: SIMPLE
+      credentialName: dex-tls-secret
+
+---
+# Virtual service for API routing
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: dex-api-virtual-service
+  namespace: dex-platform
+spec:
+  hosts:
+  - "api.dex-platform.com"
+  gateways:
+  - dex-gateway
+  http:
+  # Backend API routes
+  - match:
+    - uri:
+        prefix: "/api/v1/"
+    route:
+    - destination:
+        host: dex-backend
+        port:
+          number: 3000
+      weight: 80
+    - destination:
+        host: dex-backend-v2
+        port:
+          number: 3000
+      weight: 20
+  # Frontend routes
+  - match:
+    - uri:
+        prefix: "/"
+    route:
+    - destination:
+        host: dex-frontend
+        port:
+          number: 80
+  # Mobile API routes
+  - match:
+    - uri:
+        prefix: "/api/mobile/"
+    route:
+    - destination:
+        host: dex-mobile-api
+        port:
+          number: 3000
+  # AI service routes
+  - match:
+    - uri:
+        prefix: "/api/v6/quantum/"
+    route:
+    - destination:
+        host: dex-ai-service
+        port:
+          number: 3000
+    headers:
+      request:
+        set:
+          x-service-type: "quantum-ai"
+
+---
+# Destination rule with circuit breaker
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: dex-backend-destination-rule
+  namespace: dex-platform
+spec:
+  host: dex-backend
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+        connectTimeout: 10ms
+        keepalive:
+          time: 7200s
+          interval: 75s
+      http:
+        http1MaxPendingRequests: 10
+        http2MaxRequests: 500
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+        idleTimeout: 1h
+        http2IdleTimeout: 1h
+    outlierDetection:
+      consecutive5xxErrors: 5
+      consecutiveGatewayErrors: 5
+      consecutiveLocalOriginFailures: 5
+      consecutiveErrors: 5
+      splitBrainThreshold: 0.5
+      maxEjectionPercent: 50
+      minHealthPercent: 50
+      baseEjectionTime: 30s
+      maxEjectionTime: 300s
+    tls:
+      mode: ISTIO_MUTUAL
+
+---
+# Service mesh security policies
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: dex-mtls-policy
+  namespace: dex-platform
+spec:
+  selector:
+    matchLabels:
+      app: dex
+  mtls:
+    mode: STRICT
+
+---
+# Authorization policies
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: dex-backend-authz
+  namespace: dex-platform
+spec:
+  selector:
+    matchLabels:
+      app: dex-backend
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - "cluster.local/ns/dex-platform/sa/dex-frontend"
+        - "cluster.local/ns/dex-platform/sa/dex-mobile"
+        - "cluster.local/ns/dex-platform/sa/dex-ai-service"
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/*"]
+
+---
+# Rate limiting configuration
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: dex-rate-limit
+  namespace: dex-platform
+spec:
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: SIDECAR_INBOUND
+      listener:
+        filterChain:
+          filter:
+            name: "envoy.filters.network.http_connection_manager"
+            subFilter:
+              name: "envoy.filters.http.router"
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: envoy.filters.http.ratelimit
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.http.ratelimit.v3.RateLimit
+          domain: dex-platform
+          descriptors:
+          - key: service
+            value: dex-backend
+          - key: method
+            value: POST
+          rate_limit_service:
+            grpc_service:
+              envoy_grpc:
+                cluster_name: rate_limit_cluster
+            timeout: 100ms
+
+---
+# Service mesh observability
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: dex-observability
+  namespace: dex-platform
+spec:
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: SIDECAR_INBOUND
+      listener:
+        filterChain:
+          filter:
+            name: "envoy.filters.network.http_connection_manager"
+            subFilter:
+              name: "envoy.filters.http.router"
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: envoy.filters.http.wasm
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
+          config:
+            name: "observability"
+            vm_config:
+              runtime: "envoy.wasm.runtime.v8"
+              code:
+                local:
+                  filename: "/etc/envoy/observability.wasm"
+            configuration:
+              "@type": "type.googleapis.com/google.protobuf.StringValue"
+              value: |
+                {
+                  "metrics": {
+                    "request_duration": true,
+                    "request_size": true,
+                    "response_size": true,
+                    "error_rate": true
+                  },
+                  "tracing": {
+                    "enabled": true,
+                    "sampling_rate": 0.1
+                  }
+                }
+
+---
+# Multi-cluster configuration
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: dex-multi-cluster
+  namespace: istio-system
+spec:
+  values:
+    global:
+      multiCluster:
+        enabled: true
+        clusterName: "dex-primary"
+      meshID: "dex-mesh"
+      network: "network1"
+    pilot:
+      env:
+        PILOT_ENABLE_WORKLOAD_ENTRY_AUTOREGISTRATION: true
+        CLUSTER_ID: "dex-primary"
+    gateways:
+      istio-ingressgateway:
+        env:
+          ISTIO_META_CLUSTER_ID: "dex-primary"
+      istio-egressgateway:
+        env:
+          ISTIO_META_CLUSTER_ID: "dex-primary"
+
+---
+# Service mesh resilience policies
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: dex-resilience-policy
+  namespace: dex-platform
+spec:
+  host: dex-backend
+  trafficPolicy:
+    connectionPool:
+      http:
+        maxRequestsPerConnection: 1
+        maxRetries: 3
+        retryOn: gateway-error,connect-failure,refused-stream
+        retryRemoteLocalities: false
+      tcp:
+        maxConnections: 1000
+        connectTimeout: 100ms
+        keepalive:
+          time: 7200s
+    outlierDetection:
+      consecutiveLocalOriginFailures: 3
+      consecutive5xxErrors: 3
+      consecutiveGatewayErrors: 3
+      consecutiveErrors: 3
+      baseEjectionTime: 10s
+      maxEjectionTime: 60s
+      splitBrainThreshold: 0.1
+      maxEjectionPercent: 100
+      minHealthPercent: 0
+
+---
+# Chaos engineering integration
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: dex-chaos-integration
+  namespace: dex-platform
+spec:
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: SIDECAR_INBOUND
+      listener:
+        filterChain:
+          filter:
+            name: "envoy.filters.network.http_connection_manager"
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: envoy.filters.http.lua
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+          inline_code: |
+            function envoy_on_request(request_handle)
+              -- Chaos engineering fault injection
+              if os.getenv("CHAOS_MODE") == "enabled" then
+                local chaos_type = os.getenv("CHAOS_TYPE")
+                if chaos_type == "latency" then
+                  request_handle:respond({[":status"] = "200"}, "chaos:latency")
+                elseif chaos_type == "error" then
+                  request_handle:respond({[":status"] = "500"}, "chaos:error")
+                elseif chaos_type == "timeout" then
+                  -- Simulate timeout
+                  return
+                end
+              end
+            end
+
+---
+# Service mesh monitoring dashboard
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: istio-monitoring-config
+  namespace: dex-platform
+data:
+  grafana-dashboards: |
+    {
+      "dashboard": {
+        "title": "DEX Service Mesh",
+        "panels": [
+          {
+            "title": "Request Success Rate",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "sum(rate(istio_requests_total{destination_service_name=~\"dex-.*\", response_code=~\"2..\"}[5m])) / sum(rate(istio_requests_total{destination_service_name=~\"dex-.*\"}[5m]))",
+                "legendFormat": "Success Rate"
+              }
+            ]
+          },
+          {
+            "title": "Response Time",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name=~\"dex-.*\"}[5m])) by (le))",
+                "legendFormat": "95th Percentile"
+              }
+            ]
+          },
+          {
+            "title": "Circuit Breaker State",
+            "type": "singlestat",
+            "targets": [
+              {
+                "expr": "sum(istio_circuit_breakers{destination_service_name=~\"dex-.*\"})",
+                "legendFormat": "Active Circuit Breakers"
+              }
+            ]
+          }
+        ]
+      }
+    }

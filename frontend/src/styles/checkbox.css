@@ -1,0 +1,168 @@
+/* ===== ATLAS CHECKBOX COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-checkbox-container {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--space-075);
+}
+
+.atlas-checkbox-label {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-150);
+  cursor: pointer;
+  user-select: none;
+}
+
+.atlas-checkbox__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.atlas-checkbox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.atlas-checkbox__control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--neutral-400);
+  border-radius: var(--radius-100);
+  background: var(--neutral-0);
+  transition: all var(--transition-normal);
+}
+
+.atlas-checkbox__input:focus-visible + .atlas-checkbox .atlas-checkbox__control {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.atlas-checkbox--checked .atlas-checkbox__control,
+.atlas-checkbox--indeterminate .atlas-checkbox__control {
+  border-color: var(--brand-primary);
+  background: var(--brand-primary);
+}
+
+.atlas-checkbox--disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.atlas-checkbox__icon {
+  width: 14px;
+  height: 14px;
+  color: var(--neutral-0);
+  opacity: 0;
+  transform: scale(0.7);
+  transition: all var(--transition-fast);
+}
+
+.atlas-checkbox--checked .atlas-checkbox__icon,
+.atlas-checkbox--indeterminate .atlas-checkbox__icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.atlas-checkbox__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-050);
+}
+
+.atlas-checkbox__label {
+  font-size: var(--font-size-100);
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-1300);
+  line-height: var(--line-height-tight);
+}
+
+.atlas-checkbox__required {
+  color: var(--danger-500);
+  margin-left: var(--space-050);
+}
+
+.atlas-checkbox__helper {
+  font-size: var(--font-size-075);
+  color: var(--neutral-800);
+  line-height: var(--line-height-normal);
+}
+
+.atlas-checkbox__error {
+  margin: 0;
+  font-size: var(--font-size-075);
+  color: var(--danger-600);
+  font-weight: var(--font-weight-medium);
+}
+
+.atlas-checkbox-container--error .atlas-checkbox__control {
+  border-color: var(--danger-500);
+}
+
+/* ===== CHECKBOX GROUP ===== */
+
+.atlas-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-150);
+}
+
+.atlas-checkbox-group__label {
+  font-size: var(--font-size-100);
+  font-weight: var(--font-weight-semibold);
+  color: var(--neutral-1100);
+  line-height: var(--line-height-tight);
+}
+
+.atlas-checkbox-group__required {
+  color: var(--danger-500);
+  margin-left: var(--space-050);
+}
+
+.atlas-checkbox-group__options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-100);
+}
+
+.atlas-checkbox-group__error {
+  margin: 0;
+  font-size: var(--font-size-075);
+  color: var(--danger-600);
+  font-weight: var(--font-weight-medium);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-checkbox__control,
+  .atlas-checkbox__icon {
+    transition: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .atlas-checkbox__control {
+    border-color: var(--neutral-600);
+    background: var(--neutral-200);
+  }
+
+  .atlas-checkbox--checked .atlas-checkbox__control,
+  .atlas-checkbox--indeterminate .atlas-checkbox__control {
+    border-color: var(--brand-secondary);
+    background: var(--brand-secondary);
+  }
+}

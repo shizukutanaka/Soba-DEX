@@ -1,0 +1,224 @@
+/**
+ * Kubernetes Vertical Pod Autoscaler Configuration
+ *
+ * Intelligent resource allocation for DEX platform:
+ * - Automatic CPU and memory recommendations
+ * - Resource usage pattern analysis
+ * - Over-provisioning detection and correction
+ * - Resource limits optimization
+ * - Integration with HPA for multi-dimensional scaling
+ * - Historical data analysis for accurate recommendations
+ *
+ * @version 6.0.0
+ */
+
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: dex-backend-vpa
+  namespace: dex-platform
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: Deployment
+    name: dex-backend
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: dex-backend
+      mode: "Auto"
+      controlledResources: ["cpu", "memory"]
+      controlledValues: "RequestsAndLimits"
+      minAllowed:
+        cpu: "100m"
+        memory: "256Mi"
+      maxAllowed:
+        cpu: "8"
+        memory: "16Gi"
+
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: dex-frontend-vpa
+  namespace: dex-platform
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: Deployment
+    name: dex-frontend
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: dex-frontend
+      mode: "Auto"
+      controlledResources: ["cpu", "memory"]
+      controlledValues: "RequestsAndLimits"
+      minAllowed:
+        cpu: "50m"
+        memory: "128Mi"
+      maxAllowed:
+        cpu: "2"
+        memory: "4Gi"
+
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: dex-ai-service-vpa
+  namespace: dex-platform
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: Deployment
+    name: dex-ai-service
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: dex-ai-service
+      mode: "Auto"
+      controlledResources: ["cpu", "memory"]
+      controlledValues: "RequestsAndLimits"
+      minAllowed:
+        cpu: "200m"
+        memory: "512Mi"
+      maxAllowed:
+        cpu: "16"
+        memory: "32Gi"
+
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: dex-database-vpa
+  namespace: dex-platform
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: StatefulSet
+    name: dex-postgres
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: postgres
+      mode: "Auto"
+      controlledResources: ["cpu", "memory"]
+      controlledValues: "RequestsAndLimits"
+      minAllowed:
+        cpu: "500m"
+        memory: "1Gi"
+      maxAllowed:
+        cpu: "4"
+        memory: "16Gi"
+
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: dex-redis-vpa
+  namespace: dex-platform
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: StatefulSet
+    name: dex-redis
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: redis
+      mode: "Auto"
+      controlledResources: ["cpu", "memory"]
+      controlledValues: "RequestsAndLimits"
+      minAllowed:
+        cpu: "100m"
+        memory: "256Mi"
+      maxAllowed:
+        cpu: "2"
+        memory: "8Gi"
+
+---
+# Cluster-wide VPA for monitoring and optimization
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: dex-cluster-vpa
+  namespace: dex-platform
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: Deployment
+    name: dex-cluster-autoscaler
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: cluster-autoscaler
+      mode: "Auto"
+      controlledResources: ["cpu", "memory"]
+      controlledValues: "RequestsAndLimits"
+      minAllowed:
+        cpu: "50m"
+        memory: "128Mi"
+      maxAllowed:
+        cpu: "1"
+        memory: "2Gi"
+
+---
+# VPA Recommender for custom recommendations
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vpa-recommender-config
+  namespace: dex-platform
+data:
+  config.yaml: |
+    recommender:
+      recommendationLifetime: 24h
+      resources:
+        - name: cpu
+          min: 100m
+          max: 16
+        - name: memory
+          min: 256Mi
+          max: 64Gi
+      extraArgs:
+        - --v=4
+        - --logtostderr
+        - --recommendation-bounds-cpu-ratio=0.1
+        - --recommendation-bounds-memory-ratio=0.1
+        - --recommendation-lower-bound-cpu-ratio=0.5
+        - --recommendation-lower-bound-memory-ratio=0.7
+        - --recommendation-upper-bound-cpu-ratio=2.0
+        - --recommendation-upper-bound-memory-ratio=1.5
+
+---
+# Custom metrics for VPA decisions
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vpa-custom-metrics
+  namespace: dex-platform
+data:
+  metrics.yaml: |
+    customMetrics:
+      - name: transaction_throughput
+        query: |
+          sum(rate(http_requests_total[5m])) by (service)
+        threshold: 1000
+      - name: memory_efficiency
+        query: |
+          sum(container_memory_usage_bytes) / sum(container_spec_memory_limit_bytes)
+        threshold: 0.8
+      - name: cpu_efficiency
+        query: |
+          sum(rate(container_cpu_usage_seconds_total[5m])) / sum(container_spec_cpu_quota)
+        threshold: 0.7
+      - name: error_rate
+        query: |
+          sum(rate(http_requests_error_total[5m])) / sum(rate(http_requests_total[5m]))
+        threshold: 0.05

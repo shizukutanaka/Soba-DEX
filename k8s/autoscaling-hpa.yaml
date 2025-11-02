@@ -1,0 +1,259 @@
+/**
+ * Kubernetes Horizontal Pod Autoscaler Configuration
+ *
+ * Advanced auto-scaling configuration for DEX platform:
+ * - CPU and memory-based scaling
+ * - Custom metrics scaling (TPS, latency, error rate)
+ * - Multi-dimensional scaling policies
+ * - Predictive scaling with ML
+ * - Circuit breaker integration
+ * - Cost optimization scaling
+ *
+ * @version 6.0.0
+ */
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: dex-backend-hpa
+  namespace: dex-platform
+  labels:
+    app: dex-backend
+    version: "6.0.0"
+    component: "backend"
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: dex-backend
+  minReplicas: 3
+  maxReplicas: 100
+  metrics:
+  # CPU-based scaling
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  # Memory-based scaling
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  # Custom metrics - Transactions per second
+  - type: Pods
+    pods:
+      metric:
+        name: http_requests_total
+      target:
+        type: AverageValue
+        averageValue: "1000"
+  # Custom metrics - Response time
+  - type: Pods
+    pods:
+      metric:
+        name: http_request_duration_seconds
+      target:
+        type: AverageValue
+        averageValue: "0.5"
+  # Custom metrics - Error rate
+  - type: Pods
+    pods:
+      metric:
+        name: http_requests_error_total
+      target:
+        type: AverageValue
+        averageValue: "10"
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+      - type: Pods
+        value: 1
+        periodSeconds: 60
+      selectPolicy: Min
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+      - type: Pods
+        value: 5
+        periodSeconds: 60
+      selectPolicy: Max
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: dex-frontend-hpa
+  namespace: dex-platform
+  labels:
+    app: dex-frontend
+    version: "6.0.0"
+    component: "frontend"
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: dex-frontend
+  minReplicas: 2
+  maxReplicas: 50
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 60
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Pods
+    pods:
+      metric:
+        name: nginx_requests_total
+      target:
+        type: AverageValue
+        averageValue: "500"
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 180
+      policies:
+      - type: Percent
+        value: 20
+        periodSeconds: 60
+      selectPolicy: Min
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 30
+      selectPolicy: Max
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: dex-ai-service-hpa
+  namespace: dex-platform
+  labels:
+    app: dex-ai-service
+    version: "6.0.0"
+    component: "ai"
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: dex-ai-service
+  minReplicas: 1
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 85
+  - type: Pods
+    pods:
+      metric:
+        name: ai_predictions_total
+      target:
+        type: AverageValue
+        averageValue: "100"
+  - type: Pods
+    pods:
+      metric:
+        name: ai_processing_duration_seconds
+      target:
+        type: AverageValue
+        averageValue: "2.0"
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 600
+      policies:
+      - type: Percent
+        value: 25
+        periodSeconds: 120
+      selectPolicy: Min
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 200
+        periodSeconds: 30
+      selectPolicy: Max
+
+---
+# Predictive scaling based on ML models
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: dex-predictive-hpa
+  namespace: dex-platform
+  labels:
+    app: dex-predictive-scaler
+    version: "6.0.0"
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: dex-backend
+  minReplicas: 2
+  maxReplicas: 150
+  metrics:
+  - type: Object
+    object:
+      metric:
+        name: predictive_cpu_utilization
+      describedObject:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: dex-backend
+      target:
+        type: Value
+        value: "60"
+  - type: Object
+    object:
+      metric:
+        name: predictive_memory_utilization
+      describedObject:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: dex-backend
+      target:
+        type: Value
+        value: "70"
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 1800  # 30 minutes
+      policies:
+      - type: Percent
+        value: 5
+        periodSeconds: 300
+      selectPolicy: Min
+    scaleUp:
+      stabilizationWindowSeconds: 300   # 5 minutes
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 60
+      selectPolicy: Max

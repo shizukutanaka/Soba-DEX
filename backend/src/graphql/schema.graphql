@@ -1,0 +1,591 @@
+# Soba DEX GraphQL Schema
+# Version: 5.0.0
+
+"""
+Root Query type for all read operations
+"""
+type Query {
+  # ============ Swap Queries ============
+
+  """Get swap quote"""
+  getQuote(
+    tokenIn: Address!
+    tokenOut: Address!
+    amountIn: BigInt!
+    slippage: Float = 0.5
+  ): Quote!
+
+  """Get best route across multiple DEXs"""
+  getBestRoute(
+    tokenIn: Address!
+    tokenOut: Address!
+    amountIn: BigInt!
+  ): Route!
+
+  # ============ Pool Queries ============
+
+  """Get pool by address"""
+  pool(address: Address!): Pool
+
+  """List all pools"""
+  pools(
+    type: PoolType
+    tokens: [Address!]
+    limit: Int = 20
+    offset: Int = 0
+  ): PoolConnection!
+
+  """Get pool statistics"""
+  poolStats(address: Address!): PoolStats!
+
+  # ============ Token Queries ============
+
+  """Get token information"""
+  token(address: Address!): Token
+
+  """List tokens"""
+  tokens(
+    search: String
+    limit: Int = 20
+    offset: Int = 0
+  ): TokenConnection!
+
+  """Get token price"""
+  tokenPrice(address: Address!): TokenPrice!
+
+  """Get token price history"""
+  tokenPriceHistory(
+    address: Address!
+    from: Timestamp
+    to: Timestamp
+    interval: Interval = HOUR
+  ): [PricePoint!]!
+
+  # ============ Order Queries ============
+
+  """Get order by ID"""
+  order(id: ID!): Order
+
+  """Get user orders"""
+  userOrders(
+    userAddress: Address!
+    status: OrderStatus
+    limit: Int = 20
+    offset: Int = 0
+  ): OrderConnection!
+
+  """Get order book"""
+  orderBook(
+    tokenIn: Address!
+    tokenOut: Address!
+    depth: Int = 50
+  ): OrderBook!
+
+  # ============ User Queries ============
+
+  """Get user profile"""
+  user(address: Address!): User
+
+  """Get user portfolio"""
+  userPortfolio(address: Address!): Portfolio!
+
+  """Get user trades"""
+  userTrades(
+    address: Address!
+    limit: Int = 20
+    offset: Int = 0
+  ): TradeConnection!
+
+  # ============ Analytics Queries ============
+
+  """Get platform statistics"""
+  stats: PlatformStats!
+
+  """Get trading volume"""
+  volume(
+    from: Timestamp
+    to: Timestamp
+    interval: Interval = DAY
+  ): [VolumePoint!]!
+
+  """Get TVL (Total Value Locked)"""
+  tvl(
+    from: Timestamp
+    to: Timestamp
+    interval: Interval = DAY
+  ): [TVLPoint!]!
+
+  """Get top tokens by volume"""
+  topTokens(
+    period: Period = DAY
+    limit: Int = 10
+  ): [TokenStats!]!
+
+  """Get top pools by volume"""
+  topPools(
+    period: Period = DAY
+    limit: Int = 10
+  ): [PoolStats!]!
+}
+
+"""
+Root Mutation type for all write operations
+"""
+type Mutation {
+  # ============ Swap Mutations ============
+
+  """Execute swap"""
+  executeSwap(input: SwapInput!): SwapResult!
+
+  # ============ Order Mutations ============
+
+  """Create limit order"""
+  createLimitOrder(input: LimitOrderInput!): Order!
+
+  """Cancel order"""
+  cancelOrder(orderId: ID!): Order!
+
+  # ============ Liquidity Mutations ============
+
+  """Add liquidity to pool"""
+  addLiquidity(input: AddLiquidityInput!): LiquidityResult!
+
+  """Remove liquidity from pool"""
+  removeLiquidity(input: RemoveLiquidityInput!): LiquidityResult!
+
+  # ============ Pool Mutations ============
+
+  """Create new pool"""
+  createPool(input: CreatePoolInput!): Pool!
+
+  # ============ Webhook Mutations ============
+
+  """Register webhook"""
+  registerWebhook(input: WebhookInput!): Webhook!
+
+  """Unregister webhook"""
+  unregisterWebhook(webhookId: ID!): Boolean!
+}
+
+"""
+Subscription type for real-time updates
+"""
+type Subscription {
+  """Subscribe to price updates"""
+  priceUpdated(tokenAddress: Address!): TokenPrice!
+
+  """Subscribe to order book updates"""
+  orderBookUpdated(
+    tokenIn: Address!
+    tokenOut: Address!
+  ): OrderBook!
+
+  """Subscribe to trade events"""
+  tradeExecuted(pair: String!): Trade!
+
+  """Subscribe to order updates"""
+  orderUpdated(userAddress: Address!): Order!
+
+  """Subscribe to pool updates"""
+  poolUpdated(poolAddress: Address!): Pool!
+}
+
+# ============ Types ============
+
+"""Trading pool"""
+type Pool {
+  address: Address!
+  type: PoolType!
+  tokens: [Token!]!
+  reserves: [BigInt!]!
+  weights: [Float!]
+  fee: Float!
+  totalSupply: BigInt!
+  createdAt: Timestamp!
+  stats: PoolStats!
+}
+
+"""Pool statistics"""
+type PoolStats {
+  volume24h: BigInt!
+  volume7d: BigInt!
+  tvl: BigInt!
+  apy: Float
+  fees24h: BigInt!
+  txCount24h: Int!
+}
+
+"""Token information"""
+type Token {
+  address: Address!
+  name: String!
+  symbol: String!
+  decimals: Int!
+  totalSupply: BigInt!
+  price: TokenPrice
+  logoURI: String
+}
+
+"""Token price"""
+type TokenPrice {
+  token: Address!
+  usd: Float!
+  eth: Float
+  change24h: Float
+  volume24h: BigInt!
+  marketCap: BigInt
+  updatedAt: Timestamp!
+}
+
+"""Historical price point"""
+type PricePoint {
+  timestamp: Timestamp!
+  open: Float!
+  high: Float!
+  low: Float!
+  close: Float!
+  volume: BigInt!
+}
+
+"""Swap quote"""
+type Quote {
+  tokenIn: Address!
+  tokenOut: Address!
+  amountIn: BigInt!
+  expectedOutput: BigInt!
+  minOutput: BigInt!
+  priceImpact: Float!
+  route: Route!
+  gasEstimate: BigInt!
+  executionTime: Int!
+}
+
+"""Routing information"""
+type Route {
+  path: [Address!]!
+  pools: [Pool!]!
+  splits: [RouteSplit!]
+  totalOutput: BigInt!
+  gasEstimate: BigInt!
+}
+
+"""Route split"""
+type RouteSplit {
+  percentage: Float!
+  path: [Address!]!
+  expectedOutput: BigInt!
+}
+
+"""Order"""
+type Order {
+  id: ID!
+  type: OrderType!
+  status: OrderStatus!
+  userAddress: Address!
+  tokenIn: Address!
+  tokenOut: Address!
+  amountIn: BigInt!
+  limitPrice: Float
+  filled: BigInt!
+  createdAt: Timestamp!
+  expiresAt: Timestamp
+  executedAt: Timestamp
+}
+
+"""Order book"""
+type OrderBook {
+  pair: String!
+  bids: [OrderBookLevel!]!
+  asks: [OrderBookLevel!]!
+  spread: Float!
+  updatedAt: Timestamp!
+}
+
+"""Order book level"""
+type OrderBookLevel {
+  price: Float!
+  amount: BigInt!
+  total: BigInt!
+  orders: Int!
+}
+
+"""Trade"""
+type Trade {
+  id: ID!
+  pair: String!
+  side: TradeSide!
+  price: Float!
+  amount: BigInt!
+  buyer: Address!
+  seller: Address!
+  timestamp: Timestamp!
+  txHash: String!
+}
+
+"""User profile"""
+type User {
+  address: Address!
+  totalTrades: Int!
+  totalVolume: BigInt!
+  joinedAt: Timestamp!
+  portfolio: Portfolio!
+}
+
+"""User portfolio"""
+type Portfolio {
+  totalValue: BigInt!
+  tokens: [TokenBalance!]!
+  liquidityPositions: [LiquidityPosition!]!
+  openOrders: [Order!]!
+}
+
+"""Token balance"""
+type TokenBalance {
+  token: Token!
+  balance: BigInt!
+  value: BigInt!
+  change24h: Float
+}
+
+"""Liquidity position"""
+type LiquidityPosition {
+  pool: Pool!
+  lpTokens: BigInt!
+  share: Float!
+  value: BigInt!
+  unclaimedFees: BigInt!
+}
+
+"""Platform statistics"""
+type PlatformStats {
+  totalVolume: BigInt!
+  volume24h: BigInt!
+  volume7d: BigInt!
+  tvl: BigInt!
+  totalPools: Int!
+  totalUsers: Int!
+  totalTrades: Int!
+  updatedAt: Timestamp!
+}
+
+"""Volume data point"""
+type VolumePoint {
+  timestamp: Timestamp!
+  volume: BigInt!
+  trades: Int!
+}
+
+"""TVL data point"""
+type TVLPoint {
+  timestamp: Timestamp!
+  tvl: BigInt!
+}
+
+"""Token statistics"""
+type TokenStats {
+  token: Token!
+  volume: BigInt!
+  trades: Int!
+  priceChange: Float!
+}
+
+"""Swap result"""
+type SwapResult {
+  txHash: String!
+  amountOut: BigInt!
+  gasUsed: BigInt!
+  timestamp: Timestamp!
+}
+
+"""Liquidity result"""
+type LiquidityResult {
+  txHash: String!
+  lpTokens: BigInt!
+  amounts: [BigInt!]!
+  timestamp: Timestamp!
+}
+
+"""Webhook"""
+type Webhook {
+  id: ID!
+  url: String!
+  events: [String!]!
+  enabled: Boolean!
+  createdAt: Timestamp!
+  stats: WebhookStats!
+}
+
+"""Webhook statistics"""
+type WebhookStats {
+  delivered: Int!
+  failed: Int!
+  lastDelivery: Timestamp
+}
+
+# ============ Connections ============
+
+"""Pool connection"""
+type PoolConnection {
+  edges: [PoolEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type PoolEdge {
+  node: Pool!
+  cursor: String!
+}
+
+"""Token connection"""
+type TokenConnection {
+  edges: [TokenEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type TokenEdge {
+  node: Token!
+  cursor: String!
+}
+
+"""Order connection"""
+type OrderConnection {
+  edges: [OrderEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type OrderEdge {
+  node: Order!
+  cursor: String!
+}
+
+"""Trade connection"""
+type TradeConnection {
+  edges: [TradeEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type TradeEdge {
+  node: Trade!
+  cursor: String!
+}
+
+"""Page info for pagination"""
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+# ============ Inputs ============
+
+"""Swap input"""
+input SwapInput {
+  tokenIn: Address!
+  tokenOut: Address!
+  amountIn: BigInt!
+  minAmountOut: BigInt!
+  deadline: Timestamp
+  recipient: Address
+}
+
+"""Limit order input"""
+input LimitOrderInput {
+  tokenIn: Address!
+  tokenOut: Address!
+  amountIn: BigInt!
+  limitPrice: Float!
+  expiry: Timestamp
+}
+
+"""Add liquidity input"""
+input AddLiquidityInput {
+  poolAddress: Address!
+  amounts: [BigInt!]!
+  minLPTokens: BigInt!
+  deadline: Timestamp
+}
+
+"""Remove liquidity input"""
+input RemoveLiquidityInput {
+  poolAddress: Address!
+  lpTokens: BigInt!
+  minAmounts: [BigInt!]!
+  deadline: Timestamp
+}
+
+"""Create pool input"""
+input CreatePoolInput {
+  type: PoolType!
+  tokens: [Address!]!
+  weights: [Float!]
+  fee: Float!
+  initialLiquidity: [BigInt!]!
+}
+
+"""Webhook input"""
+input WebhookInput {
+  url: String!
+  events: [String!]!
+  secret: String
+  description: String
+}
+
+# ============ Enums ============
+
+enum PoolType {
+  CONSTANT_PRODUCT
+  STABLE_SWAP
+  WEIGHTED
+  CONCENTRATED
+}
+
+enum OrderType {
+  MARKET
+  LIMIT
+  STOP_LOSS
+  TAKE_PROFIT
+  TRAILING_STOP
+}
+
+enum OrderStatus {
+  OPEN
+  PARTIALLY_FILLED
+  FILLED
+  CANCELLED
+  EXPIRED
+}
+
+enum TradeSide {
+  BUY
+  SELL
+}
+
+enum Interval {
+  MINUTE
+  HOUR
+  DAY
+  WEEK
+  MONTH
+}
+
+enum Period {
+  HOUR
+  DAY
+  WEEK
+  MONTH
+}
+
+# ============ Scalars ============
+
+"""Ethereum address"""
+scalar Address
+
+"""BigInt for large numbers"""
+scalar BigInt
+
+"""Unix timestamp"""
+scalar Timestamp

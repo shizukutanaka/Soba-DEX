@@ -1,0 +1,80 @@
+{
+  "errors": {
+    "title": "错误",
+    "general": "发生错误",
+    "network": "网络错误",
+    "timeout": "请求超时",
+    "notFound": "未找到",
+    "unauthorized": "未授权",
+    "forbidden": "禁止访问",
+    "serverError": "服务器错误",
+    "serviceUnavailable": "服务不可用",
+    "validationError": "验证错误",
+    "insufficientFunds": "资金不足",
+    "transactionFailed": "交易失败",
+    "walletError": "钱包错误",
+    "connectionError": "连接错误",
+    "apiError": "API 错误",
+    "rateLimit": "超出速率限制",
+    "maintenance": "系统维护",
+    "deprecated": "此功能已弃用"
+  },
+  "validation": {
+    "required": "此字段为必填项",
+    "invalidEmail": "无效的电子邮件地址",
+    "invalidUrl": "无效的 URL",
+    "invalidNumber": "无效的数字",
+    "invalidAddress": "无效的地址",
+    "invalidAmount": "无效的数量",
+    "amountTooLow": "数量过低",
+    "amountTooHigh": "数量过高",
+    "insufficientBalance": "余额不足",
+    "invalidSlippage": "无效的滑点容忍度",
+    "invalidDeadline": "无效的截止时间",
+    "invalidGasPrice": "无效的燃料价格",
+    "invalidToken": "无效的代币",
+    "duplicateTransaction": "重复交易"
+  },
+  "wallet": {
+    "connectionFailed": "钱包连接失败",
+    "userRejected": "用户拒绝了请求",
+    "networkMismatch": "网络不匹配",
+    "insufficientFunds": "交易资金不足",
+    "transactionRejected": "交易被拒绝",
+    "gasTooLow": "燃料价格过低",
+    "nonceTooLow": "Nonce 过低",
+    "replacementUnderpriced": "替换交易价格过低",
+    "executionReverted": "交易执行已回滚",
+    "outOfGas": "燃料不足"
+  },
+  "trading": {
+    "orderFailed": "订单失败",
+    "insufficientLiquidity": "流动性不足",
+    "priceImpactTooHigh": "价格影响过高",
+    "slippageExceeded": "超出滑点容忍度",
+    "marketClosed": "市场已关闭",
+    "tradingDisabled": "交易已禁用",
+    "invalidOrder": "无效订单",
+    "orderExpired": "订单已过期",
+    "positionLiquidated": "仓位已清算"
+  },
+  "security": {
+    "suspiciousActivity": "检测到可疑活动",
+    "blockedAddress": "地址已被阻止",
+    "sanctionsViolation": "违反制裁",
+    "unusualVolume": "检测到异常交易量",
+    "multipleFailures": "多次认证失败"
+  },
+  "system": {
+    "databaseError": "数据库错误",
+    "cacheError": "缓存错误",
+    "diskFull": "磁盘已满",
+    "memoryError": "内存错误",
+    "cpuOverload": "CPU 过载",
+    "networkCongestion": "网络拥堵"
+  },
+  "retry": "请重试",
+  "contactSupport": "如果问题持续存在，请联系支持",
+  "errorCode": "错误代码：{{code}}",
+  "details": "错误详情：{{details}}"
+}

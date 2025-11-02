@@ -1,0 +1,872 @@
+---
+# Kubernetes Deployment Manifests for Python ML Services
+# Version: 1.0.0
+# Date: November 1, 2025
+
+---
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: python-services
+  labels:
+    app: soba-dex
+    environment: production
+    version: "1.0.0"
+
+---
+# ConfigMap for Environment Variables
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: python-services-config
+  namespace: python-services
+data:
+  LOG_LEVEL: "info"
+  ENVIRONMENT: "production"
+  REDIS_DB: "0"
+  CACHE_TTL_PREDICTIONS: "3600"
+  CACHE_TTL_TRANSLATIONS: "86400"
+  CACHE_TTL_RISK_ASSESSMENTS: "1800"
+  CACHE_TTL_DATA_VALIDATION: "3600"
+  CACHE_TTL_CONTRACT_ANALYSIS: "604800"
+  MAX_WORKERS: "4"
+  BATCH_SIZE: "32"
+  MODEL_CACHE_SIZE: "10"
+
+---
+# Secret for Sensitive Data
+apiVersion: v1
+kind: Secret
+metadata:
+  name: python-services-secrets
+  namespace: python-services
+type: Opaque
+stringData:
+  REDIS_PASSWORD: "change-me-in-production"
+  API_KEY: "your-api-key-here"
+  DATABASE_URL: "postgresql://user:password@db:5432/soba_dex"
+
+---
+# PersistentVolume for Model Cache
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: model-cache-pv
+  namespace: python-services
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  hostPath:
+    path: /data/model-cache
+
+---
+# PersistentVolumeClaim for Model Cache
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: model-cache-pvc
+  namespace: python-services
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+# Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: python-services-sa
+  namespace: python-services
+  labels:
+    app: soba-dex
+
+---
+# Role for RBAC
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: python-services-role
+  namespace: python-services
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets"]
+    verbs: ["get", "list", "watch"]
+
+---
+# RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: python-services-rolebinding
+  namespace: python-services
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: python-services-role
+subjects:
+  - kind: ServiceAccount
+    name: python-services-sa
+    namespace: python-services
+
+---
+# ML Models Service Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-models
+  namespace: python-services
+  labels:
+    app: ml-models
+    version: "1.0.0"
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: ml-models
+  template:
+    metadata:
+      labels:
+        app: ml-models
+        version: "1.0.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8001"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: python-services-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+      - name: ml-models
+        image: soba-dex/python-services:1.0.0
+        imagePullPolicy: IfNotPresent
+        command: ["python", "services/ml_models_service.py"]
+        ports:
+        - name: http
+          containerPort: 8001
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "8001"
+        - name: SERVICE_NAME
+          value: "ml-models"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: python-services-config
+              key: LOG_LEVEL
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: python-services-secrets
+              key: REDIS_PASSWORD
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "2Gi"
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        volumeMounts:
+        - name: model-cache
+          mountPath: /app/models
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          readOnlyRootFilesystem: true
+        lifecycle:
+          preStop:
+            exec:
+              command: ["sleep", "15"]
+      volumes:
+      - name: model-cache
+        persistentVolumeClaim:
+          claimName: model-cache-pvc
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - ml-models
+              topologyKey: kubernetes.io/hostname
+
+---
+# ML Models Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: ml-models-service
+  namespace: python-services
+  labels:
+    app: ml-models
+spec:
+  type: ClusterIP
+  selector:
+    app: ml-models
+  ports:
+  - name: http
+    port: 8001
+    targetPort: 8001
+    protocol: TCP
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+
+---
+# NLP Translation Service Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nlp-translation
+  namespace: python-services
+  labels:
+    app: nlp-translation
+    version: "1.0.0"
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: nlp-translation
+  template:
+    metadata:
+      labels:
+        app: nlp-translation
+        version: "1.0.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8002"
+    spec:
+      serviceAccountName: python-services-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+      - name: nlp-translation
+        image: soba-dex/python-services:1.0.0
+        imagePullPolicy: IfNotPresent
+        command: ["python", "services/nlp_translation_service.py"]
+        ports:
+        - name: http
+          containerPort: 8002
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "8002"
+        - name: SERVICE_NAME
+          value: "nlp-translation"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: python-services-config
+              key: LOG_LEVEL
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: python-services-secrets
+              key: REDIS_PASSWORD
+        resources:
+          requests:
+            cpu: "1000m"
+            memory: "3Gi"
+          limits:
+            cpu: "2000m"
+            memory: "5Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 40
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        volumeMounts:
+        - name: model-cache
+          mountPath: /app/models
+      volumes:
+      - name: model-cache
+        persistentVolumeClaim:
+          claimName: model-cache-pvc
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - nlp-translation
+              topologyKey: kubernetes.io/hostname
+
+---
+# NLP Translation Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nlp-translation-service
+  namespace: python-services
+  labels:
+    app: nlp-translation
+spec:
+  type: ClusterIP
+  selector:
+    app: nlp-translation
+  ports:
+  - name: http
+    port: 8002
+    targetPort: 8002
+    protocol: TCP
+
+---
+# Fraud Detection Service Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraud-detection
+  namespace: python-services
+  labels:
+    app: fraud-detection
+    version: "1.0.0"
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: fraud-detection
+  template:
+    metadata:
+      labels:
+        app: fraud-detection
+        version: "1.0.0"
+    spec:
+      serviceAccountName: python-services-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+      - name: fraud-detection
+        image: soba-dex/python-services:1.0.0
+        imagePullPolicy: IfNotPresent
+        command: ["python", "services/fraud_detection_service.py"]
+        ports:
+        - name: http
+          containerPort: 8003
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "8003"
+        - name: SERVICE_NAME
+          value: "fraud-detection"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: python-services-config
+              key: LOG_LEVEL
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1.5Gi"
+          limits:
+            cpu: "1500m"
+            memory: "3Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 3
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - fraud-detection
+              topologyKey: kubernetes.io/hostname
+
+---
+# Fraud Detection Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: fraud-detection-service
+  namespace: python-services
+  labels:
+    app: fraud-detection
+spec:
+  type: ClusterIP
+  selector:
+    app: fraud-detection
+  ports:
+  - name: http
+    port: 8003
+    targetPort: 8003
+    protocol: TCP
+
+---
+# Data Processing Service Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-processing
+  namespace: python-services
+  labels:
+    app: data-processing
+    version: "1.0.0"
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: data-processing
+  template:
+    metadata:
+      labels:
+        app: data-processing
+        version: "1.0.0"
+    spec:
+      serviceAccountName: python-services-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+      - name: data-processing
+        image: soba-dex/python-services:1.0.0
+        imagePullPolicy: IfNotPresent
+        command: ["python", "services/data_processing_service.py"]
+        ports:
+        - name: http
+          containerPort: 8004
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "8004"
+        - name: SERVICE_NAME
+          value: "data-processing"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: python-services-config
+              key: LOG_LEVEL
+        resources:
+          requests:
+            cpu: "1000m"
+            memory: "2Gi"
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 3
+
+---
+# Data Processing Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-processing-service
+  namespace: python-services
+  labels:
+    app: data-processing
+spec:
+  type: ClusterIP
+  selector:
+    app: data-processing
+  ports:
+  - name: http
+    port: 8004
+    targetPort: 8004
+    protocol: TCP
+
+---
+# Blockchain Intelligence Service Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blockchain-intelligence
+  namespace: python-services
+  labels:
+    app: blockchain-intelligence
+    version: "1.0.0"
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: blockchain-intelligence
+  template:
+    metadata:
+      labels:
+        app: blockchain-intelligence
+        version: "1.0.0"
+    spec:
+      serviceAccountName: python-services-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+      - name: blockchain-intelligence
+        image: soba-dex/python-services:1.0.0
+        imagePullPolicy: IfNotPresent
+        command: ["python", "services/blockchain_intelligence_service.py"]
+        ports:
+        - name: http
+          containerPort: 8005
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "8005"
+        - name: SERVICE_NAME
+          value: "blockchain-intelligence"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: python-services-config
+              key: LOG_LEVEL
+        resources:
+          requests:
+            cpu: "1000m"
+            memory: "2Gi"
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 3
+
+---
+# Blockchain Intelligence Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: blockchain-intelligence-service
+  namespace: python-services
+  labels:
+    app: blockchain-intelligence
+spec:
+  type: ClusterIP
+  selector:
+    app: blockchain-intelligence
+  ports:
+  - name: http
+    port: 8005
+    targetPort: 8005
+    protocol: TCP
+
+---
+# Horizontal Pod Autoscaler for ML Models
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ml-models-hpa
+  namespace: python-services
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ml-models
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+# Horizontal Pod Autoscaler for NLP Translation
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nlp-translation-hpa
+  namespace: python-services
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nlp-translation
+  minReplicas: 3
+  maxReplicas: 15
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+# Horizontal Pod Autoscaler for Fraud Detection
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: fraud-detection-hpa
+  namespace: python-services
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: fraud-detection
+  minReplicas: 3
+  maxReplicas: 12
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+
+---
+# Horizontal Pod Autoscaler for Data Processing
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: data-processing-hpa
+  namespace: python-services
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: data-processing
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 75
+
+---
+# Horizontal Pod Autoscaler for Blockchain Intelligence
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: blockchain-intelligence-hpa
+  namespace: python-services
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: blockchain-intelligence
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+
+---
+# NetworkPolicy for Service-to-Service Communication
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: python-services-network-policy
+  namespace: python-services
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: python-services
+    - namespaceSelector:
+        matchLabels:
+          name: default
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: python-services
+  - to:
+    - podSelector: {}
+  - ports:
+    - protocol: TCP
+      port: 6379
+    - protocol: TCP
+      port: 5432
+
+---
+# Pod Disruption Budget for High Availability
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ml-models-pdb
+  namespace: python-services
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: ml-models
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: nlp-translation-pdb
+  namespace: python-services
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: nlp-translation
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: fraud-detection-pdb
+  namespace: python-services
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: fraud-detection

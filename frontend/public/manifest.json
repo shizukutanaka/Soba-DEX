@@ -1,0 +1,55 @@
+{
+  "short_name": "Soba DEX",
+  "name": "Soba - Enterprise DEX Trading Platform",
+  "description": "Advanced decentralized exchange with enterprise-grade security and performance",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#667eea",
+  "background_color": "#1a202c",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["finance", "business", "productivity"],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Swap Tokens",
+      "short_name": "Swap",
+      "description": "Quick token swap",
+      "url": "/swap",
+      "icons": [{ "src": "/favicon.ico", "sizes": "64x64" }]
+    },
+    {
+      "name": "Add Liquidity",
+      "short_name": "Liquidity",
+      "description": "Add liquidity to pools",
+      "url": "/liquidity",
+      "icons": [{ "src": "/favicon.ico", "sizes": "64x64" }]
+    },
+    {
+      "name": "Portfolio",
+      "short_name": "Portfolio",
+      "description": "View your portfolio",
+      "url": "/portfolio",
+      "icons": [{ "src": "/favicon.ico", "sizes": "64x64" }]
+    }
+  ]
+}

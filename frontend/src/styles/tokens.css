@@ -1,0 +1,298 @@
+/**
+ * Design Tokens - Based on Atlassian Design System
+ * These tokens provide a consistent foundation for UI design
+ */
+
+:root {
+  /* ===== COLOR TOKENS ===== */
+
+  /* Neutral Colors */
+  --neutral-0: #FFFFFF;
+  --neutral-50: #FAFBFC;
+  --neutral-100: #F4F5F7;
+  --neutral-200: #EBECF0;
+  --neutral-300: #DFE1E6;
+  --neutral-400: #C1C7D0;
+  --neutral-500: #B3BAC5;
+  --neutral-600: #A5ADBA;
+  --neutral-700: #7A869A;
+  --neutral-800: #6B778C;
+  --neutral-900: #505F79;
+  --neutral-1000: #42526E;
+  --neutral-1100: #344563;
+  --neutral-1200: #253858;
+  --neutral-1300: #172B4D;
+  --neutral-1400: #091E42;
+
+  /* Brand Colors */
+  --brand-primary: #0052CC;
+  --brand-primary-hover: #0747A6;
+  --brand-primary-active: #0052CC;
+  --brand-secondary: #2684FF;
+  --brand-tertiary: #4C9AFF;
+
+  /* Status Colors */
+  --success-50: #E3FCEF;
+  --success-100: #ABF5D1;
+  --success-200: #79F2C0;
+  --success-300: #57D9A3;
+  --success-400: #36B37E;
+  --success-500: #00875A;
+  --success-600: #006644;
+  --success-700: #1F845A;
+
+  --warning-50: #FFFAE6;
+  --warning-100: #FFF0B3;
+  --warning-200: #FFE380;
+  --warning-300: #FFC400;
+  --warning-400: #FFAB00;
+  --warning-500: #FF991F;
+  --warning-600: #FF8B00;
+  --warning-700: #B65C02;
+
+  --danger-50: #FFEBE6;
+  --danger-100: #FFBDAD;
+  --danger-200: #FF8F73;
+  --danger-300: #FF7452;
+  --danger-400: #FF5630;
+  --danger-500: #DE350B;
+  --danger-600: #C9372C;
+  --danger-700: #BF2600;
+
+  --info-50: #DEEBFF;
+  --info-100: #B3D4FF;
+  --info-200: #4C9AFF;
+  --info-300: #2684FF;
+  --info-400: #0065FF;
+  --info-500: #0052CC;
+  --info-600: #0747A6;
+
+  /* ===== SPACING TOKENS ===== */
+  --space-025: 2px;
+  --space-050: 4px;
+  --space-075: 6px;
+  --space-100: 8px;
+  --space-150: 12px;
+  --space-200: 16px;
+  --space-250: 20px;
+  --space-300: 24px;
+  --space-400: 32px;
+  --space-500: 40px;
+  --space-600: 48px;
+  --space-800: 64px;
+  --space-1000: 80px;
+
+  /* ===== TYPOGRAPHY TOKENS ===== */
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                       'Ubuntu', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --font-family-mono: 'SF Mono', 'Segoe UI Mono', 'Roboto Mono', 'Ubuntu Mono',
+                      Menlo, Courier, monospace;
+
+  /* Font Sizes */
+  --font-size-050: 0.6875rem;  /* 11px */
+  --font-size-075: 0.75rem;    /* 12px */
+  --font-size-100: 0.875rem;   /* 14px */
+  --font-size-200: 1rem;       /* 16px */
+  --font-size-300: 1.125rem;   /* 18px */
+  --font-size-400: 1.25rem;    /* 20px */
+  --font-size-500: 1.5rem;     /* 24px */
+  --font-size-600: 1.875rem;   /* 30px */
+  --font-size-700: 2.25rem;    /* 36px */
+
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* ===== BORDER RADIUS TOKENS ===== */
+  --radius-025: 2px;
+  --radius-050: 3px;
+  --radius-100: 4px;
+  --radius-200: 6px;
+  --radius-300: 8px;
+  --radius-400: 12px;
+  --radius-round: 999px;
+  --radius-circle: 50%;
+
+  /* ===== SHADOW TOKENS ===== */
+  --shadow-050: 0 1px 1px rgba(9, 30, 66, 0.08);
+  --shadow-100: 0 1px 1px rgba(9, 30, 66, 0.1), 0 0 1px rgba(9, 30, 66, 0.08);
+  --shadow-200: 0 4px 8px rgba(9, 30, 66, 0.12), 0 0 1px rgba(9, 30, 66, 0.08);
+  --shadow-300: 0 8px 16px rgba(9, 30, 66, 0.16), 0 0 1px rgba(9, 30, 66, 0.1);
+  --shadow-400: 0 12px 24px rgba(9, 30, 66, 0.2), 0 0 1px rgba(9, 30, 66, 0.12);
+  --shadow-500: 0 20px 32px rgba(9, 30, 66, 0.24), 0 0 1px rgba(9, 30, 66, 0.14);
+
+  /* ===== ELEVATION TOKENS ===== */
+  --elevation-raised: var(--shadow-100);
+  --elevation-overlay: var(--shadow-300);
+  --elevation-modal: var(--shadow-500);
+
+  /* ===== TRANSITION TOKENS ===== */
+  --transition-fast: 100ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 400ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* ===== Z-INDEX TOKENS ===== */
+  --z-index-dropdown: 100;
+  --z-index-sticky: 200;
+  --z-index-fixed: 300;
+  --z-index-modal-backdrop: 400;
+  --z-index-modal: 500;
+  --z-index-popover: 600;
+  --z-index-tooltip: 700;
+  --z-index-notification: 800;
+
+  /* ===== OPACITY TOKENS ===== */
+  --opacity-disabled: 0.4;
+  --opacity-loading: 0.6;
+  --opacity-hover: 0.08;
+  --opacity-active: 0.12;
+
+  /* ===== LAYOUT TOKENS ===== */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+
+  /* ===== COMPONENT-SPECIFIC TOKENS ===== */
+
+  /* Buttons */
+  --button-height-sm: 32px;
+  --button-height-md: 40px;
+  --button-height-lg: 48px;
+  --button-padding-x: var(--space-200);
+  --button-padding-y: var(--space-100);
+
+  /* Inputs */
+  --input-height: 40px;
+  --input-padding-x: var(--space-150);
+  --input-padding-y: var(--space-100);
+  --input-border-width: 2px;
+  --input-border-color: var(--neutral-300);
+  --input-border-color-focus: var(--brand-primary);
+  --input-border-color-error: var(--danger-500);
+
+  /* Cards */
+  --card-padding: var(--space-300);
+  --card-border-radius: var(--radius-300);
+  --card-border-color: var(--neutral-200);
+
+  /* Navigation */
+  --nav-height: 56px;
+  --sidebar-width: 240px;
+
+  /* ===== FOCUS TOKENS ===== */
+  --focus-ring-color: var(--brand-primary);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --focus-ring-style: solid;
+  --focus-ring-radius: var(--radius-100);
+
+  /* ===== INTERACTION TOKENS ===== */
+  --interaction-hovered: rgba(9, 30, 66, 0.08);
+  --interaction-pressed: rgba(9, 30, 66, 0.12);
+  --interaction-selected: rgba(0, 82, 204, 0.12);
+  --interaction-disabled: rgba(9, 30, 66, 0.04);
+}
+
+/* ===== DARK MODE TOKENS ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --neutral-0: #0D1117;
+    --neutral-50: #161B22;
+    --neutral-100: #1C2128;
+    --neutral-200: #21262D;
+    --neutral-300: #30363D;
+    --neutral-1300: #C9D1D9;
+    --neutral-1400: #E6EDF3;
+
+    --brand-primary: #4C9AFF;
+    --brand-primary-hover: #2684FF;
+
+    --shadow-050: 0 1px 1px rgba(0, 0, 0, 0.2);
+    --shadow-100: 0 1px 1px rgba(0, 0, 0, 0.25), 0 0 1px rgba(0, 0, 0, 0.2);
+    --shadow-200: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.2);
+    --shadow-300: 0 8px 16px rgba(0, 0, 0, 0.35), 0 0 1px rgba(0, 0, 0, 0.25);
+    --shadow-400: 0 12px 24px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 0, 0, 0.3);
+    --shadow-500: 0 20px 32px rgba(0, 0, 0, 0.45), 0 0 1px rgba(0, 0, 0, 0.35);
+
+    --interaction-hovered: rgba(255, 255, 255, 0.12);
+    --interaction-pressed: rgba(255, 255, 255, 0.2);
+    --interaction-selected: rgba(76, 154, 255, 0.2);
+    --interaction-disabled: rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* Spacing utilities */
+.p-0 { padding: 0; }
+.p-1 { padding: var(--space-100); }
+.p-2 { padding: var(--space-200); }
+.p-3 { padding: var(--space-300); }
+.p-4 { padding: var(--space-400); }
+
+.m-0 { margin: 0; }
+.m-1 { margin: var(--space-100); }
+.m-2 { margin: var(--space-200); }
+.m-3 { margin: var(--space-300); }
+.m-4 { margin: var(--space-400); }
+
+/* Text utilities */
+.text-sm { font-size: var(--font-size-075); }
+.text-base { font-size: var(--font-size-100); }
+.text-lg { font-size: var(--font-size-300); }
+.text-xl { font-size: var(--font-size-500); }
+
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+
+/* Color utilities */
+.text-neutral { color: var(--neutral-800); }
+.text-primary { color: var(--brand-primary); }
+.text-success { color: var(--success-500); }
+.text-warning { color: var(--warning-500); }
+.text-danger { color: var(--danger-500); }
+
+.bg-neutral { background-color: var(--neutral-100); }
+.bg-primary { background-color: var(--brand-primary); }
+.bg-success { background-color: var(--success-500); }
+.bg-warning { background-color: var(--warning-500); }
+.bg-danger { background-color: var(--danger-500); }
+
+/* Layout utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-1 { gap: var(--space-100); }
+.gap-2 { gap: var(--space-200); }
+.gap-3 { gap: var(--space-300); }
+
+/* Accessibility utilities */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.focus-visible:focus-visible {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}

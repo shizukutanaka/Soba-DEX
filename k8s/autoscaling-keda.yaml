@@ -1,0 +1,293 @@
+/**
+ * KEDA (Kubernetes Event-Driven Autoscaling) Configuration
+ *
+ * Advanced event-driven scaling for DEX platform:
+ * - Blockchain transaction volume scaling
+ * - Market volatility scaling
+ * - Social media sentiment scaling
+ * - Trading volume scaling
+ * - AI prediction demand scaling
+ * - Multi-trigger scaling policies
+ * - Cooldown and scale-in prevention
+ *
+ * @version 6.0.0
+ */
+
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: dex-backend-blockchain-scaler
+  namespace: dex-platform
+spec:
+  scaleTargetRef:
+    name: dex-backend
+  minReplicaCount: 3
+  maxReplicaCount: 100
+  cooldownPeriod: 300
+  triggers:
+  # Blockchain transaction volume
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+      metricName: blockchain_transactions_per_second
+      threshold: "100"
+      query: |
+        sum(rate(blockchain_transactions_total[5m])) by (service)
+    authenticationRef:
+      name: prometheus-auth
+  # Market volatility
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+      metricName: market_volatility_index
+      threshold: "0.3"
+      query: |
+        avg(market_volatility_gauge)
+    authenticationRef:
+      name: prometheus-auth
+  # Trading volume
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+      metricName: trading_volume_usd
+      threshold: "1000000"
+      query: |
+        sum(rate(trading_volume_usd_total[5m])) by (service)
+    authenticationRef:
+      name: prometheus-auth
+
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: dex-ai-service-scaler
+  namespace: dex-platform
+spec:
+  scaleTargetRef:
+    name: dex-ai-service
+  minReplicaCount: 1
+  maxReplicaCount: 50
+  cooldownPeriod: 600
+  triggers:
+  # AI prediction requests
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+      metricName: ai_predictions_per_second
+      threshold: "50"
+      query: |
+        sum(rate(ai_predictions_total[5m])) by (service)
+  # Sentiment analysis requests
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+      metricName: sentiment_analysis_requests
+      threshold: "100"
+      query: |
+        sum(rate(sentiment_analysis_requests_total[5m])) by (service)
+  # Market news volume
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+      metricName: market_news_volume
+      threshold: "1000"
+      query: |
+        sum(market_news_articles_total)
+
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: dex-frontend-scaler
+  namespace: dex-platform
+spec:
+  scaleTargetRef:
+    name: dex-frontend
+  minReplicaCount: 2
+  maxReplicaCount: 200
+  cooldownPeriod: 180
+  triggers:
+  # Active users
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+      metricName: active_users
+      threshold: "1000"
+      query: |
+        sum(active_users_gauge) by (service)
+  # Page views per second
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+      metricName: page_views_per_second
+      threshold: "500"
+      query: |
+        sum(rate(page_views_total[5m])) by (service)
+  # WebSocket connections
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+      metricName: websocket_connections
+      threshold: "2000"
+      query: |
+        sum(websocket_connections_gauge) by (service)
+
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: dex-database-scaler
+  namespace: dex-platform
+spec:
+  scaleTargetRef:
+    name: dex-postgres
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  cooldownPeriod: 900
+  triggers:
+  # Database connections
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+      metricName: database_connections
+      threshold: "80"
+      query: |
+        sum(database_connections_gauge)
+  # Query latency
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+      metricName: database_query_latency
+      threshold: "100ms"
+      query: |
+        avg(database_query_duration_seconds)
+  # Database load
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+      metricName: database_load
+      threshold: "0.8"
+      query: |
+        avg(database_cpu_usage)
+
+---
+# Multi-trigger scaling with logical operators
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: dex-multi-trigger-scaler
+  namespace: dex-platform
+spec:
+  scaleTargetRef:
+    name: dex-backend
+  minReplicaCount: 2
+  maxReplicaCount: 150
+  advanced:
+    restoreToOriginalReplicaCount: true
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 600
+          policies:
+          - type: Percent
+            value: 5
+            periodSeconds: 300
+        scaleUp:
+          stabilizationWindowSeconds: 120
+          policies:
+          - type: Percent
+            value: 100
+            periodSeconds: 60
+  triggers:
+  # High volatility + high volume scenario
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+      metricName: high_volatility_scenario
+      threshold: "1"
+      query: |
+        (market_volatility_gauge > 0.5) AND (trading_volume_usd_total > 10000000)
+  # Flash crash scenario
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+      metricName: flash_crash_scenario
+      threshold: "1"
+      query: |
+        (price_drop_percentage > 10) AND (trading_volume_spike > 5)
+  # Social media hype scenario
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+      metricName: social_hype_scenario
+      threshold: "1"
+      query: |
+        (social_sentiment_score > 0.8) AND (social_volume > 10000)
+
+---
+# Prometheus authentication for KEDA
+apiVersion: v1
+kind: Secret
+metadata:
+  name: prometheus-auth
+  namespace: dex-platform
+type: Opaque
+data:
+  bearerToken: "cHJvbWV0aGV1c19iZWFyZXJfdG9rZW4="  # base64 encoded token
+
+---
+# KEDA metrics server configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keda-metrics-config
+  namespace: dex-platform
+data:
+  metrics-server-config.yaml: |
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: keda-metrics-apiserver
+      namespace: keda
+    data:
+      metrics-apiserver-config.yaml: |
+        apiserver:
+          securePort: 6443
+          tls:
+            certFile: /certs/tls.crt
+            privateKeyFile: /certs/tls.key
+          authentication:
+            token:
+              audiences:
+              - api
+              webhooks:
+              - name: authentication
+                config: /etc/kubernetes/authentication
+            anonymous:
+              enabled: false
+          authorization:
+            mode: Webhook
+            webhooks:
+            - name: authorization
+              config: /etc/kubernetes/authorization
+          requestheader:
+            clientCAFile: /certs/ca.crt
+            allowedNames:
+            - aggregator
+            usernameHeaders:
+            - X-Remote-User
+            groupHeaders:
+            - X-Remote-Group
+            extraHeaderPrefixes:
+            - X-Remote-Extra-
+          admissionControl:
+          - NamespaceLifecycle
+          - LimitRanger
+          - ServiceAccount
+          - PersistentVolumeLabel
+          - DefaultStorageClass
+          - DefaultTolerationSeconds
+          - NodeRestriction
+          - ResourceQuota
+          - PodSecurityPolicy
+          - Priority

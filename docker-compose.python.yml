@@ -1,0 +1,301 @@
+# Docker Compose for Python ML Services
+version: '3.8'
+
+services:
+  # ML Models Service - Price Prediction & Market Analysis
+  ml-models:
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+      target: runtime
+    image: soba-ml-models:latest
+    container_name: soba-ml-models
+    environment:
+      SERVICE_NAME: ml_models_service
+      LOG_LEVEL: INFO
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: dex
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DEVICE: cuda  # Change to 'cpu' if no GPU available
+      MODEL_CACHE_DIR: /app/models
+    ports:
+      - "8001:8001"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./python/models:/app/models
+      - ./python/logs:/app/logs
+    networks:
+      - dex-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "prometheus-job=ml-models"
+
+  # NLP Translation Service - 100+ Languages, <100ms latency
+  nlp-translation:
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+      target: runtime
+    image: soba-nlp-translation:latest
+    container_name: soba-nlp-translation
+    environment:
+      SERVICE_NAME: nlp_translation_service
+      LOG_LEVEL: INFO
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CACHE_TTL: 86400
+      DEVICE: cuda  # Change to 'cpu' if no GPU available
+      MODEL_CACHE_DIR: /app/models
+    ports:
+      - "8002:8002"
+    depends_on:
+      - redis
+    volumes:
+      - ./python/models:/app/models
+      - ./python/logs:/app/logs
+    networks:
+      - dex-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "prometheus-job=nlp-translation"
+
+  # Fraud Detection Service - Anomaly Detection & Risk Scoring
+  fraud-detection:
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+      target: runtime
+    image: soba-fraud-detection:latest
+    container_name: soba-fraud-detection
+    environment:
+      SERVICE_NAME: fraud_detection_service
+      LOG_LEVEL: INFO
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: dex
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "8003:8003"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./python/logs:/app/logs
+    networks:
+      - dex-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "prometheus-job=fraud-detection"
+
+  # Data Processing Service - ETL Pipelines
+  data-processing:
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+      target: runtime
+    image: soba-data-processing:latest
+    container_name: soba-data-processing
+    environment:
+      SERVICE_NAME: data_processing_service
+      LOG_LEVEL: INFO
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: dex
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "8004:8004"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./python/logs:/app/logs
+    networks:
+      - dex-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "prometheus-job=data-processing"
+
+  # Blockchain Intelligence Service - Smart Contract Analysis
+  blockchain-intelligence:
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+      target: runtime
+    image: soba-blockchain-intelligence:latest
+    container_name: soba-blockchain-intelligence
+    environment:
+      SERVICE_NAME: blockchain_intelligence_service
+      LOG_LEVEL: INFO
+      ETH_RPC_URL: ${ETH_RPC_URL}
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: dex
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "8005:8005"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./python/logs:/app/logs
+    networks:
+      - dex-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "prometheus-job=blockchain-intelligence"
+
+  # Celery Worker for Async Tasks
+  celery-worker:
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+      target: runtime
+    image: soba-celery-worker:latest
+    container_name: soba-celery-worker
+    command: celery -A services.tasks worker --loglevel=info --concurrency=4
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: dex
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - ./python/logs:/app/logs
+    networks:
+      - dex-network
+    restart: unless-stopped
+    labels:
+      - "prometheus-job=celery-worker"
+
+  # Flower - Celery Monitoring
+  flower:
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+      target: runtime
+    image: soba-flower:latest
+    container_name: soba-flower
+    command: celery -A services.tasks flower --port=5555
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+    networks:
+      - dex-network
+    restart: unless-stopped
+    labels:
+      - "prometheus-job=flower"
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: soba-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-dex}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - dex-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: soba-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - dex-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Prometheus Metrics Collector
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: soba-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - dex-network
+    restart: unless-stopped
+
+networks:
+  dex-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local

@@ -1,0 +1,39 @@
+# ============================================================================
+# ConfigMap for Security Monitor Configuration
+# ============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: security-monitor-config
+  namespace: security-monitor
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+  LOG_LEVEL: "info"
+
+  # Database
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_NAME: "security_monitor"
+  DB_USER: "postgres"
+  DB_POOL_SIZE: "20"
+
+  # Redis
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+
+  # Security
+  MAX_SECURITY_EVENTS: "10000"
+  MAX_INCIDENTS: "1000"
+  RATE_LIMIT_PER_IP: "100"
+
+  # Monitoring
+  PROMETHEUS_PORT: "9090"
+  GRAFANA_PORT: "3001"
+
+  # Tracing
+  JAEGER_ENDPOINT: "http://jaeger-service:14268/api/traces"
+  OTEL_SERVICE_NAME: "security-monitor"
+  OTEL_EXPORTER_JAEGER_AGENT_HOST: "jaeger-service"
+  OTEL_EXPORTER_JAEGER_AGENT_PORT: "6831"

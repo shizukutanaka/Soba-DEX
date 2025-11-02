@@ -1,0 +1,23 @@
+# Security scanner dependencies
+requests==2.31.0
+psycopg2-binary==2.9.7
+redis==4.6.0
+web3==6.10.0
+prometheus-client==0.17.1
+schedule==1.2.0
+python-nmap==0.7.1
+cryptography==41.0.4
+sqlalchemy==2.0.21
+alembic==1.12.0
+pydantic==2.3.0
+fastapi==0.103.1
+uvicorn==0.23.2
+python-jose==3.3.0
+passlib==1.7.4
+python-multipart==0.0.6
+aiofiles==23.2.1
+httpx==0.24.1
+asyncio-mqtt==0.16.1
+celery==5.3.2
+flower==2.0.1
+boto3==1.28.57

@@ -1,0 +1,208 @@
+/* ===== ATLAS PROGRESS TRACKER COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-progress-tracker {
+  /* Base styles */
+  width: 100%;
+}
+
+.atlas-progress-tracker__list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: var(--space-400);
+}
+
+/* Horizontal layout */
+.atlas-progress-tracker--horizontal .atlas-progress-tracker__list {
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.atlas-progress-tracker--horizontal .atlas-progress-tracker__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.atlas-progress-tracker--horizontal .atlas-progress-tracker__step-connector {
+  position: absolute;
+  top: 16px;
+  left: calc(50% + 20px);
+  right: calc(-50% + 20px);
+  height: 2px;
+  background: var(--neutral-300);
+  z-index: 0;
+}
+
+/* Vertical layout */
+.atlas-progress-tracker--vertical .atlas-progress-tracker__list {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.atlas-progress-tracker--vertical .atlas-progress-tracker__step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-200);
+  width: 100%;
+  position: relative;
+}
+
+.atlas-progress-tracker--vertical .atlas-progress-tracker__step-connector {
+  position: absolute;
+  top: 32px;
+  left: 16px;
+  bottom: -24px;
+  width: 2px;
+  background: var(--neutral-300);
+  z-index: 0;
+}
+
+/* Step components */
+.atlas-progress-tracker__step-marker {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--neutral-300);
+  background: var(--neutral-0);
+  color: var(--neutral-600);
+  font-size: var(--font-size-075);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal);
+}
+
+.atlas-progress-tracker__step-number {
+  font-size: var(--font-size-075);
+  font-weight: var(--font-weight-medium);
+}
+
+.atlas-progress-tracker__step-content {
+  text-align: center;
+  margin-top: var(--space-150);
+}
+
+.atlas-progress-tracker--vertical .atlas-progress-tracker__step-content {
+  text-align: left;
+  margin-top: 0;
+  margin-left: var(--space-150);
+}
+
+.atlas-progress-tracker__step-label {
+  font-size: var(--font-size-100);
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-900);
+  margin-bottom: var(--space-050);
+}
+
+.atlas-progress-tracker__step-description {
+  font-size: var(--font-size-075);
+  color: var(--neutral-600);
+  line-height: var(--line-height-normal);
+}
+
+/* Step states */
+.atlas-progress-tracker__step--completed .atlas-progress-tracker__step-marker {
+  background: var(--success-500);
+  border-color: var(--success-500);
+  color: var(--neutral-0);
+}
+
+.atlas-progress-tracker__step--completed .atlas-progress-tracker__step-connector {
+  background: var(--success-500);
+}
+
+.atlas-progress-tracker__step--current .atlas-progress-tracker__step-marker {
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: var(--neutral-0);
+  box-shadow: var(--shadow-200);
+}
+
+.atlas-progress-tracker__step--current .atlas-progress-tracker__step-label {
+  color: var(--brand-primary);
+}
+
+.atlas-progress-tracker__step--error .atlas-progress-tracker__step-marker {
+  background: var(--danger-500);
+  border-color: var(--danger-500);
+  color: var(--neutral-0);
+}
+
+.atlas-progress-tracker__step--error .atlas-progress-tracker__step-connector {
+  background: var(--danger-500);
+}
+
+/* ===== DARK MODE ===== */
+@media (prefers-color-scheme: dark) {
+  .atlas-progress-tracker__step-marker {
+    background: var(--neutral-100);
+    border-color: var(--neutral-400);
+    color: var(--neutral-300);
+  }
+
+  .atlas-progress-tracker__step-connector {
+    background: var(--neutral-400);
+  }
+
+  .atlas-progress-tracker__step-label {
+    color: var(--neutral-0);
+  }
+
+  .atlas-progress-tracker__step-description {
+    color: var(--neutral-400);
+  }
+
+  .atlas-progress-tracker__step--incomplete .atlas-progress-tracker__step-label {
+    color: var(--neutral-300);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .atlas-progress-tracker--horizontal .atlas-progress-tracker__list {
+    gap: var(--space-200);
+  }
+
+  .atlas-progress-tracker--horizontal .atlas-progress-tracker__step-content {
+    margin-top: var(--space-100);
+  }
+
+  .atlas-progress-tracker--horizontal .atlas-progress-tracker__step-label {
+    font-size: var(--font-size-075);
+  }
+
+  .atlas-progress-tracker--horizontal .atlas-progress-tracker__step-description {
+    font-size: var(--font-size-050);
+  }
+}
+
+/* ===== HIGH CONTRAST MODE ===== */
+@media (prefers-contrast: high) {
+  .atlas-progress-tracker__step-marker {
+    border-width: 3px;
+  }
+
+  .atlas-progress-tracker__step-connector {
+    height: 3px;
+  }
+
+  .atlas-progress-tracker--vertical .atlas-progress-tracker__step-connector {
+    width: 3px;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-progress-tracker__step-marker {
+    transition: none;
+  }
+}

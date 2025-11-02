@@ -1,0 +1,19 @@
+{
+  "ETH-USDC": {
+    "bids": [
+      {
+        "id": 1,
+        "userId": "test-user",
+        "type": "buy",
+        "tokenA": "ETH",
+        "tokenB": "USDC",
+        "price": 2000,
+        "amount": 1,
+        "timestamp": 1758556780726,
+        "status": "active"
+      }
+    ],
+    "asks": [],
+    "lastPrice": 0
+  }
+}

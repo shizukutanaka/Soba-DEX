@@ -1,0 +1,82 @@
+{
+  "trading": {
+    "title": "Trading",
+    "description": "Professional trading interface for DeFi markets",
+    "marketData": "Market Data",
+    "orderBook": "Order Book",
+    "priceChart": "Price Chart",
+    "recentTrades": "Recent Trades",
+    "tradeHistory": "Trade History",
+    "openOrders": "Open Orders",
+    "orderHistory": "Order History",
+    "positions": "Positions",
+    "portfolio": "Portfolio"
+  },
+  "markets": {
+    "title": "Markets",
+    "search": "Search markets...",
+    "filter": "Filter markets",
+    "sortBy": "Sort by",
+    "volume24h": "24h Volume",
+    "priceChange": "Price Change",
+    "marketCap": "Market Cap",
+    "allMarkets": "All Markets",
+    "favorites": "Favorites",
+    "gainers": "Gainers",
+    "losers": "Losers",
+    "newListings": "New Listings"
+  },
+  "orders": {
+    "buy": "Buy",
+    "sell": "Sell",
+    "limit": "Limit Order",
+    "market": "Market Order",
+    "stop": "Stop Order",
+    "stopLimit": "Stop Limit",
+    "orderType": "Order Type",
+    "amount": "Amount",
+    "price": "Price",
+    "total": "Total",
+    "placeOrder": "Place Order",
+    "cancelOrder": "Cancel Order",
+    "orderPlaced": "Order placed successfully",
+    "orderCancelled": "Order cancelled",
+    "insufficientBalance": "Insufficient balance",
+    "priceImpact": "Price Impact",
+    "minimumReceived": "Minimum Received",
+    "slippageTolerance": "Slippage Tolerance"
+  },
+  "chart": {
+    "timeframe": "Timeframe",
+    "indicators": "Indicators",
+    "drawingTools": "Drawing Tools",
+    "fullscreen": "Fullscreen",
+    "price": "Price",
+    "volume": "Volume",
+    "time": "Time",
+    "open": "Open",
+    "high": "High",
+    "low": "Low",
+    "close": "Close"
+  },
+  "liquidity": {
+    "title": "Liquidity",
+    "addLiquidity": "Add Liquidity",
+    "removeLiquidity": "Remove Liquidity",
+    "yourLiquidity": "Your Liquidity",
+    "poolShare": "Pool Share",
+    "apy": "APY",
+    "rewards": "Rewards",
+    "impermanentLoss": "Impermanent Loss Risk"
+  },
+  "staking": {
+    "title": "Staking",
+    "stake": "Stake",
+    "unstake": "Unstake",
+    "claimRewards": "Claim Rewards",
+    "stakingApy": "Staking APY",
+    "totalStaked": "Total Staked",
+    "yourStake": "Your Stake",
+    "rewardsEarned": "Rewards Earned"
+  }
+}

@@ -1,0 +1,302 @@
+# ============================================================================
+# Automated Backup CronJobs for PostgreSQL and Redis
+# ============================================================================
+
+# PostgreSQL Daily Backup
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup-daily
+  namespace: security-monitor
+spec:
+  schedule: "0 2 * * *"  # 2 AM daily
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: postgres-backup
+              image: postgres:14-alpine
+              env:
+                - name: PGHOST
+                  value: "postgres-service"
+                - name: PGPORT
+                  value: "5432"
+                - name: PGDATABASE
+                  valueFrom:
+                    configMapKeyRef:
+                      name: security-monitor-config
+                      key: DB_NAME
+                - name: PGUSER
+                  valueFrom:
+                    configMapKeyRef:
+                      name: security-monitor-config
+                      key: DB_USER
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: security-monitor-secrets
+                      key: DB_PASSWORD
+                - name: BACKUP_DATE
+                  value: "$(date +%Y%m%d-%H%M%S)"
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  BACKUP_FILE="/backups/postgres-backup-$(date +%Y%m%d-%H%M%S).sql.gz"
+                  echo "Starting PostgreSQL backup to $BACKUP_FILE"
+
+                  pg_dump --verbose --format=custom --compress=9 | gzip > $BACKUP_FILE
+
+                  if [ $? -eq 0 ]; then
+                    echo "Backup completed successfully: $BACKUP_FILE"
+                    ls -lh $BACKUP_FILE
+
+                    # Delete backups older than 30 days
+                    find /backups -name "postgres-backup-*.sql.gz" -mtime +30 -delete
+                    echo "Cleanup completed"
+                  else
+                    echo "Backup failed!"
+                    exit 1
+                  fi
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backups
+          volumes:
+            - name: backup-storage
+              persistentVolumeClaim:
+                claimName: backup-pvc
+
+---
+# PostgreSQL Weekly Full Backup (with verification)
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup-weekly
+  namespace: security-monitor
+spec:
+  schedule: "0 3 * * 0"  # 3 AM every Sunday
+  successfulJobsHistoryLimit: 4
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: postgres-backup
+              image: postgres:14-alpine
+              env:
+                - name: PGHOST
+                  value: "postgres-service"
+                - name: PGPORT
+                  value: "5432"
+                - name: PGDATABASE
+                  valueFrom:
+                    configMapKeyRef:
+                      name: security-monitor-config
+                      key: DB_NAME
+                - name: PGUSER
+                  valueFrom:
+                    configMapKeyRef:
+                      name: security-monitor-config
+                      key: DB_USER
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: security-monitor-secrets
+                      key: DB_PASSWORD
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  BACKUP_FILE="/backups/weekly/postgres-backup-weekly-$(date +%Y%m%d-%H%M%S).sql.gz"
+                  mkdir -p /backups/weekly
+
+                  echo "Starting weekly PostgreSQL backup to $BACKUP_FILE"
+
+                  pg_dump --verbose --format=custom --compress=9 | gzip > $BACKUP_FILE
+
+                  if [ $? -eq 0 ]; then
+                    echo "Weekly backup completed successfully: $BACKUP_FILE"
+                    ls -lh $BACKUP_FILE
+
+                    # Verify backup integrity
+                    echo "Verifying backup integrity..."
+                    gunzip -t $BACKUP_FILE
+
+                    if [ $? -eq 0 ]; then
+                      echo "Backup verification successful"
+                    else
+                      echo "Backup verification failed!"
+                      exit 1
+                    fi
+
+                    # Delete weekly backups older than 90 days
+                    find /backups/weekly -name "postgres-backup-weekly-*.sql.gz" -mtime +90 -delete
+                    echo "Cleanup completed"
+                  else
+                    echo "Weekly backup failed!"
+                    exit 1
+                  fi
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backups
+          volumes:
+            - name: backup-storage
+              persistentVolumeClaim:
+                claimName: backup-pvc
+
+---
+# Redis Backup (RDB snapshot)
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: redis-backup-daily
+  namespace: security-monitor
+spec:
+  schedule: "30 2 * * *"  # 2:30 AM daily
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: redis-backup
+              image: redis:7-alpine
+              env:
+                - name: REDIS_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: security-monitor-secrets
+                      key: REDIS_PASSWORD
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  BACKUP_FILE="/backups/redis-backup-$(date +%Y%m%d-%H%M%S).rdb"
+                  echo "Starting Redis backup to $BACKUP_FILE"
+
+                  # Trigger BGSAVE
+                  redis-cli -h redis-service -p 6379 -a $REDIS_PASSWORD --no-auth-warning BGSAVE
+
+                  # Wait for BGSAVE to complete
+                  sleep 10
+
+                  # Copy RDB file
+                  redis-cli -h redis-service -p 6379 -a $REDIS_PASSWORD --no-auth-warning --rdb $BACKUP_FILE
+
+                  if [ $? -eq 0 ]; then
+                    echo "Redis backup completed successfully: $BACKUP_FILE"
+                    gzip $BACKUP_FILE
+                    ls -lh $BACKUP_FILE.gz
+
+                    # Delete backups older than 14 days
+                    find /backups -name "redis-backup-*.rdb.gz" -mtime +14 -delete
+                    echo "Cleanup completed"
+                  else
+                    echo "Redis backup failed!"
+                    exit 1
+                  fi
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backups
+          volumes:
+            - name: backup-storage
+              persistentVolumeClaim:
+                claimName: backup-pvc
+
+---
+# Backup Storage PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backup-pvc
+  namespace: security-monitor
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: standard
+
+---
+# Backup Verification and Monitoring
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-verification
+  namespace: security-monitor
+spec:
+  schedule: "0 6 * * *"  # 6 AM daily (after backups complete)
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup-verifier
+              image: alpine:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  echo "Verifying backups created in the last 24 hours..."
+
+                  # Check PostgreSQL backups
+                  POSTGRES_BACKUP=$(find /backups -name "postgres-backup-*.sql.gz" -mtime -1 | head -n 1)
+                  if [ -z "$POSTGRES_BACKUP" ]; then
+                    echo "ERROR: No PostgreSQL backup found in last 24 hours!"
+                    exit 1
+                  fi
+                  echo "Found PostgreSQL backup: $POSTGRES_BACKUP"
+
+                  # Verify PostgreSQL backup is not empty
+                  POSTGRES_SIZE=$(stat -c%s "$POSTGRES_BACKUP")
+                  if [ "$POSTGRES_SIZE" -lt 1000 ]; then
+                    echo "ERROR: PostgreSQL backup is too small ($POSTGRES_SIZE bytes)"
+                    exit 1
+                  fi
+                  echo "PostgreSQL backup size: $POSTGRES_SIZE bytes - OK"
+
+                  # Check Redis backups
+                  REDIS_BACKUP=$(find /backups -name "redis-backup-*.rdb.gz" -mtime -1 | head -n 1)
+                  if [ -z "$REDIS_BACKUP" ]; then
+                    echo "ERROR: No Redis backup found in last 24 hours!"
+                    exit 1
+                  fi
+                  echo "Found Redis backup: $REDIS_BACKUP"
+
+                  # Generate backup report
+                  echo "===== Backup Verification Report ====="
+                  echo "Date: $(date)"
+                  echo ""
+                  echo "PostgreSQL Backups:"
+                  find /backups -name "postgres-backup-*.sql.gz" -mtime -7 -exec ls -lh {} \;
+                  echo ""
+                  echo "Redis Backups:"
+                  find /backups -name "redis-backup-*.rdb.gz" -mtime -7 -exec ls -lh {} \;
+                  echo ""
+                  echo "Weekly Backups:"
+                  find /backups/weekly -name "postgres-backup-weekly-*.sql.gz" -exec ls -lh {} \;
+                  echo ""
+                  echo "Total Backup Storage:"
+                  du -sh /backups
+                  echo "======================================"
+
+                  echo "All backup verifications passed!"
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backups
+          volumes:
+            - name: backup-storage
+              persistentVolumeClaim:
+                claimName: backup-pvc

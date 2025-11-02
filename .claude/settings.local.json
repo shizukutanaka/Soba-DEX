@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"c:\\Users\\irosa\\Desktop\\Claude\\DEX\\backend\\src\\services\\accountAbstractionService.js\" )",
+      "Bash(\"c:\\Users\\irosa\\Desktop\\Claude\\DEX\\backend\\src\\services\\daoGovernanceAttackPreventionService.js\" )",
+      "Bash(\"c:\\Users\\irosa\\Desktop\\Claude\\DEX\\backend\\src\\services\\flashLoanProtectionService.js\" )",
+      "Bash(\"c:\\Users\\irosa\\Desktop\\Claude\\DEX\\backend\\src\\services\\uniswapV4HooksSecurityService.js\" )",
+      "Bash(\"c:\\Users\\irosa\\Desktop\\Claude\\DEX\\backend\\src\\services\\web3SocialService.js\" )",
+      "Bash(\"c:\\Users\\irosa\\Desktop\\Claude\\DEX\\backend\\src\\services\\zkpPrivacyService.js\")",
+      "Bash(__NEW_LINE__ echo \"✅ Deleted 6 fake blockchain services\")",
+      "Bash(uniq:*)",
+      "Bash(while read file)",
+      "Bash(do node -c \"$file\")",
+      "Bash(echo \"ERROR: $file\" done)",
+      "Bash(node:*)",
+      "Bash(echo:*)",
+      "Bash(move \"c:\\Users\\irosa\\Desktop\\Claude\\DEX\\backend\\src\\middleware\\sand-validator.js\" \"c:\\Users\\irosa\\Desktop\\Claude\\DEX\\backend\\src\\middleware\\sandValidator.js\")",
+      "Bash(npm run test:*)",
+      "Bash(npm audit:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(PYTHON_ASSESSMENT.md)",
+      "Bash(awk '{print $9, \"\"\"\"(\"\"\"\" $5 \"\"\"\")\"\"\"\"}')",
+      "Bash(dir /b *.yml *.yaml 2)",
+      "Bash(nul)",
+      "Bash(dir:*)",
+      "Bash(python cleanup_middleware.py:*)",
+      "Bash(awk:*)",
+      "Bash(git init:*)",
+      "Bash(git config:*)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

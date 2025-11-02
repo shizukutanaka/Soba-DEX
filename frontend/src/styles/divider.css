@@ -1,0 +1,210 @@
+/**
+ * Divider Component Styles
+ * Following Atlassian Design System principles
+ */
+
+@import './tokens.css';
+
+/* Base Divider */
+.atlas-divider {
+  border: none;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* Horizontal Orientation */
+.atlas-divider--horizontal {
+  width: 100%;
+  height: 1px;
+  background: var(--neutral-200);
+}
+
+/* Vertical Orientation */
+.atlas-divider--vertical {
+  width: 1px;
+  height: 100%;
+  background: var(--neutral-200);
+  display: inline-block;
+}
+
+/* Variant Styles */
+.atlas-divider--solid {
+  background: var(--neutral-200);
+}
+
+.atlas-divider--dashed {
+  background: none;
+  border-top: 1px dashed var(--neutral-300);
+}
+
+.atlas-divider--horizontal.atlas-divider--dashed {
+  border-top: 1px dashed var(--neutral-300);
+  height: 0;
+}
+
+.atlas-divider--vertical.atlas-divider--dashed {
+  border-left: 1px dashed var(--neutral-300);
+  border-top: none;
+  width: 0;
+}
+
+.atlas-divider--dotted {
+  background: none;
+  border-top: 1px dotted var(--neutral-300);
+}
+
+.atlas-divider--horizontal.atlas-divider--dotted {
+  border-top: 1px dotted var(--neutral-300);
+  height: 0;
+}
+
+.atlas-divider--vertical.atlas-divider--dotted {
+  border-left: 1px dotted var(--neutral-300);
+  border-top: none;
+  width: 0;
+}
+
+/* Spacing Variants */
+.atlas-divider--horizontal.atlas-divider--spacing-none {
+  margin: 0;
+}
+
+.atlas-divider--horizontal.atlas-divider--spacing-sm {
+  margin: var(--space-100) 0;
+}
+
+.atlas-divider--horizontal.atlas-divider--spacing-md {
+  margin: var(--space-200) 0;
+}
+
+.atlas-divider--horizontal.atlas-divider--spacing-lg {
+  margin: var(--space-400) 0;
+}
+
+.atlas-divider--vertical.atlas-divider--spacing-none {
+  margin: 0;
+}
+
+.atlas-divider--vertical.atlas-divider--spacing-sm {
+  margin: 0 var(--space-100);
+}
+
+.atlas-divider--vertical.atlas-divider--spacing-md {
+  margin: 0 var(--space-200);
+}
+
+.atlas-divider--vertical.atlas-divider--spacing-lg {
+  margin: 0 var(--space-400);
+}
+
+/* With Label */
+.atlas-divider--with-label {
+  display: flex;
+  align-items: center;
+  background: none;
+  height: auto;
+  color: var(--neutral-700);
+  font-size: var(--font-size-100);
+  font-weight: 500;
+}
+
+.atlas-divider--with-label::before,
+.atlas-divider--with-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--neutral-200);
+}
+
+.atlas-divider--with-label.atlas-divider--dashed::before,
+.atlas-divider--with-label.atlas-divider--dashed::after {
+  background: none;
+  border-top: 1px dashed var(--neutral-300);
+}
+
+.atlas-divider--with-label.atlas-divider--dotted::before,
+.atlas-divider--with-label.atlas-divider--dotted::after {
+  background: none;
+  border-top: 1px dotted var(--neutral-300);
+}
+
+/* Label */
+.atlas-divider__label {
+  padding: 0 var(--space-200);
+  white-space: nowrap;
+}
+
+/* Label Alignment */
+.atlas-divider--label-left::before {
+  flex: 0;
+  width: 0;
+}
+
+.atlas-divider--label-left .atlas-divider__label {
+  padding-left: 0;
+}
+
+.atlas-divider--label-right::after {
+  flex: 0;
+  width: 0;
+}
+
+.atlas-divider--label-right .atlas-divider__label {
+  padding-right: 0;
+}
+
+.atlas-divider--label-center::before,
+.atlas-divider--label-center::after {
+  flex: 1;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .atlas-divider--horizontal,
+  .atlas-divider--vertical {
+    background: var(--neutral-700);
+  }
+
+  .atlas-divider--solid {
+    background: var(--neutral-700);
+  }
+
+  .atlas-divider--dashed,
+  .atlas-divider--horizontal.atlas-divider--dashed,
+  .atlas-divider--vertical.atlas-divider--dashed {
+    border-color: var(--neutral-700);
+  }
+
+  .atlas-divider--dotted,
+  .atlas-divider--horizontal.atlas-divider--dotted,
+  .atlas-divider--vertical.atlas-divider--dotted {
+    border-color: var(--neutral-700);
+  }
+
+  .atlas-divider--with-label {
+    color: var(--neutral-300);
+  }
+
+  .atlas-divider--with-label::before,
+  .atlas-divider--with-label::after {
+    background: var(--neutral-700);
+  }
+
+  .atlas-divider--with-label.atlas-divider--dashed::before,
+  .atlas-divider--with-label.atlas-divider--dashed::after {
+    border-color: var(--neutral-700);
+  }
+
+  .atlas-divider--with-label.atlas-divider--dotted::before,
+  .atlas-divider--with-label.atlas-divider--dotted::after {
+    border-color: var(--neutral-700);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .atlas-divider__label {
+    font-size: var(--font-size-75);
+    padding: 0 var(--space-150);
+  }
+}

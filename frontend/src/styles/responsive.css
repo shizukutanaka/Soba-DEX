@@ -1,0 +1,267 @@
+/* Mobile Responsive Styles */
+
+/* Extra Small Devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+  .MuiContainer-root {
+    padding: 8px !important;
+  }
+
+  .MuiPaper-root {
+    margin: 8px !important;
+    padding: 16px !important;
+  }
+
+  .MuiTypography-h4 {
+    font-size: 1.5rem !important;
+  }
+
+  .MuiTypography-h5 {
+    font-size: 1.2rem !important;
+  }
+
+  .MuiButton-root {
+    font-size: 0.875rem !important;
+    padding: 8px 16px !important;
+  }
+
+  .swap-container,
+  .liquidity-container {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .chart-container {
+    height: 300px !important;
+  }
+
+  .order-book {
+    font-size: 0.75rem !important;
+  }
+
+  .pool-list {
+    overflow-x: auto !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .navigation-tabs {
+    flex-wrap: wrap !important;
+  }
+
+  .wallet-button {
+    width: 100% !important;
+    margin-top: 8px !important;
+  }
+}
+
+/* Small Devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) and (max-width: 768px) {
+  .MuiContainer-root {
+    padding: 16px !important;
+  }
+
+  .swap-container,
+  .liquidity-container {
+    max-width: 500px !important;
+  }
+
+  .chart-container {
+    height: 400px !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Medium Devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) and (max-width: 992px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .chart-container {
+    height: 450px !important;
+  }
+}
+
+/* Large Devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) and (max-width: 1200px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .MuiButton-root {
+    min-height: 48px !important;
+    min-width: 48px !important;
+  }
+
+  .MuiIconButton-root {
+    padding: 12px !important;
+  }
+
+  .MuiTextField-root input {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+
+  .clickable-element {
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .hover-effect:hover {
+    background-color: transparent !important;
+  }
+
+  .hover-effect:active {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #0f0f23;
+    --bg-secondary: #1a1a2e;
+    --text-primary: #ffffff;
+    --text-secondary: #8a8fa3;
+    --accent: #6a84c7;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
+
+/* Landscape Orientation */
+@media only screen and (orientation: landscape) and (max-height: 500px) {
+  .header {
+    position: relative !important;
+    height: auto !important;
+  }
+
+  .main-content {
+    padding-top: 0 !important;
+  }
+
+  .chart-container {
+    height: 250px !important;
+  }
+}
+
+/* High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .logo-image {
+    background-image: url('/logo@2x.png');
+  }
+}
+
+/* Custom Scrollbar for Mobile */
+@media only screen and (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 4px !important;
+    height: 4px !important;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3) !important;
+    border-radius: 4px !important;
+  }
+}
+
+/* Safe Area Insets for Modern Devices */
+@supports (padding: max(0px)) {
+  .header {
+    padding-top: max(20px, env(safe-area-inset-top));
+  }
+
+  .footer {
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+
+  .sidebar {
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
+  }
+}
+
+/* Foldable Device Support */
+@media (screen-spanning: single-fold-vertical) {
+  .main-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: env(fold-width);
+  }
+}
+
+@media (screen-spanning: single-fold-horizontal) {
+  .main-layout {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: env(fold-height);
+  }
+}
+
+/* Utility Classes */
+.mobile-only {
+  display: none !important;
+}
+
+.desktop-only {
+  display: block !important;
+}
+
+@media only screen and (max-width: 768px) {
+  .mobile-only {
+    display: block !important;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flex-responsive {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+@media only screen and (max-width: 600px) {
+  .flex-responsive {
+    flex-direction: column;
+  }
+}

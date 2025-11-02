@@ -1,0 +1,196 @@
+/* ===== ATLAS BANNER COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-banner {
+  /* Base styles */
+  background: var(--neutral-0);
+  border-bottom: 1px solid var(--neutral-200);
+  padding: var(--space-200) var(--space-300);
+  position: relative;
+  z-index: var(--z-index-notification);
+}
+
+.atlas-banner__content {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-200);
+  max-width: var(--container-xl);
+  margin: 0 auto;
+}
+
+.atlas-banner__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.atlas-banner__text {
+  flex: 1;
+  color: var(--neutral-1000);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-normal);
+}
+
+.atlas-banner__dismiss {
+  /* Reset button styles */
+  background: none;
+  border: none;
+  padding: var(--space-050);
+  margin: calc(-1 * var(--space-050));
+  border-radius: var(--radius-100);
+  cursor: pointer;
+  color: var(--neutral-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+
+  /* Focus styles */
+  outline: none;
+}
+
+.atlas-banner__dismiss:hover {
+  background: var(--interaction-hovered);
+  color: var(--neutral-900);
+}
+
+.atlas-banner__dismiss:focus-visible {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.atlas-banner__dismiss svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Type variants */
+.atlas-banner--info {
+  background: var(--info-50);
+  border-bottom-color: var(--info-200);
+}
+
+.atlas-banner--info .atlas-banner__icon {
+  color: var(--info-600);
+}
+
+.atlas-banner--info .atlas-banner__text {
+  color: var(--info-900);
+}
+
+.atlas-banner--success {
+  background: var(--success-50);
+  border-bottom-color: var(--success-200);
+}
+
+.atlas-banner--success .atlas-banner__icon {
+  color: var(--success-600);
+}
+
+.atlas-banner--success .atlas-banner__text {
+  color: var(--success-900);
+}
+
+.atlas-banner--warning {
+  background: var(--warning-50);
+  border-bottom-color: var(--warning-200);
+}
+
+.atlas-banner--warning .atlas-banner__icon {
+  color: var(--warning-600);
+}
+
+.atlas-banner--warning .atlas-banner__text {
+  color: var(--warning-900);
+}
+
+.atlas-banner--error {
+  background: var(--danger-50);
+  border-bottom-color: var(--danger-200);
+}
+
+.atlas-banner--error .atlas-banner__icon {
+  color: var(--danger-600);
+}
+
+.atlas-banner--error .atlas-banner__text {
+  color: var(--danger-900);
+}
+
+/* ===== DARK MODE ===== */
+@media (prefers-color-scheme: dark) {
+  .atlas-banner {
+    background: var(--neutral-100);
+    border-bottom-color: var(--neutral-300);
+  }
+
+  .atlas-banner__text {
+    color: var(--neutral-0);
+  }
+
+  .atlas-banner__dismiss {
+    color: var(--neutral-400);
+  }
+
+  .atlas-banner__dismiss:hover {
+    background: var(--interaction-hovered);
+    color: var(--neutral-0);
+  }
+
+  .atlas-banner--info {
+    background: rgba(76, 154, 255, 0.1);
+    border-bottom-color: rgba(76, 154, 255, 0.3);
+  }
+
+  .atlas-banner--success {
+    background: rgba(0, 135, 90, 0.1);
+    border-bottom-color: rgba(0, 135, 90, 0.3);
+  }
+
+  .atlas-banner--warning {
+    background: rgba(255, 171, 0, 0.1);
+    border-bottom-color: rgba(255, 171, 0, 0.3);
+  }
+
+  .atlas-banner--error {
+    background: rgba(201, 55, 44, 0.1);
+    border-bottom-color: rgba(201, 55, 44, 0.3);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .atlas-banner {
+    padding: var(--space-150) var(--space-200);
+  }
+
+  .atlas-banner__content {
+    gap: var(--space-150);
+  }
+
+  .atlas-banner__text {
+    font-size: var(--font-size-075);
+  }
+}
+
+/* ===== HIGH CONTRAST MODE ===== */
+@media (prefers-contrast: high) {
+  .atlas-banner {
+    border-bottom-width: 2px;
+  }
+
+  .atlas-banner__dismiss {
+    border: 1px solid currentColor;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-banner__dismiss {
+    transition: none;
+  }
+}

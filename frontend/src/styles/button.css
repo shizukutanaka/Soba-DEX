@@ -1,0 +1,328 @@
+/* ===== ATLAS BUTTON COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-button {
+  /* Base styles */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-100);
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  border: 2px solid transparent;
+  transition: all var(--transition-normal);
+  outline: none;
+
+  /* Default size (medium) */
+  height: var(--button-height-md);
+  padding: 0 var(--space-200);
+  font-size: var(--font-size-100);
+  border-radius: var(--radius-200);
+}
+
+/* ===== SIZE VARIANTS ===== */
+.atlas-button--sm {
+  height: var(--button-height-sm);
+  padding: 0 var(--space-150);
+  font-size: var(--font-size-075);
+  border-radius: var(--radius-100);
+}
+
+.atlas-button--lg {
+  height: var(--button-height-lg);
+  padding: 0 var(--space-300);
+  font-size: var(--font-size-200);
+  border-radius: var(--radius-300);
+}
+
+/* ===== COLOR VARIANTS ===== */
+
+/* Primary Button */
+.atlas-button--primary {
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+  color: var(--neutral-0);
+  box-shadow: var(--shadow-100);
+}
+
+.atlas-button--primary:hover:not(.atlas-button--disabled) {
+  background: var(--brand-primary-hover);
+  box-shadow: var(--shadow-200);
+  transform: translateY(-1px);
+}
+
+.atlas-button--primary:active:not(.atlas-button--disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-050);
+}
+
+.atlas-button--primary:focus-visible {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Secondary Button */
+.atlas-button--secondary {
+  background: var(--neutral-0);
+  color: var(--neutral-1300);
+  border-color: var(--neutral-300);
+  box-shadow: var(--shadow-050);
+}
+
+.atlas-button--secondary:hover:not(.atlas-button--disabled) {
+  background: var(--neutral-50);
+  border-color: var(--neutral-400);
+  box-shadow: var(--shadow-100);
+}
+
+.atlas-button--secondary:active:not(.atlas-button--disabled) {
+  background: var(--neutral-100);
+}
+
+/* Success Button */
+.atlas-button--success {
+  background: linear-gradient(135deg, var(--success-400), var(--success-500));
+  color: var(--neutral-0);
+  box-shadow: 0 4px 12px rgba(0, 135, 90, 0.3);
+}
+
+.atlas-button--success:hover:not(.atlas-button--disabled) {
+  background: var(--success-600);
+  box-shadow: 0 6px 16px rgba(0, 135, 90, 0.4);
+  transform: translateY(-1px);
+}
+
+.atlas-button--success:active:not(.atlas-button--disabled) {
+  transform: translateY(0);
+}
+
+/* Danger Button */
+.atlas-button--danger {
+  background: linear-gradient(135deg, var(--danger-300), var(--danger-600));
+  color: var(--neutral-0);
+  box-shadow: 0 4px 12px rgba(201, 55, 44, 0.3);
+}
+
+.atlas-button--danger:hover:not(.atlas-button--disabled) {
+  background: var(--danger-700);
+  box-shadow: 0 6px 16px rgba(201, 55, 44, 0.4);
+  transform: translateY(-1px);
+}
+
+.atlas-button--danger:active:not(.atlas-button--disabled) {
+  transform: translateY(0);
+}
+
+/* Warning Button */
+.atlas-button--warning {
+  background: var(--warning-400);
+  color: var(--neutral-1400);
+  box-shadow: 0 4px 12px rgba(255, 171, 0, 0.3);
+}
+
+.atlas-button--warning:hover:not(.atlas-button--disabled) {
+  background: var(--warning-500);
+  box-shadow: 0 6px 16px rgba(255, 171, 0, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Ghost Button */
+.atlas-button--ghost {
+  background: transparent;
+  color: var(--neutral-900);
+  border-color: transparent;
+}
+
+.atlas-button--ghost:hover:not(.atlas-button--disabled) {
+  background: var(--interaction-hovered);
+}
+
+.atlas-button--ghost:active:not(.atlas-button--disabled) {
+  background: var(--interaction-pressed);
+}
+
+/* Link Button */
+.atlas-button--link {
+  background: transparent;
+  color: var(--brand-primary);
+  border-color: transparent;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.atlas-button--link:hover:not(.atlas-button--disabled) {
+  color: var(--brand-primary-hover);
+  text-decoration-thickness: 2px;
+}
+
+/* ===== STATE VARIANTS ===== */
+
+/* Disabled State */
+.atlas-button--disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Loading State */
+.atlas-button--loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+
+.atlas-button--loading .atlas-button__text {
+  visibility: hidden;
+}
+
+/* ===== LAYOUT VARIANTS ===== */
+.atlas-button--full {
+  width: 100%;
+}
+
+/* ===== BUTTON ELEMENTS ===== */
+
+.atlas-button__text {
+  display: inline-flex;
+  align-items: center;
+}
+
+.atlas-button__icon-before,
+.atlas-button__icon-after {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.atlas-button__icon-before svg,
+.atlas-button__icon-after svg {
+  width: 1em;
+  height: 1em;
+}
+
+/* Loading Spinner */
+.atlas-button__spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.atlas-button__spinner-svg {
+  width: 1.25em;
+  height: 1.25em;
+  animation: atlas-button-spin 0.8s linear infinite;
+}
+
+.atlas-button__spinner-circle {
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: atlas-button-dash 1.5s ease-in-out infinite;
+}
+
+/* Primary variant spinner color */
+.atlas-button--primary .atlas-button__spinner-circle {
+  stroke: var(--neutral-0);
+}
+
+/* Secondary variant spinner color */
+.atlas-button--secondary .atlas-button__spinner-circle {
+  stroke: var(--brand-primary);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes atlas-button-spin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes atlas-button-dash {
+  0% {
+    stroke-dashoffset: 50;
+  }
+  50% {
+    stroke-dashoffset: 10;
+  }
+  100% {
+    stroke-dashoffset: 50;
+  }
+}
+
+/* ===== BUTTON GROUP ===== */
+.atlas-button-group {
+  display: inline-flex;
+  gap: var(--space-100);
+}
+
+.atlas-button-group--attached {
+  gap: 0;
+}
+
+.atlas-button-group--attached .atlas-button:not(:first-child):not(:last-child) {
+  border-radius: 0;
+}
+
+.atlas-button-group--attached .atlas-button:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.atlas-button-group--attached .atlas-button:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .atlas-button--lg {
+    height: var(--button-height-md);
+    padding: 0 var(--space-200);
+    font-size: var(--font-size-100);
+  }
+}
+
+/* ===== HIGH CONTRAST MODE ===== */
+@media (prefers-contrast: high) {
+  .atlas-button {
+    border-width: 2px;
+  }
+
+  .atlas-button--primary,
+  .atlas-button--success,
+  .atlas-button--danger {
+    border-color: currentColor;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-button {
+    transition: none;
+  }
+
+  .atlas-button:hover:not(.atlas-button--disabled) {
+    transform: none;
+  }
+
+  .atlas-button__spinner-svg,
+  .atlas-button__spinner-circle {
+    animation: none;
+  }
+}

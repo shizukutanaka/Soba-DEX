@@ -1,0 +1,250 @@
+/* ===== ATLAS CODE COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-code {
+  /* Base styles */
+  position: relative;
+  background: var(--neutral-100);
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radius-200);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-100);
+  line-height: 1.5;
+  color: var(--neutral-1000);
+  overflow: hidden;
+}
+
+.atlas-code__container {
+  display: flex;
+  position: relative;
+}
+
+/* Copy button */
+.atlas-code__copy-button {
+  position: absolute;
+  top: var(--space-150);
+  right: var(--space-150);
+  z-index: 1;
+  background: var(--neutral-0);
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radius-100);
+  padding: var(--space-050);
+  cursor: pointer;
+  color: var(--neutral-600);
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.atlas-code__copy-button:hover {
+  background: var(--neutral-50);
+  border-color: var(--neutral-400);
+  color: var(--neutral-900);
+}
+
+.atlas-code__copy-button:focus-visible {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.atlas-code__copy-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Static code display */
+.atlas-code__pre {
+  margin: 0;
+  padding: var(--space-200) var(--space-300);
+  overflow-x: auto;
+  flex: 1;
+  min-width: 0;
+}
+
+.atlas-code__code {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  white-space: pre;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+
+/* Editable code */
+.atlas-code--editable {
+  background: var(--neutral-0);
+}
+
+.atlas-code__textarea {
+  width: 100%;
+  min-height: 120px;
+  margin: 0;
+  padding: var(--space-200) var(--space-300);
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  resize: vertical;
+  overflow: hidden;
+  white-space: pre;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+
+.atlas-code__textarea::placeholder {
+  color: var(--neutral-500);
+  opacity: 1;
+}
+
+.atlas-code__textarea:focus {
+  outline: none;
+}
+
+/* Line numbers */
+.atlas-code__line-numbers {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: var(--space-200) var(--space-150) var(--space-200) var(--space-200);
+  background: var(--neutral-200);
+  border-right: 1px solid var(--neutral-300);
+  font-size: var(--font-size-075);
+  color: var(--neutral-600);
+  user-select: none;
+  min-width: 40px;
+}
+
+.atlas-code__line-number {
+  display: block;
+  line-height: 1.5;
+  padding-right: var(--space-100);
+  text-align: right;
+}
+
+/* Syntax highlighting (basic) */
+/* Note: Advanced syntax highlighting can be added with libraries like Prism.js or Highlight.js */
+/* Language-specific styling can be added here as needed */
+
+/* Inline code */
+.atlas-inline-code {
+  font-family: var(--font-family-mono);
+  font-size: 0.875em;
+  background: var(--neutral-200);
+  color: var(--neutral-900);
+  padding: 2px var(--space-050);
+  border-radius: var(--radius-100);
+  border: 1px solid var(--neutral-300);
+  white-space: nowrap;
+}
+
+/* ===== DARK MODE ===== */
+@media (prefers-color-scheme: dark) {
+  .atlas-code {
+    background: var(--neutral-200);
+    border-color: var(--neutral-400);
+    color: var(--neutral-0);
+  }
+
+  .atlas-code__copy-button {
+    background: var(--neutral-300);
+    border-color: var(--neutral-400);
+    color: var(--neutral-300);
+  }
+
+  .atlas-code__copy-button:hover {
+    background: var(--neutral-200);
+    border-color: var(--neutral-300);
+    color: var(--neutral-0);
+  }
+
+  .atlas-code--editable {
+    background: var(--neutral-100);
+  }
+
+  .atlas-code__line-numbers {
+    background: var(--neutral-300);
+    border-right-color: var(--neutral-400);
+    color: var(--neutral-400);
+  }
+
+  .atlas-code__textarea::placeholder {
+    color: var(--neutral-400);
+  }
+
+  .atlas-inline-code {
+    background: var(--neutral-300);
+    color: var(--neutral-0);
+    border-color: var(--neutral-400);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .atlas-code__pre,
+  .atlas-code__textarea {
+    padding: var(--space-150) var(--space-200);
+    font-size: var(--font-size-075);
+  }
+
+  .atlas-code__copy-button {
+    top: var(--space-100);
+    right: var(--space-100);
+    padding: 2px;
+  }
+
+  .atlas-code__copy-button svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .atlas-code__line-numbers {
+    padding: var(--space-150) var(--space-100) var(--space-150) var(--space-150);
+    min-width: 32px;
+    font-size: var(--font-size-050);
+  }
+}
+
+/* ===== HIGH CONTRAST MODE ===== */
+@media (prefers-contrast: high) {
+  .atlas-code {
+    border-width: 2px;
+  }
+
+  .atlas-code__copy-button {
+    border-width: 2px;
+  }
+
+  .atlas-inline-code {
+    border-width: 2px;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-code__copy-button {
+    transition: none;
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .atlas-code__copy-button {
+    display: none;
+  }
+
+  .atlas-code {
+    border: 1px solid #000;
+    background: #f8f8f8;
+    color: #000;
+    break-inside: avoid;
+  }
+}

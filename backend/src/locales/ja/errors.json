@@ -1,0 +1,80 @@
+{
+  "errors": {
+    "title": "エラー",
+    "general": "エラーが発生しました",
+    "network": "ネットワークエラー",
+    "timeout": "リクエストタイムアウト",
+    "notFound": "見つかりません",
+    "unauthorized": "認証されていません",
+    "forbidden": "アクセス禁止",
+    "serverError": "サーバーエラー",
+    "serviceUnavailable": "サービス利用不可",
+    "validationError": "検証エラー",
+    "insufficientFunds": "資金不足",
+    "transactionFailed": "トランザクション失敗",
+    "walletError": "ウォレットエラー",
+    "connectionError": "接続エラー",
+    "apiError": "APIエラー",
+    "rateLimit": "レート制限超過",
+    "maintenance": "システムメンテナンス",
+    "deprecated": "この機能は非推奨です"
+  },
+  "validation": {
+    "required": "このフィールドは必須です",
+    "invalidEmail": "無効なメールアドレス",
+    "invalidUrl": "無効なURL",
+    "invalidNumber": "無効な数字",
+    "invalidAddress": "無効なアドレス",
+    "invalidAmount": "無効な数量",
+    "amountTooLow": "数量が低すぎます",
+    "amountTooHigh": "数量が高すぎます",
+    "insufficientBalance": "残高不足",
+    "invalidSlippage": "無効なスリッページ許容度",
+    "invalidDeadline": "無効な期限",
+    "invalidGasPrice": "無効なガス価格",
+    "invalidToken": "無効なトークン",
+    "duplicateTransaction": "重複トランザクション"
+  },
+  "wallet": {
+    "connectionFailed": "ウォレット接続に失敗しました",
+    "userRejected": "ユーザーがリクエストを拒否しました",
+    "networkMismatch": "ネットワークの不一致",
+    "insufficientFunds": "トランザクションのための資金不足",
+    "transactionRejected": "トランザクションが拒否されました",
+    "gasTooLow": "ガス価格が低すぎます",
+    "nonceTooLow": "ノンスが低すぎます",
+    "replacementUnderpriced": "置き換えトランザクションの価格が低すぎます",
+    "executionReverted": "トランザクション実行が元に戻されました",
+    "outOfGas": "ガス切れ"
+  },
+  "trading": {
+    "orderFailed": "注文失敗",
+    "insufficientLiquidity": "流動性不足",
+    "priceImpactTooHigh": "価格影響が高すぎます",
+    "slippageExceeded": "スリッページ許容度を超えました",
+    "marketClosed": "市場閉鎖",
+    "tradingDisabled": "取引無効",
+    "invalidOrder": "無効な注文",
+    "orderExpired": "注文期限切れ",
+    "positionLiquidated": "ポジション清算"
+  },
+  "security": {
+    "suspiciousActivity": "不審なアクティビティが検出されました",
+    "blockedAddress": "アドレスがブロックされました",
+    "sanctionsViolation": "制裁違反",
+    "unusualVolume": "異常な取引量が検出されました",
+    "multipleFailures": "複数の認証失敗"
+  },
+  "system": {
+    "databaseError": "データベースエラー",
+    "cacheError": "キャッシュエラー",
+    "diskFull": "ディスクフル",
+    "memoryError": "メモリエラー",
+    "cpuOverload": "CPU過負荷",
+    "networkCongestion": "ネットワーク混雑"
+  },
+  "retry": "再試行してください",
+  "contactSupport": "問題が解決しない場合はサポートにお問い合わせください",
+  "errorCode": "エラーコード: {{code}}",
+  "details": "エラー詳細: {{details}}"
+}

@@ -1,0 +1,269 @@
+# Artillery Load Testing Configuration
+# Security Monitor Performance Testing
+
+config:
+  target: "http://localhost:3000"
+  phases:
+    # Warm-up phase
+    - duration: 60
+      arrivalRate: 10
+      name: "Warm-up"
+
+    # Ramp-up phase
+    - duration: 120
+      arrivalRate: 10
+      rampTo: 100
+      name: "Ramp-up to 100 req/sec"
+
+    # Sustained load
+    - duration: 300
+      arrivalRate: 100
+      name: "Sustained load (100 req/sec)"
+
+    # Peak load
+    - duration: 120
+      arrivalRate: 100
+      rampTo: 500
+      name: "Peak load (500 req/sec)"
+
+    # Stress test
+    - duration: 60
+      arrivalRate: 1000
+      name: "Stress test (1000 req/sec)"
+
+    # Cool-down
+    - duration: 60
+      arrivalRate: 10
+      name: "Cool-down"
+
+  processor: "./load-test-processor.js"
+
+  # Environment variables
+  variables:
+    normalUser: "user@example.com"
+    adminUser: "admin@example.com"
+
+  # Plugins
+  plugins:
+    metrics-by-endpoint:
+      stripQueryString: true
+      ignoreUnknownEndpoints: false
+
+  # Custom metrics
+  ensure:
+    maxErrorRate: 5  # Max 5% error rate
+    p95: 100         # 95th percentile < 100ms
+    p99: 200         # 99th percentile < 200ms
+
+scenarios:
+  # Scenario 1: Normal user traffic
+  - name: "Normal User Traffic"
+    weight: 70
+    flow:
+      - get:
+          url: "/api/test/normal"
+          headers:
+            User-Agent: "LoadTest/1.0"
+          expect:
+            - statusCode: 200
+          capture:
+            - json: "$.status"
+              as: "status"
+
+      - think: 1
+
+      - post:
+          url: "/api/test/data"
+          json:
+            userId: "{{ $randomNumber(1, 1000) }}"
+            action: "view"
+            timestamp: "{{ $timestamp }}"
+          expect:
+            - statusCode: 200
+
+      - think: 2
+
+      - get:
+          url: "/api/stats"
+          expect:
+            - statusCode: 200
+            - contentType: json
+
+  # Scenario 2: Attack simulation (SQL Injection)
+  - name: "SQL Injection Attack Simulation"
+    weight: 5
+    flow:
+      - get:
+          url: "/api/test/normal?id={{ $randomString() }} OR 1=1"
+          expect:
+            - statusCode:
+                - 200
+                - 400
+                - 403
+
+      - think: 1
+
+      - post:
+          url: "/api/test/data"
+          json:
+            query: "'; DROP TABLE users--"
+          expect:
+            - statusCode:
+                - 200
+                - 400
+                - 403
+
+  # Scenario 3: XSS Attack Simulation
+  - name: "XSS Attack Simulation"
+    weight: 5
+    flow:
+      - get:
+          url: "/api/test/normal?name=<script>alert('XSS')</script>"
+          headers:
+            User-Agent: "<script>document.cookie</script>"
+          expect:
+            - statusCode:
+                - 200
+                - 400
+                - 403
+
+  # Scenario 4: Path Traversal Simulation
+  - name: "Path Traversal Simulation"
+    weight: 3
+    flow:
+      - get:
+          url: "/api/../../../etc/passwd"
+          expect:
+            - statusCode:
+                - 400
+                - 403
+                - 404
+
+      - get:
+          url: "/api/test/%2e%2e%2fetc%2fpasswd"
+          expect:
+            - statusCode:
+                - 400
+                - 403
+                - 404
+
+  # Scenario 5: Advanced Threats
+  - name: "Advanced Threat Simulation"
+    weight: 3
+    flow:
+      # LDAP Injection
+      - get:
+          url: "/api/test/search?filter=admin)(uid=*"
+          expect:
+            - statusCode:
+                - 200
+                - 400
+                - 403
+
+      - think: 1
+
+      # NoSQL Injection
+      - post:
+          url: "/api/test/login"
+          json:
+            username: { "$ne": null }
+            password: { "$ne": null }
+          expect:
+            - statusCode:
+                - 200
+                - 400
+                - 403
+
+      - think: 1
+
+      # Prototype Pollution
+      - post:
+          url: "/api/test/data"
+          json:
+            __proto__: { admin: true }
+          expect:
+            - statusCode:
+                - 200
+                - 400
+                - 403
+
+  # Scenario 6: Rate Limit Test
+  - name: "Rate Limit Test"
+    weight: 5
+    flow:
+      - loop:
+          - get:
+              url: "/api/test/normal"
+          count: 150
+      # 最後のリクエストは429になるはず
+
+  # Scenario 7: Metrics Collection
+  - name: "Metrics Endpoint Load"
+    weight: 2
+    flow:
+      - get:
+          url: "/metrics"
+          expect:
+            - statusCode: 200
+            - contentType: text/plain
+
+  # Scenario 8: Database Query Load
+  - name: "Database Query Load"
+    weight: 5
+    flow:
+      - get:
+          url: "/api/events?limit=100&offset=0"
+          expect:
+            - statusCode: 200
+
+      - think: 1
+
+      - get:
+          url: "/api/incidents?severity=HIGH&status=ACTIVE"
+          expect:
+            - statusCode: 200
+
+  # Scenario 9: Mixed realistic traffic
+  - name: "Realistic Mixed Traffic"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/test/normal"
+
+      - think: "{{ $randomNumber(1, 5) }}"
+
+      - post:
+          url: "/api/test/data"
+          json:
+            action: "{{ $randomString() }}"
+            value: "{{ $randomNumber(1, 100) }}"
+
+      - think: "{{ $randomNumber(1, 3) }}"
+
+      - get:
+          url: "/api/stats"
+
+      - think: "{{ $randomNumber(1, 10) }}"
+
+      - get:
+          url: "/api/events?limit=10"
+
+# Custom functions for load test
+before:
+  flow:
+    - log: "Starting load test..."
+    - get:
+        url: "/health"
+        expect:
+          - statusCode: 200
+
+after:
+  flow:
+    - log: "Load test completed"
+    - get:
+        url: "/api/stats"
+        capture:
+          - json: "$.eventsProcessed"
+            as: "finalEventsProcessed"
+          - json: "$.threatsDetected"
+            as: "finalThreatsDetected"

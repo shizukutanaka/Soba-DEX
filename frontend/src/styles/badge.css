@@ -1,0 +1,161 @@
+/* ===== ATLAS BADGE COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-050);
+  padding: var(--space-050) var(--space-100);
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  border-radius: var(--radius-100);
+  white-space: nowrap;
+  vertical-align: middle;
+  transition: all var(--transition-fast);
+}
+
+/* ===== SIZE VARIANTS ===== */
+.atlas-badge--sm {
+  padding: 2px var(--space-075);
+  font-size: var(--font-size-050);
+}
+
+.atlas-badge--md {
+  padding: var(--space-050) var(--space-100);
+  font-size: var(--font-size-075);
+}
+
+.atlas-badge--lg {
+  padding: var(--space-075) var(--space-150);
+  font-size: var(--font-size-100);
+}
+
+/* ===== COLOR VARIANTS ===== */
+.atlas-badge--default {
+  background: var(--neutral-200);
+  color: var(--neutral-1100);
+}
+
+.atlas-badge--primary {
+  background: rgba(0, 82, 204, 0.12);
+  color: var(--brand-primary);
+}
+
+.atlas-badge--success {
+  background: var(--success-50);
+  color: var(--success-700);
+}
+
+.atlas-badge--warning {
+  background: var(--warning-50);
+  color: var(--warning-700);
+}
+
+.atlas-badge--danger {
+  background: var(--danger-50);
+  color: var(--danger-700);
+}
+
+.atlas-badge--info {
+  background: var(--info-50);
+  color: var(--info-600);
+}
+
+/* ===== OUTLINED VARIANTS ===== */
+.atlas-badge--outlined {
+  background: transparent;
+  border: 1px solid currentColor;
+}
+
+.atlas-badge--outlined.atlas-badge--default {
+  border-color: var(--neutral-400);
+}
+
+/* ===== PILL VARIANT ===== */
+.atlas-badge--pill {
+  border-radius: var(--radius-round);
+}
+
+/* ===== BADGE ELEMENTS ===== */
+.atlas-badge__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+}
+
+.atlas-badge__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.atlas-badge__text {
+  line-height: 1;
+}
+
+/* ===== DOT BADGE ===== */
+.atlas-badge-dot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-100);
+}
+
+.atlas-badge-dot__indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-circle);
+  animation: atlas-badge-dot-pulse 2s ease-in-out infinite;
+}
+
+.atlas-badge-dot--default .atlas-badge-dot__indicator {
+  background: var(--neutral-500);
+}
+
+.atlas-badge-dot--primary .atlas-badge-dot__indicator {
+  background: var(--brand-primary);
+}
+
+.atlas-badge-dot--success .atlas-badge-dot__indicator {
+  background: var(--success-500);
+}
+
+.atlas-badge-dot--warning .atlas-badge-dot__indicator {
+  background: var(--warning-500);
+}
+
+.atlas-badge-dot--danger .atlas-badge-dot__indicator {
+  background: var(--danger-500);
+}
+
+@keyframes atlas-badge-dot-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.85);
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-badge {
+    transition: none;
+  }
+
+  .atlas-badge-dot__indicator {
+    animation: none;
+  }
+}
+
+/* ===== DARK MODE ===== */
+@media (prefers-color-scheme: dark) {
+  .atlas-badge--default {
+    background: var(--neutral-300);
+    color: var(--neutral-1400);
+  }
+}

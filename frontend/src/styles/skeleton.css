@@ -1,0 +1,180 @@
+/* ===== ATLAS SKELETON COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-skeleton {
+  display: block;
+  background: linear-gradient(
+    90deg,
+    var(--neutral-200) 0%,
+    var(--neutral-100) 50%,
+    var(--neutral-200) 100%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--radius-100);
+  overflow: hidden;
+}
+
+/* ===== VARIANT STYLES ===== */
+
+.atlas-skeleton--text {
+  height: 1em;
+  margin-bottom: var(--space-100);
+  transform-origin: 0 60%;
+  transform: scale(1, 0.6);
+  border-radius: var(--radius-400);
+}
+
+.atlas-skeleton--text:last-child {
+  margin-bottom: 0;
+}
+
+.atlas-skeleton--circle {
+  border-radius: var(--radius-circle);
+}
+
+.atlas-skeleton--rect {
+  border-radius: var(--radius-200);
+}
+
+/* ===== ANIMATION VARIANTS ===== */
+
+.atlas-skeleton--pulse {
+  animation: atlas-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.atlas-skeleton--wave {
+  animation: atlas-skeleton-wave 1.6s linear infinite;
+}
+
+@keyframes atlas-skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes atlas-skeleton-wave {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ===== SKELETON GROUP ===== */
+
+.atlas-skeleton-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-100);
+}
+
+/* ===== SKELETON CARD ===== */
+
+.atlas-skeleton-card {
+  background: var(--neutral-0);
+  border-radius: var(--card-border-radius);
+  border: 1px solid var(--card-border-color);
+  padding: var(--card-padding);
+  box-shadow: var(--elevation-raised);
+}
+
+.atlas-skeleton-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-150);
+  margin-bottom: var(--space-200);
+}
+
+.atlas-skeleton-card__header-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-100);
+}
+
+.atlas-skeleton-card__body {
+  margin-bottom: var(--space-200);
+}
+
+.atlas-skeleton-card__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-150);
+}
+
+/* ===== SKELETON TABLE ===== */
+
+.atlas-skeleton-table {
+  background: var(--neutral-0);
+  border-radius: var(--card-border-radius);
+  border: 1px solid var(--card-border-color);
+  overflow: hidden;
+}
+
+.atlas-skeleton-table__header {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: var(--space-200);
+  padding: var(--space-200);
+  background: var(--neutral-100);
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.atlas-skeleton-table__body {
+  display: flex;
+  flex-direction: column;
+}
+
+.atlas-skeleton-table__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: var(--space-200);
+  padding: var(--space-200);
+  border-bottom: 1px solid var(--neutral-100);
+}
+
+.atlas-skeleton-table__row:last-child {
+  border-bottom: none;
+}
+
+/* ===== ACCESSIBILITY ===== */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ===== REDUCED MOTION ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-skeleton--pulse,
+  .atlas-skeleton--wave {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
+/* ===== DARK MODE ===== */
+
+@media (prefers-color-scheme: dark) {
+  .atlas-skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--neutral-300) 0%,
+      var(--neutral-200) 50%,
+      var(--neutral-300) 100%
+    );
+    background-size: 200% 100%;
+  }
+}

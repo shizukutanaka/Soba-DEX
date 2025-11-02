@@ -1,0 +1,11 @@
+{
+  "dashboard": {
+    "title": "Soba DEX - Comprehensive Monitoring",
+    "tags": ["soba-dex", "backend", "prometheus"],
+    "refresh": "30s",
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    }
+  }
+}

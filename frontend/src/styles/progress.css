@@ -1,0 +1,169 @@
+/* ===== ATLAS PROGRESS COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-progress-container {
+  width: 100%;
+}
+
+.atlas-progress-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-100);
+  font-size: var(--font-size-075);
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-900);
+}
+
+.atlas-progress {
+  position: relative;
+  width: 100%;
+  background: var(--neutral-200);
+  border-radius: var(--radius-round);
+  overflow: hidden;
+}
+
+/* ===== SIZE VARIANTS ===== */
+.atlas-progress--sm {
+  height: 4px;
+}
+
+.atlas-progress--md {
+  height: 8px;
+}
+
+.atlas-progress--lg {
+  height: 12px;
+}
+
+/* ===== PROGRESS BAR ===== */
+.atlas-progress__bar {
+  height: 100%;
+  border-radius: var(--radius-round);
+  transition: width var(--transition-slow) ease-in-out;
+}
+
+/* ===== COLOR VARIANTS ===== */
+.atlas-progress--default .atlas-progress__bar {
+  background: var(--brand-primary);
+}
+
+.atlas-progress--success .atlas-progress__bar {
+  background: var(--success-500);
+}
+
+.atlas-progress--warning .atlas-progress__bar {
+  background: var(--warning-500);
+}
+
+.atlas-progress--danger .atlas-progress__bar {
+  background: var(--danger-500);
+}
+
+/* ===== INDETERMINATE ===== */
+.atlas-progress--indeterminate .atlas-progress__bar {
+  width: 50% !important;
+  animation: atlas-progress-indeterminate 1.5s ease-in-out infinite;
+}
+
+@keyframes atlas-progress-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+/* ===== CIRCULAR PROGRESS ===== */
+.atlas-circular-progress-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.atlas-circular-progress {
+  transform-origin: center;
+}
+
+.atlas-circular-progress__track {
+  stroke: var(--neutral-200);
+}
+
+.atlas-circular-progress__bar {
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--transition-slow) ease-in-out;
+}
+
+.atlas-circular-progress--default .atlas-circular-progress__bar {
+  stroke: var(--brand-primary);
+}
+
+.atlas-circular-progress--success .atlas-circular-progress__bar {
+  stroke: var(--success-500);
+}
+
+.atlas-circular-progress--warning .atlas-circular-progress__bar {
+  stroke: var(--warning-500);
+}
+
+.atlas-circular-progress--danger .atlas-circular-progress__bar {
+  stroke: var(--danger-500);
+}
+
+.atlas-circular-progress--indeterminate {
+  animation: atlas-circular-progress-rotate 1.4s linear infinite;
+}
+
+.atlas-circular-progress--indeterminate .atlas-circular-progress__bar {
+  animation: atlas-circular-progress-dash 1.4s ease-in-out infinite;
+  stroke-dasharray: 80, 200;
+  stroke-dashoffset: 0;
+}
+
+@keyframes atlas-circular-progress-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes atlas-circular-progress-dash {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 100, 200;
+    stroke-dashoffset: -15;
+  }
+  100% {
+    stroke-dasharray: 100, 200;
+    stroke-dashoffset: -125;
+  }
+}
+
+.atlas-circular-progress__label {
+  position: absolute;
+  font-size: var(--font-size-075);
+  font-weight: var(--font-weight-semibold);
+  color: var(--neutral-900);
+  font-family: var(--font-family-mono);
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-progress__bar,
+  .atlas-circular-progress__bar {
+    transition: none;
+  }
+
+  .atlas-progress--indeterminate .atlas-progress__bar,
+  .atlas-circular-progress--indeterminate,
+  .atlas-circular-progress--indeterminate .atlas-circular-progress__bar {
+    animation: none;
+  }
+}

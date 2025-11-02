@@ -1,0 +1,73 @@
+/**
+ * TypeScript configuration for React Native 0.82.1
+ *
+ * Optimized for React 18 and modern React Native development
+ * - Enables strict type checking for better code quality
+ * - Configures JSX for React 18's new transform
+ * - Optimizes compilation for better performance
+ *
+ * @version 1.0.0
+ */
+
+{
+  "extends": "@tsconfig/react-native/tsconfig.json",
+  "compilerOptions": {
+    // Enable React 18's new JSX Transform
+    "jsx": "react-jsx",
+
+    // Strict type checking for better code quality
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+
+    // Module resolution
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+
+    // Target modern JavaScript
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+
+    // Performance optimizations
+    "skipLibCheck": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo",
+
+    // Path mapping for cleaner imports
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"],
+      "@/components/*": ["components/*"],
+      "@/screens/*": ["screens/*"],
+      "@/services/*": ["services/*"],
+      "@/utils/*": ["utils/*"],
+      "@/types/*": ["types/*"],
+      "@/constants/*": ["constants/*"]
+    },
+
+    // React Native specific
+    "types": ["react-native", "jest"],
+  },
+  "include": [
+    "src/**/*",
+    "App.tsx",
+    "index.js",
+    "babel.config.js",
+    "metro.config.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "babel.config.js",
+    "metro.config.js",
+    "jest.config.js",
+    "android",
+    "ios",
+    "dist"
+  ]
+}

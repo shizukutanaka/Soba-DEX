@@ -1,0 +1,11 @@
+# ============================================================================
+# Kubernetes Namespace for Security Monitor
+# ============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: security-monitor
+  labels:
+    name: security-monitor
+    environment: production
+    app: dex-security-monitor

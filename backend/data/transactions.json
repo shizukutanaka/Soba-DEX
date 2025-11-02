@@ -1,0 +1,16 @@
+{
+  "all": [
+    {
+      "success": true,
+      "tokenIn": "ETH",
+      "tokenOut": "USDC",
+      "amountIn": 1,
+      "amountOut": 0.9969990059919911,
+      "priceImpact": 0.00009969990059919911,
+      "fee": 0.003,
+      "txHash": "0x58043ce49cd56",
+      "timestamp": 1758556780729,
+      "type": "swap"
+    }
+  ]
+}

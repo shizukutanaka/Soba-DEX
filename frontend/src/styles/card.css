@@ -1,0 +1,182 @@
+/* ===== ATLAS CARD COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--neutral-0);
+  border-radius: var(--card-border-radius);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ===== VARIANTS ===== */
+
+.atlas-card--default {
+  border: 1px solid var(--card-border-color);
+  box-shadow: var(--shadow-050);
+}
+
+.atlas-card--elevated {
+  border: none;
+  box-shadow: var(--elevation-raised);
+}
+
+.atlas-card--outlined {
+  border: 2px solid var(--neutral-300);
+  box-shadow: none;
+}
+
+.atlas-card--interactive {
+  border: 1px solid var(--card-border-color);
+  box-shadow: var(--elevation-raised);
+  cursor: pointer;
+}
+
+/* ===== PADDING VARIANTS ===== */
+
+.atlas-card--padding-none {
+  padding: 0;
+}
+
+.atlas-card--padding-sm {
+  padding: var(--space-200);
+}
+
+.atlas-card--padding-md {
+  padding: var(--space-300);
+}
+
+.atlas-card--padding-lg {
+  padding: var(--space-400);
+}
+
+/* ===== STATES ===== */
+
+.atlas-card--hoverable:hover,
+.atlas-card--clickable:hover {
+  box-shadow: var(--elevation-overlay);
+  transform: translateY(-2px);
+  border-color: var(--neutral-400);
+}
+
+.atlas-card--clickable {
+  cursor: pointer;
+  border: none;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.atlas-card--clickable:focus-visible {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.atlas-card--clickable:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-100);
+}
+
+/* ===== CARD SECTIONS ===== */
+
+.atlas-card__header {
+  padding: var(--space-300);
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.atlas-card--padding-none .atlas-card__header {
+  padding: var(--space-300);
+}
+
+.atlas-card__body {
+  flex: 1;
+  padding: var(--space-300);
+}
+
+.atlas-card--padding-none .atlas-card__body {
+  padding: var(--space-300);
+}
+
+.atlas-card__footer {
+  padding: var(--space-300);
+  border-top: 1px solid var(--neutral-200);
+  background: var(--neutral-50);
+}
+
+.atlas-card--padding-none .atlas-card__footer {
+  padding: var(--space-300);
+}
+
+/* ===== CARD TITLE ===== */
+
+.atlas-card__title {
+  margin: 0;
+  font-size: var(--font-size-400);
+  font-weight: var(--font-weight-semibold);
+  color: var(--neutral-1300);
+  line-height: var(--line-height-tight);
+}
+
+/* ===== CARD DESCRIPTION ===== */
+
+.atlas-card__description {
+  margin: var(--space-100) 0 0 0;
+  font-size: var(--font-size-100);
+  font-weight: var(--font-weight-regular);
+  color: var(--neutral-800);
+  line-height: var(--line-height-normal);
+}
+
+/* ===== CARD GRID ===== */
+
+.atlas-card-grid {
+  display: grid;
+  gap: var(--space-300);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 768px) {
+  .atlas-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .atlas-card__header,
+  .atlas-card__body,
+  .atlas-card__footer {
+    padding: var(--space-200);
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-card {
+    transition: none;
+  }
+
+  .atlas-card--hoverable:hover,
+  .atlas-card--clickable:hover {
+    transform: none;
+  }
+}
+
+/* ===== DARK MODE ===== */
+
+@media (prefers-color-scheme: dark) {
+  .atlas-card {
+    background: var(--neutral-100);
+  }
+
+  .atlas-card--outlined {
+    border-color: var(--neutral-300);
+  }
+
+  .atlas-card__footer {
+    background: var(--neutral-200);
+  }
+}

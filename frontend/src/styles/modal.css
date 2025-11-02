@@ -1,0 +1,285 @@
+/* ===== ATLAS MODAL COMPONENT ===== */
+@import './tokens.css';
+
+.atlas-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-index-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-300);
+  animation: atlas-modal-fade-in var(--transition-normal);
+}
+
+@keyframes atlas-modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== BACKDROP ===== */
+
+.atlas-modal__backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(9, 30, 66, 0.54);
+  backdrop-filter: blur(4px);
+  z-index: -1;
+  animation: atlas-modal-backdrop-fade-in var(--transition-normal);
+}
+
+@keyframes atlas-modal-backdrop-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== CONTENT ===== */
+
+.atlas-modal__content {
+  position: relative;
+  background: var(--neutral-0);
+  border-radius: var(--radius-400);
+  box-shadow: var(--elevation-modal);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - var(--space-600));
+  width: 100%;
+  animation: atlas-modal-slide-up var(--transition-slow);
+  outline: none;
+}
+
+@keyframes atlas-modal-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== SIZE VARIANTS ===== */
+
+.atlas-modal__content--sm {
+  max-width: 400px;
+}
+
+.atlas-modal__content--md {
+  max-width: 600px;
+}
+
+.atlas-modal__content--lg {
+  max-width: 800px;
+}
+
+.atlas-modal__content--xl {
+  max-width: 1200px;
+}
+
+.atlas-modal__content--full {
+  max-width: none;
+  max-height: calc(100vh - var(--space-400));
+  height: calc(100vh - var(--space-400));
+}
+
+/* ===== HEADER ===== */
+
+.atlas-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-400) var(--space-400) var(--space-300);
+  border-bottom: 1px solid var(--neutral-200);
+  flex-shrink: 0;
+}
+
+.atlas-modal__title {
+  margin: 0;
+  font-size: var(--font-size-500);
+  font-weight: var(--font-weight-semibold);
+  color: var(--neutral-1300);
+  line-height: var(--line-height-tight);
+}
+
+.atlas-modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-100);
+  color: var(--neutral-700);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  margin-left: var(--space-200);
+}
+
+.atlas-modal__close:hover {
+  background: rgba(9, 30, 66, var(--opacity-hover));
+  color: var(--neutral-1300);
+}
+
+.atlas-modal__close:active {
+  background: rgba(9, 30, 66, var(--opacity-active));
+}
+
+.atlas-modal__close:focus-visible {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.atlas-modal__close svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ===== BODY ===== */
+
+.atlas-modal__body {
+  flex: 1;
+  padding: var(--space-400);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Custom scrollbar */
+.atlas-modal__body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.atlas-modal__body::-webkit-scrollbar-track {
+  background: var(--neutral-100);
+  border-radius: var(--radius-100);
+}
+
+.atlas-modal__body::-webkit-scrollbar-thumb {
+  background: var(--neutral-400);
+  border-radius: var(--radius-100);
+}
+
+.atlas-modal__body::-webkit-scrollbar-thumb:hover {
+  background: var(--neutral-500);
+}
+
+/* ===== FOOTER ===== */
+
+.atlas-modal__footer {
+  padding: var(--space-300) var(--space-400) var(--space-400);
+  border-top: 1px solid var(--neutral-200);
+  background: var(--neutral-50);
+  border-radius: 0 0 var(--radius-400) var(--radius-400);
+  flex-shrink: 0;
+}
+
+/* ===== MODAL ACTIONS ===== */
+
+.atlas-modal__actions {
+  display: flex;
+  gap: var(--space-150);
+  justify-content: flex-end;
+}
+
+/* ===== MODAL MESSAGE ===== */
+
+.atlas-modal__message {
+  margin: 0;
+  font-size: var(--font-size-100);
+  color: var(--neutral-900);
+  line-height: var(--line-height-normal);
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 768px) {
+  .atlas-modal {
+    padding: var(--space-200);
+    align-items: flex-end;
+  }
+
+  .atlas-modal__content {
+    max-height: 90vh;
+    border-radius: var(--radius-400) var(--radius-400) 0 0;
+    animation: atlas-modal-slide-up-mobile var(--transition-slow);
+  }
+
+  @keyframes atlas-modal-slide-up-mobile {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .atlas-modal__content--sm,
+  .atlas-modal__content--md,
+  .atlas-modal__content--lg,
+  .atlas-modal__content--xl {
+    max-width: none;
+  }
+
+  .atlas-modal__header {
+    padding: var(--space-300) var(--space-300) var(--space-200);
+  }
+
+  .atlas-modal__body {
+    padding: var(--space-300);
+  }
+
+  .atlas-modal__footer {
+    padding: var(--space-200) var(--space-300) var(--space-300);
+  }
+
+  .atlas-modal__actions {
+    flex-direction: column-reverse;
+  }
+
+  .atlas-modal__actions .atlas-button {
+    width: 100%;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-modal,
+  .atlas-modal__backdrop,
+  .atlas-modal__content {
+    animation: none;
+  }
+}
+
+/* ===== DARK MODE ===== */
+
+@media (prefers-color-scheme: dark) {
+  .atlas-modal__backdrop {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  .atlas-modal__content {
+    background: var(--neutral-100);
+  }
+
+  .atlas-modal__footer {
+    background: var(--neutral-200);
+  }
+}

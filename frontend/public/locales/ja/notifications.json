@@ -1,0 +1,83 @@
+{
+  "notifications": {
+    "title": "通知",
+    "markAllRead": "すべて既読にする",
+    "clearAll": "すべてクリア",
+    "noNotifications": "通知なし",
+    "newNotifications": "新しい通知",
+    "all": "すべて",
+    "unread": "未読",
+    "read": "既読",
+    "settings": "通知設定",
+    "email": "メール通知",
+    "push": "プッシュ通知",
+    "sms": "SMS通知",
+    "sound": "音声",
+    "desktop": "デスクトップ通知"
+  },
+  "types": {
+    "success": "成功",
+    "error": "エラー",
+    "warning": "警告",
+    "info": "情報",
+    "trade": "取引",
+    "transaction": "トランザクション",
+    "security": "セキュリティ",
+    "system": "システム",
+    "price": "価格アラート",
+    "liquidity": "流動性",
+    "staking": "ステーキング"
+  },
+  "messages": {
+    "walletConnected": "ウォレットが正常に接続されました",
+    "walletDisconnected": "ウォレットが切断されました",
+    "orderPlaced": "注文が正常に発注されました",
+    "orderFilled": "注文が約定しました: {{amount}} {{symbol}} @ {{price}}",
+    "orderCancelled": "注文がキャンセルされました",
+    "transactionSent": "トランザクションが送信されました",
+    "transactionConfirmed": "トランザクションが確認されました",
+    "transactionFailed": "トランザクションが失敗しました",
+    "priceAlert": "価格アラート: {{symbol}} が {{price}} に到達しました",
+    "liquidityAdded": "流動性が正常に追加されました",
+    "liquidityRemoved": "流動性が削除されました",
+    "rewardsClaimed": "報酬請求: {{amount}} {{symbol}}",
+    "stakeSuccessful": "ステーキング成功",
+    "unstakeSuccessful": "アンステーキング成功",
+    "securityAlert": "セキュリティアラート: {{message}}",
+    "systemMaintenance": "システムメンテナンスが予定されています",
+    "newListing": "新規トークン上場: {{symbol}}",
+    "airdrop": "エアドロップ受領: {{amount}} {{symbol}}",
+    "forkDetected": "ネットワークでフォークが検出されました",
+    "gasPriceHigh": "ガス価格が高騰しています",
+    "marketVolatility": "市場変動性が高いことが検出されました",
+    "positionAlert": "ポジションアラート: {{message}}"
+  },
+  "trading": {
+    "orderFilled": "注文約定",
+    "orderPartiallyFilled": "注文一部約定",
+    "orderExpired": "注文期限切れ",
+    "positionOpened": "ポジションオープン",
+    "positionClosed": "ポジションクローズ",
+    "stopLossTriggered": "ストップロス発動",
+    "takeProfitTriggered": "テイクプロフィット発動",
+    "marginCall": "マージンコール",
+    "liquidationWarning": "清算警告"
+  },
+  "wallet": {
+    "balanceLow": "残高不足警告",
+    "largeTransaction": "大口取引が検出されました",
+    "multipleTransactions": "複数取引が検出されました",
+    "addressChange": "アドレス変更",
+    "approvalRequired": "承認が必要です",
+    "tokenReceived": "トークン受領: {{amount}} {{symbol}}",
+    "tokenSent": "トークン送信: {{amount}} {{symbol}}"
+  },
+  "system": {
+    "updateAvailable": "更新利用可能",
+    "maintenanceScheduled": "メンテナンス予定",
+    "serviceRestart": "サービス再起動が必要です",
+    "backupCompleted": "バックアップ完了",
+    "securityUpdate": "セキュリティ更新がインストールされました",
+    "performanceIssue": "パフォーマンス問題が検出されました"
+  }
+}

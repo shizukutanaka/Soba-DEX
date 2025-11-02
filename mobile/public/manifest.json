@@ -1,0 +1,53 @@
+{
+  "name": "DEX Trading Platform",
+  "short_name": "DEX",
+  "description": "Mobile application for DEX trading platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#007AFF",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["finance", "business"],
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Quick Trade",
+      "short_name": "Trade",
+      "description": "Quick access to trading interface",
+      "url": "/trade",
+      "icons": [
+        {
+          "src": "/shortcut-trade.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Portfolio",
+      "short_name": "Portfolio",
+      "description": "View your portfolio",
+      "url": "/portfolio",
+      "icons": [
+        {
+          "src": "/shortcut-portfolio.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

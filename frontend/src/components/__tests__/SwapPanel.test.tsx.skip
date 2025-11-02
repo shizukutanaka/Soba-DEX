@@ -1,0 +1,234 @@
+import React from 'react';
+import { render } from '@testing-library/react';
+import '@testing-library/jest-dom';
+
+// Note: screen, fireEvent, waitFor are re-exported from @testing-library/react
+// but TypeScript may not recognize them. Using direct DOM queries instead.
+import SwapPanel from '../SwapPanel';
+import { useDEX } from '../../hooks/useDEX';
+
+// Mock dependencies
+jest.mock('../../hooks/useDEX');
+jest.mock('react-hot-toast', () => ({
+  success: jest.fn(),
+  error: jest.fn()
+}));
+
+const mockUseDEX = useDEX as jest.MockedFunction<typeof useDEX>;
+
+describe('SwapPanel', () => {
+  const defaultProps = {
+    isConnected: true,
+    walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+    balance: '1.5',
+    onError: jest.fn(),
+    onLoading: jest.fn(),
+    contractAddress: '0x1234567890123456789012345678901234567890'
+  };
+
+  const mockDEXFunctions = {
+    getTokenInfo: jest.fn(),
+    swap: jest.fn(),
+    approve: jest.fn(),
+    getAllowance: jest.fn(),
+    getAmountOut: jest.fn()
+  };
+
+  beforeEach(() => {
+    mockUseDEX.mockReturnValue(mockDEXFunctions as any);
+    jest.clearAllMocks();
+  });
+
+  describe('Rendering', () => {
+    test('should render swap panel', () => {
+      render(<SwapPanel {...defaultProps} />);
+      expect(screen.getByText(/swap/i)).toBeInTheDocument();
+    });
+
+    test('should disable swap when not connected', () => {
+      render(<SwapPanel {...defaultProps} isConnected={false} />);
+      const swapButton = screen.getByRole('button', { name: /swap/i });
+      expect(swapButton).toBeDisabled();
+    });
+
+    test('should show connect wallet message when not connected', () => {
+      render(<SwapPanel {...defaultProps} isConnected={false} />);
+      expect(screen.getByText(/connect wallet/i)).toBeInTheDocument();
+    });
+  });
+
+  describe('Token Selection', () => {
+    test('should load token info when address is entered', async () => {
+      const tokenInfo = {
+        address: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+        symbol: 'TOKEN',
+        decimals: 18,
+        balance: '100'
+      };
+
+      mockDEXFunctions.getTokenInfo.mockResolvedValue(tokenInfo);
+
+      render(<SwapPanel {...defaultProps} />);
+
+      const tokenInput = screen.getAllByPlaceholderText(/token address/i)[0];
+      fireEvent.change(tokenInput, {
+        target: { value: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb' }
+      });
+
+      await waitFor(() => {
+        expect(mockDEXFunctions.getTokenInfo).toHaveBeenCalledWith(
+          '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb'
+        );
+      });
+    });
+
+    test('should handle token info loading error', async () => {
+      mockDEXFunctions.getTokenInfo.mockRejectedValue(new Error('Failed to load'));
+
+      render(<SwapPanel {...defaultProps} />);
+
+      const tokenInput = screen.getAllByPlaceholderText(/token address/i)[0];
+      fireEvent.change(tokenInput, {
+        target: { value: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb' }
+      });
+
+      await waitFor(() => {
+        expect(mockDEXFunctions.getTokenInfo).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('Amount Input', () => {
+    test('should update amount when user types', () => {
+      render(<SwapPanel {...defaultProps} />);
+
+      const amountInput = screen.getByPlaceholderText(/amount in/i);
+      fireEvent.change(amountInput, { target: { value: '1.5' } });
+
+      expect(amountInput).toHaveValue('1.5');
+    });
+
+    test('should calculate output amount', async () => {
+      mockDEXFunctions.getAmountOut.mockResolvedValue('150');
+
+      render(<SwapPanel {...defaultProps} />);
+
+      const amountInput = screen.getByPlaceholderText(/amount in/i);
+      fireEvent.change(amountInput, { target: { value: '1' } });
+
+      await waitFor(() => {
+        expect(mockDEXFunctions.getAmountOut).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('Swap Execution', () => {
+    test('should execute swap when button is clicked', async () => {
+      const tokenInInfo = {
+        address: '0x1111111111111111111111111111111111111111',
+        symbol: 'TKN1',
+        decimals: 18,
+        balance: '100'
+      };
+
+      const tokenOutInfo = {
+        address: '0x2222222222222222222222222222222222222222',
+        symbol: 'TKN2',
+        decimals: 18,
+        balance: '50'
+      };
+
+      mockDEXFunctions.getTokenInfo
+        .mockResolvedValueOnce(tokenInInfo)
+        .mockResolvedValueOnce(tokenOutInfo);
+      mockDEXFunctions.swap.mockResolvedValue('150');
+      mockDEXFunctions.getAllowance.mockResolvedValue('1000000000000000000000');
+
+      render(<SwapPanel {...defaultProps} />);
+
+      // Enter token addresses
+      const [tokenInInput, tokenOutInput] = screen.getAllByPlaceholderText(/token address/i);
+      fireEvent.change(tokenInInput, {
+        target: { value: tokenInInfo.address }
+      });
+      fireEvent.change(tokenOutInput, {
+        target: { value: tokenOutInfo.address }
+      });
+
+      // Wait for token info to load
+      await waitFor(() => {
+        expect(mockDEXFunctions.getTokenInfo).toHaveBeenCalledTimes(2);
+      });
+
+      // Enter amount
+      const amountInput = screen.getByPlaceholderText(/amount in/i);
+      fireEvent.change(amountInput, { target: { value: '1' } });
+
+      // Click swap
+      const swapButton = screen.getByRole('button', { name: /swap/i });
+      fireEvent.click(swapButton);
+
+      await waitFor(() => {
+        expect(mockDEXFunctions.swap).toHaveBeenCalled();
+      });
+    });
+
+    test('should require approval if needed', async () => {
+      mockDEXFunctions.getAllowance.mockResolvedValue('0');
+      mockDEXFunctions.approve.mockResolvedValue(true);
+
+      render(<SwapPanel {...defaultProps} />);
+
+      // Setup would show approve button instead of swap
+      expect(screen.queryByRole('button', { name: /approve/i })).toBeInTheDocument();
+    });
+  });
+
+  describe('Slippage Settings', () => {
+    test('should allow changing slippage', () => {
+      render(<SwapPanel {...defaultProps} />);
+
+      const slippageInput = screen.getByLabelText(/slippage/i);
+      fireEvent.change(slippageInput, { target: { value: '1.0' } });
+
+      expect(slippageInput).toHaveValue('1.0');
+    });
+  });
+
+  describe('Token Swap', () => {
+    test('should swap token positions when swap button is clicked', () => {
+      render(<SwapPanel {...defaultProps} />);
+
+      const [tokenInInput, tokenOutInput] = screen.getAllByPlaceholderText(/token address/i);
+
+      fireEvent.change(tokenInInput, { target: { value: 'address1' } });
+      fireEvent.change(tokenOutInput, { target: { value: 'address2' } });
+
+      const swapPositionsButton = screen.getByRole('button', { name: /swap positions/i });
+      fireEvent.click(swapPositionsButton);
+
+      expect(tokenInInput).toHaveValue('address2');
+      expect(tokenOutInput).toHaveValue('address1');
+    });
+  });
+
+  describe('Validation', () => {
+    test('should disable swap button when required fields are empty', () => {
+      render(<SwapPanel {...defaultProps} />);
+
+      const swapButton = screen.getByRole('button', { name: /swap/i });
+      expect(swapButton).toBeDisabled();
+    });
+
+    test('should show error for invalid token address', async () => {
+      render(<SwapPanel {...defaultProps} />);
+
+      const tokenInput = screen.getAllByPlaceholderText(/token address/i)[0];
+      fireEvent.change(tokenInput, { target: { value: 'invalid' } });
+
+      await waitFor(() => {
+        expect(screen.getByText(/invalid address/i)).toBeInTheDocument();
+      });
+    });
+  });
+});

@@ -1,0 +1,80 @@
+{
+  "errors": {
+    "title": "Fehler",
+    "general": "Ein Fehler ist aufgetreten",
+    "network": "Netzwerkfehler",
+    "timeout": "Zeitüberschreitung",
+    "notFound": "Nicht Gefunden",
+    "unauthorized": "Nicht Autorisiert",
+    "forbidden": "Verboten",
+    "serverError": "Serverfehler",
+    "serviceUnavailable": "Dienst Nicht Verfügbar",
+    "validationError": "Validierungsfehler",
+    "insufficientFunds": "Unzureichende Mittel",
+    "transactionFailed": "Transaktion Fehlgeschlagen",
+    "walletError": "Wallet-Fehler",
+    "connectionError": "Verbindungsfehler",
+    "apiError": "API-Fehler",
+    "rateLimit": "Ratenlimit Überschritten",
+    "maintenance": "Systemwartung",
+    "deprecated": "Diese Funktion ist veraltet"
+  },
+  "validation": {
+    "required": "Dieses Feld ist erforderlich",
+    "invalidEmail": "Ungültige E-Mail-Adresse",
+    "invalidUrl": "Ungültige URL",
+    "invalidNumber": "Ungültige Nummer",
+    "invalidAddress": "Ungültige Adresse",
+    "invalidAmount": "Ungültiger Betrag",
+    "amountTooLow": "Betrag zu niedrig",
+    "amountTooHigh": "Betrag zu hoch",
+    "insufficientBalance": "Unzureichendes Guthaben",
+    "invalidSlippage": "Ungültige Slippage-Toleranz",
+    "invalidDeadline": "Ungültige Frist",
+    "invalidGasPrice": "Ungültiger Gas-Preis",
+    "invalidToken": "Ungültiger Token",
+    "duplicateTransaction": "Doppelte Transaktion"
+  },
+  "wallet": {
+    "connectionFailed": "Wallet-Verbindung fehlgeschlagen",
+    "userRejected": "Benutzer hat die Anfrage abgelehnt",
+    "networkMismatch": "Netzwerk-Unverträglichkeit",
+    "insufficientFunds": "Unzureichende Mittel für Transaktion",
+    "transactionRejected": "Transaktion abgelehnt",
+    "gasTooLow": "Gas-Preis zu niedrig",
+    "nonceTooLow": "Nonce zu niedrig",
+    "replacementUnderpriced": "Ersatztransaktion unterbewertet",
+    "executionReverted": "Transaktionsausführung rückgängig gemacht",
+    "outOfGas": "Gas aufgebraucht"
+  },
+  "trading": {
+    "orderFailed": "Order fehlgeschlagen",
+    "insufficientLiquidity": "Unzureichende Liquidität",
+    "priceImpactTooHigh": "Preiseinfluss zu hoch",
+    "slippageExceeded": "Slippage-Toleranz überschritten",
+    "marketClosed": "Markt geschlossen",
+    "tradingDisabled": "Handel deaktiviert",
+    "invalidOrder": "Ungültige Order",
+    "orderExpired": "Order abgelaufen",
+    "positionLiquidated": "Position liquidiert"
+  },
+  "security": {
+    "suspiciousActivity": "Verdächtige Aktivität erkannt",
+    "blockedAddress": "Adresse blockiert",
+    "sanctionsViolation": "Sanktionsverstoß",
+    "unusualVolume": "Ungewöhnliches Handelsvolumen erkannt",
+    "multipleFailures": "Mehrfache Authentifizierungsfehler"
+  },
+  "system": {
+    "databaseError": "Datenbankfehler",
+    "cacheError": "Cache-Fehler",
+    "diskFull": "Festplatte voll",
+    "memoryError": "Speicherfehler",
+    "cpuOverload": "CPU-Überlastung",
+    "networkCongestion": "Netzwerküberlastung"
+  },
+  "retry": "Bitte versuchen Sie es erneut",
+  "contactSupport": "Kontaktieren Sie den Support, wenn das Problem weiterhin besteht",
+  "errorCode": "Fehlercode: {{code}}",
+  "details": "Fehlerdetails: {{details}}"
+}

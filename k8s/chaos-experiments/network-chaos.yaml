@@ -1,0 +1,411 @@
+# ============================================================================
+# Chaos Engineering - Network Chaos Experiments
+# Test system resilience under network failures
+# ============================================================================
+
+---
+# Experiment 1: Network Delay (Latency)
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-delay
+  namespace: security-monitor
+spec:
+  action: delay
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  delay:
+    latency: '100ms'
+    correlation: '25' # 25% correlation between packets
+    jitter: '10ms'
+  duration: '5m'
+  direction: to # Delays outgoing packets
+  target:
+    mode: all
+    selector:
+      namespaces:
+        - security-monitor
+
+---
+# Experiment 2: Network Loss (Packet Loss)
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-loss
+  namespace: security-monitor
+spec:
+  action: loss
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  loss:
+    loss: '10' # 10% packet loss
+    correlation: '25'
+  duration: '3m'
+  direction: both
+
+---
+# Experiment 3: Network Partition (Split Brain)
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-partition
+  namespace: security-monitor
+spec:
+  action: partition
+  mode: all
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  direction: both
+  target:
+    mode: one
+    selector:
+      namespaces:
+        - security-monitor
+      labelSelectors:
+        app: postgres
+  duration: '2m'
+
+---
+# Experiment 4: Network Corruption
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-corrupt
+  namespace: security-monitor
+spec:
+  action: corrupt
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  corrupt:
+    corrupt: '5' # 5% packet corruption
+    correlation: '0'
+  duration: '2m'
+
+---
+# Experiment 5: Bandwidth Limitation
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-bandwidth
+  namespace: security-monitor
+spec:
+  action: bandwidth
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  bandwidth:
+    rate: '1mbps'
+    limit: 20000
+    buffer: 10000
+  duration: '5m'
+  direction: to
+
+---
+# Experiment 6: DNS Failure
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: dns-failure
+  namespace: security-monitor
+spec:
+  action: delay
+  mode: all
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  delay:
+    latency: '5s'
+  duration: '3m'
+  direction: to
+  target:
+    mode: all
+    selector:
+      namespaces:
+        - kube-system
+      labelSelectors:
+        k8s-app: kube-dns
+
+---
+# Experiment 7: Database Connection Delay
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: db-connection-delay
+  namespace: security-monitor
+spec:
+  action: delay
+  mode: all
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  delay:
+    latency: '500ms'
+    jitter: '100ms'
+  duration: '5m'
+  direction: to
+  target:
+    mode: all
+    selector:
+      namespaces:
+        - security-monitor
+      labelSelectors:
+        app: postgres
+
+---
+# Experiment 8: Redis Connection Loss
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: redis-connection-loss
+  namespace: security-monitor
+spec:
+  action: loss
+  mode: all
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  loss:
+    loss: '50' # 50% packet loss to Redis
+  duration: '2m'
+  direction: both
+  target:
+    mode: all
+    selector:
+      namespaces:
+        - security-monitor
+      labelSelectors:
+        app: redis
+
+---
+# Experiment 9: External API Network Delay
+# Simulates slow external API calls (threat intelligence, etc.)
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: external-api-delay
+  namespace: security-monitor
+spec:
+  action: delay
+  mode: all
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  delay:
+    latency: '2s'
+    correlation: '100'
+  duration: '10m'
+  direction: to
+  externalTargets:
+    - api.abuseipdb.com
+    - api.virustotal.com
+    - api.shodan.io
+
+---
+# Experiment 10: Complete Network Isolation
+# DANGEROUS - Only use in isolated test environments
+# apiVersion: chaos-mesh.org/v1alpha1
+# kind: NetworkChaos
+# metadata:
+#   name: network-isolation
+#   namespace: security-monitor
+# spec:
+#   action: partition
+#   mode: all
+#   selector:
+#     namespaces:
+#       - security-monitor
+#     labelSelectors:
+#       app: security-monitor
+#   direction: both
+#   duration: '1m'
+
+---
+# Experiment 11: Duplicate Packets (Network Issues)
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-duplicate
+  namespace: security-monitor
+spec:
+  action: duplicate
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  duplicate:
+    duplicate: '20' # 20% packet duplication
+    correlation: '0'
+  duration: '3m'
+
+---
+# Experiment 12: Asymmetric Network Delay
+# Different delays for incoming vs outgoing traffic
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: asymmetric-delay-incoming
+  namespace: security-monitor
+spec:
+  action: delay
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  delay:
+    latency: '200ms'
+  duration: '5m'
+  direction: from # Incoming traffic delay
+
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: asymmetric-delay-outgoing
+  namespace: security-monitor
+spec:
+  action: delay
+  mode: one
+  selector:
+    namespaces:
+      - security-monitor
+    labelSelectors:
+      app: security-monitor
+  delay:
+    latency: '50ms'
+  duration: '5m'
+  direction: to # Outgoing traffic delay
+
+---
+# Helper: Network Chaos Test Script
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: network-chaos-test-script
+  namespace: security-monitor
+data:
+  test-network.sh: |
+    #!/bin/bash
+    # Test script to validate network chaos experiments
+
+    echo "Starting network chaos validation..."
+
+    # Test 1: Measure latency to database
+    echo "Testing database latency..."
+    time psql -h postgres-service -U $DB_USER -d $DB_NAME -c "SELECT 1;" || echo "Database connection failed"
+
+    # Test 2: Measure latency to Redis
+    echo "Testing Redis latency..."
+    time redis-cli -h redis-service PING || echo "Redis connection failed"
+
+    # Test 3: Test HTTP endpoint response time
+    echo "Testing HTTP endpoint..."
+    curl -w "Time: %{time_total}s\n" -o /dev/null -s http://security-monitor-service:3000/health
+
+    # Test 4: Continuous monitoring
+    echo "Starting continuous monitoring (60 seconds)..."
+    for i in {1..60}; do
+      RESPONSE_TIME=$(curl -w "%{time_total}" -o /dev/null -s http://security-monitor-service:3000/health 2>&1)
+      echo "[$i/60] Response time: ${RESPONSE_TIME}s"
+      sleep 1
+    done
+
+    echo "Network chaos validation complete"
+
+---
+# Job to run network tests during chaos
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: network-chaos-tester
+  namespace: security-monitor
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: tester
+          image: postgres:14-alpine
+          env:
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: security-monitor-config
+                  key: DB_USER
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: security-monitor-config
+                  key: DB_NAME
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: security-monitor-secrets
+                  key: DB_PASSWORD
+          command:
+            - /bin/sh
+            - -c
+            - |
+              apk add --no-cache curl redis
+
+              echo "=== Network Chaos Testing ==="
+
+              # Test database connectivity
+              echo "Testing PostgreSQL..."
+              for i in {1..10}; do
+                START=$(date +%s%N)
+                psql -h postgres-service -U $DB_USER -d $DB_NAME -c "SELECT 1;" > /dev/null 2>&1
+                END=$(date +%s%N)
+                DURATION=$(( ($END - $START) / 1000000 ))
+                echo "  Attempt $i: ${DURATION}ms"
+                sleep 2
+              done
+
+              # Test Redis connectivity
+              echo "Testing Redis..."
+              for i in {1..10}; do
+                START=$(date +%s%N)
+                redis-cli -h redis-service PING > /dev/null 2>&1
+                END=$(date +%s%N)
+                DURATION=$(( ($END - $START) / 1000000 ))
+                echo "  Attempt $i: ${DURATION}ms"
+                sleep 2
+              done
+
+              # Test API endpoint
+              echo "Testing API endpoint..."
+              for i in {1..20}; do
+                curl -w "  Attempt $i: %{time_total}s\n" -o /dev/null -s http://security-monitor-service:3000/health
+                sleep 1
+              done
+
+              echo "=== Testing Complete ==="

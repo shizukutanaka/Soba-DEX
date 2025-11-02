@@ -1,0 +1,169 @@
+# Sample Alert Rules for Soba DEX v3.1.0
+# Copy this file to alert-rules.yml and customize for your environment
+
+rules:
+  # High Error Rate Alert
+  - name: high-error-rate
+    description: Alerts when API error rate exceeds 5%
+    enabled: true
+    condition:
+      metric: error_rate
+      threshold: 5        # 5% error rate
+      duration: 5m        # Sustained for 5 minutes
+      comparator: '>'
+    severity: critical
+    channels:
+      - console
+      - email
+    runbook: https://docs.soba.com/runbooks/high-error-rate
+
+  # Latency P99 Spike
+  - name: latency-p99-spike
+    description: P99 latency exceeds 1 second
+    enabled: true
+    condition:
+      metric: p99_latency
+      service: gas-price-oracle
+      threshold: 1000     # 1 second
+      duration: 2m
+      comparator: '>'
+    severity: warning
+    channels:
+      - console
+      - email
+    runbook: https://docs.soba.com/runbooks/latency-spike
+
+  # High Latency Gas Oracle
+  - name: high-latency-gas-oracle
+    description: Gas oracle latency too high
+    enabled: true
+    condition:
+      metric: p95_latency
+      service: gas-price-oracle
+      threshold: 500      # 500ms
+      duration: 5m
+      comparator: '>'
+    severity: warning
+    channels:
+      - console
+    runbook: https://docs.soba.com/runbooks/gas-oracle-latency
+
+  # Database Connection Pool Exhaustion
+  - name: db-pool-exhausted
+    description: Database connection pool near capacity
+    enabled: true
+    condition:
+      metric: db_pool_active
+      threshold: 18       # 90% of 20 connections
+      duration: 1m
+      comparator: '>'
+    severity: critical
+    channels:
+      - console
+      - email
+    runbook: https://docs.soba.com/runbooks/db-pool
+
+  # Memory Usage High
+  - name: memory-usage-high
+    description: Application memory usage exceeds threshold
+    enabled: true
+    condition:
+      metric: memory_usage_percentage
+      threshold: 85       # 85%
+      duration: 5m
+      comparator: '>'
+    severity: warning
+    channels:
+      - console
+    runbook: https://docs.soba.com/runbooks/memory-usage
+
+  # WebSocket Connection Spike
+  - name: websocket-connection-spike
+    description: Unusual spike in WebSocket connections
+    enabled: true
+    condition:
+      metric: ws_active_connections
+      threshold: 1000
+      duration: 2m
+      deviation: 200%     # 200% above baseline
+    severity: warning
+    channels:
+      - console
+
+  # External API Failure
+  - name: external-api-failure
+    description: External API (CoinGecko, Etherscan) failing
+    enabled: true
+    condition:
+      metric: external_api_error_rate
+      threshold: 50       # 50% error rate
+      duration: 3m
+      comparator: '>'
+    severity: critical
+    channels:
+      - console
+      - email
+    runbook: https://docs.soba.com/runbooks/external-api
+
+  # Anomaly Detected
+  - name: anomaly-detected
+    description: Statistical anomaly detected in traces
+    enabled: true
+    condition:
+      metric: anomaly_count
+      threshold: 10       # 10 anomalies
+      duration: 5m
+      comparator: '>'
+    severity: warning
+    channels:
+      - console
+
+  # SLO Error Budget Burn Rate
+  - name: slo-burn-rate-high
+    description: SLO error budget burning too fast
+    enabled: true
+    condition:
+      metric: slo_burn_rate
+      threshold: 5        # 5x normal burn rate
+      duration: 1h
+      comparator: '>'
+    severity: critical
+    channels:
+      - console
+      - email
+    runbook: https://docs.soba.com/runbooks/slo-burn
+
+  # Cache Hit Rate Low
+  - name: cache-hit-rate-low
+    description: Redis cache hit rate below threshold
+    enabled: true
+    condition:
+      metric: cache_hit_rate
+      threshold: 70       # 70%
+      duration: 10m
+      comparator: '<'
+    severity: warning
+    channels:
+      - console
+
+# Notification Channels Configuration
+channels:
+  email:
+    enabled: true
+    to: team@soba.com
+    from: alerts@soba.com
+    smtp:
+      host: ${SMTP_HOST}
+      port: ${SMTP_PORT}
+      user: ${SMTP_USER}
+      pass: ${SMTP_PASS}
+
+  webhook:
+    enabled: false
+    url: ${ALERT_WEBHOOK_URL}
+    headers:
+      Content-Type: application/json
+
+  console:
+    enabled: true
+    level: warn  # Log level for console alerts

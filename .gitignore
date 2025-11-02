@@ -1,0 +1,134 @@
+# Dependencies
+node_modules/
+package-lock.json
+.pnp
+.pnp.js
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Production
+build/
+dist/
+*.tgz
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*-old.*
+*.old.*
+
+# Docker
+.dockerignore
+Dockerfile.old
+
+# PM2
+.pm2/
+pm2.json
+
+# Backups
+*.backup
+*.bak
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Compiled files
+*.js.map
+*.d.ts.map
+
+# Sensitive data
+secrets/
+private/
+*.pem
+*.key
+*.cert
+
+# Archive
+archive/
+*.old
+docs/archive/
+
+# Fix and lint scripts
+fix-*.js
+fix-*.sh
+lint-*.txt
+*-round*.js
+test-round*.js
+
+# Old reports and documentation
+ROUND_*.md
+*_IMPROVEMENTS*.md
+*_REPORT*.md
+*_SUMMARY*.md
+*_GUIDE*.md
+TIER*_*.md
+*PERFECTION*.md
+*COMPLETION*.md
+*TRANSFORMATION*.md
+
+# Cache
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# Build artifacts
+*.tar.gz
+*.zip
+
+# Contract artifacts
+contracts/artifacts/
+contracts/cache/
+contracts/typechain/
+
+# Frontend specific
+frontend/build/
+frontend/.next/
+frontend/out/
+
+# Backend specific
+backend/dist/
+backend/logs/
+
+# System files
+nul
+.null
+*.nul
+
+# Development
+.prettierignore
+.eslintignore

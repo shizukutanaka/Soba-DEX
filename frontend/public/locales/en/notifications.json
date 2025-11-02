@@ -1,0 +1,83 @@
+{
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark All as Read",
+    "clearAll": "Clear All",
+    "noNotifications": "No notifications",
+    "newNotifications": "New notifications",
+    "all": "All",
+    "unread": "Unread",
+    "read": "Read",
+    "settings": "Notification Settings",
+    "email": "Email Notifications",
+    "push": "Push Notifications",
+    "sms": "SMS Notifications",
+    "sound": "Sound",
+    "desktop": "Desktop Notifications"
+  },
+  "types": {
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Information",
+    "trade": "Trade",
+    "transaction": "Transaction",
+    "security": "Security",
+    "system": "System",
+    "price": "Price Alert",
+    "liquidity": "Liquidity",
+    "staking": "Staking"
+  },
+  "messages": {
+    "walletConnected": "Wallet connected successfully",
+    "walletDisconnected": "Wallet disconnected",
+    "orderPlaced": "Order placed successfully",
+    "orderFilled": "Order filled: {{amount}} {{symbol}} at {{price}}",
+    "orderCancelled": "Order cancelled",
+    "transactionSent": "Transaction sent",
+    "transactionConfirmed": "Transaction confirmed",
+    "transactionFailed": "Transaction failed",
+    "priceAlert": "Price alert: {{symbol}} reached {{price}}",
+    "liquidityAdded": "Liquidity added successfully",
+    "liquidityRemoved": "Liquidity removed",
+    "rewardsClaimed": "Rewards claimed: {{amount}} {{symbol}}",
+    "stakeSuccessful": "Staking successful",
+    "unstakeSuccessful": "Unstaking successful",
+    "securityAlert": "Security alert: {{message}}",
+    "systemMaintenance": "System maintenance scheduled",
+    "newListing": "New token listing: {{symbol}}",
+    "airdrop": "Airdrop received: {{amount}} {{symbol}}",
+    "forkDetected": "Fork detected on network",
+    "gasPriceHigh": "Gas prices are currently high",
+    "marketVolatility": "High market volatility detected",
+    "positionAlert": "Position alert: {{message}}"
+  },
+  "trading": {
+    "orderFilled": "Order filled",
+    "orderPartiallyFilled": "Order partially filled",
+    "orderExpired": "Order expired",
+    "positionOpened": "Position opened",
+    "positionClosed": "Position closed",
+    "stopLossTriggered": "Stop loss triggered",
+    "takeProfitTriggered": "Take profit triggered",
+    "marginCall": "Margin call",
+    "liquidationWarning": "Liquidation warning"
+  },
+  "wallet": {
+    "balanceLow": "Low balance warning",
+    "largeTransaction": "Large transaction detected",
+    "multipleTransactions": "Multiple transactions detected",
+    "addressChange": "Address changed",
+    "approvalRequired": "Approval required",
+    "tokenReceived": "Token received: {{amount}} {{symbol}}",
+    "tokenSent": "Token sent: {{amount}} {{symbol}}"
+  },
+  "system": {
+    "updateAvailable": "Update available",
+    "maintenanceScheduled": "Maintenance scheduled",
+    "serviceRestart": "Service restart required",
+    "backupCompleted": "Backup completed",
+    "securityUpdate": "Security update installed",
+    "performanceIssue": "Performance issue detected"
+  }
+}
