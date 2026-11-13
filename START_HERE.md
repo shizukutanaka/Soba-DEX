@@ -1,4 +1,13 @@
 # 🚀 Soba DEX - START HERE
+> **⚠️ Status note: This document is an internal self-assessment, not an audit.**
+> The "PRODUCTION READY" status, readiness scores, and performance/business
+> figures in this document were self-reported by the project's own
+> implementation process and are not backed by measurements or records in
+> this repository. No third-party security audit of the smart contracts has
+> been performed, this project is not production ready, and it is **not**
+> distributed for use with real funds. Read this document as a historical
+> internal record only. The current status is stated in
+> [README.md](./README.md).
 
 ## Welcome to the Soba DEX Python ML Microservices Platform
 

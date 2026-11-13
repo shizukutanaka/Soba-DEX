@@ -1,4 +1,14 @@
 ================================================================================
+================================================================================
+NOTE ON STATUS: This file is an internal self-assessment, not an audit.
+The "PRODUCTION READY" status and the scores quoted below were self-reported
+by the project's own implementation process and are not backed by
+measurements or records in this repository. No third-party security audit
+of the smart contracts has been performed, this project is not production
+ready, and it is not distributed for use with real funds. Read this file as
+a historical internal record only. The current status is stated in README.md.
+================================================================================
+
                     SESSION COMPLETION SUMMARY
                  Python ML Microservices Integration
 ================================================================================
