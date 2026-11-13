@@ -1,8 +1,17 @@
 # Production Ready Implementation Report
 
+> **⚠️ Correction (2025-11-13): This document is a self-assessment, not an audit.**
+> The "PRODUCTION READY" status and the scores below (98/100 etc.) were assigned
+> by the project's own implementation process. No third-party security audit of
+> the smart contracts or services has been performed, this project has not
+> passed its distribution review, and it is **not** production ready and
+> **not** distributed for use with real funds. Read this document as a
+> historical internal checklist only. The current status is stated in
+> [README.md](./README.md).
+
 **Date:** November 4, 2025
 **Phase:** 2 (Infrastructure & Operations)
-**Status:** ✅ **PRODUCTION READY - 100% COMPLETE**
+**Status:** ✅ **PRODUCTION READY - 100% COMPLETE** *(self-assessed — superseded by the correction above)*
 
 ---
 

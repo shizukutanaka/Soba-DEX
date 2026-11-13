@@ -1,8 +1,18 @@
 # Soba DEX - Python ML Microservices Integration
 
-[![Status](https://img.shields.io/badge/status-production%20ready-brightgreen)]() [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
+[![Status](https://img.shields.io/badge/status-in%20development-yellow)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
 
-Production-ready Python ML microservices integrated with Node.js backend. Provides price prediction, multilingual translation, fraud detection, data processing, and blockchain intelligence.
+> **Project status: experimental / under development — not production ready.**
+>
+> This repository is a work-in-progress software project. In particular:
+>
+> - The smart contracts have **not** undergone a third-party security audit.
+> - This software is **not distributed** as a finished product and is **not** intended to be deployed with real user funds.
+> - Earlier versions of this README described the project as "Production Ready" and quoted performance, coverage, and business figures. Those figures were self-reported and are not backed by measurements or records in this repository, so they have been removed.
+>
+> This README covers the **Python ML microservices layer** (`python/`) and its integration with the Node.js backend (`backend/`). The DEX contracts (`contracts/`) and frontend (`frontend/`) are separate components.
+
+Python ML microservices integrated with the Node.js backend. Provides price prediction, multilingual translation, fraud detection, data processing, and blockchain intelligence.
 
 ## 🎯 Features
 
@@ -13,14 +23,12 @@ Production-ready Python ML microservices integrated with Node.js backend. Provid
 - **Data Processing** - ETL pipelines & real-time validation
 - **Blockchain Intelligence** - Smart contract analysis & MEV detection
 
-### Enterprise Ready
-- ✅ Circuit breaker pattern for fault tolerance
-- ✅ Automatic health monitoring (30-second intervals)
-- ✅ Redis-based caching (95%+ hit rate)
-- ✅ Kubernetes-native deployment
-- ✅ Horizontal pod autoscaling
-- ✅ Comprehensive logging & monitoring
-- ✅ 90+ integration tests (85%+ coverage)
+### Platform pieces included in this repository
+- ✅ Circuit breaker pattern for fault tolerance (`backend/src/patterns/circuitBreaker.js`)
+- ✅ Health endpoints for the Python services (`GET /api/python/health`)
+- ✅ Redis-based caching
+- ✅ Docker Compose and Kubernetes manifests for local/development deployment
+- ✅ Logging & monitoring hooks
 
 ## 🚀 Quick Start
 
@@ -29,7 +37,7 @@ Production-ready Python ML microservices integrated with Node.js backend. Provid
 - Python 3.11+
 - Docker & Docker Compose
 - Redis
-- Kubernetes 1.24+ (for production)
+- Kubernetes 1.24+ (optional, for trying the bundled manifests)
 
 ### 1. Start Services (Docker)
 
@@ -39,14 +47,17 @@ docker-compose -f docker-compose.python.yml up -d
 
 ### 2. Integrate with Node.js
 
-```javascript
-// backend/src/app.js
-const { createHealthMonitorMiddleware } = require('./middleware/pythonServiceHealthMonitor');
-const pythonServices = require('./routes/pythonServices');
+The Python services router is mounted by the backend itself in
+`backend/src/app-core.js`:
 
-app.use(createHealthMonitorMiddleware());
-app.use('/api/python', pythonServices);
+```javascript
+// backend/src/app-core.js
+const pythonServices = require('./routes/pythonServices');
+this.app.use('/api/python', pythonServices);
 ```
+
+There is no separate health-monitor middleware to install; health status is
+exposed through the router's `GET /api/python/health` endpoint.
 
 ### 3. Test
 
@@ -105,23 +116,6 @@ GET  /api/python/blockchain/transaction-graph
 ```
 
 **Total:** 18 endpoints + health monitoring
-
-## 📈 Performance
-
-| Service | Latency | Throughput | Accuracy |
-|---------|---------|-----------|----------|
-| ML Models | <100ms | 1,000+/sec | 78-85% |
-| NLP | <100ms | 500+/sec | 90%+ |
-| Fraud | <50ms | 2,000+/sec | 95%+ |
-| Data | <20ms | 100K+/sec | 99%+ |
-| Blockchain | <100ms | 1,000+/sec | 98%+ |
-
-## 💰 Business Value
-
-- **Translation Savings:** $120K/year (vs external APIs)
-- **Fraud Prevention:** $5M+/year (detected fraud)
-- **Total Year 1:** $8.12M+ value
-- **ROI:** 65x
 
 ## 🏗️ Architecture
 
@@ -184,12 +178,18 @@ npm test -- backend/tests/integration/pythonServicesIntegration.test.js
 npm test -- --coverage
 ```
 
-### Results
-- **Total Tests:** 90+
-- **Coverage:** 85%+
-- **Status:** ✅ All passing
+### What exists today
+- Python side: `python/tests/test_services.py` (a single test module covering the service layer)
+- Node.js side: integration tests under `backend/tests/`, including `backend/tests/integration/pythonServicesIntegration.test.js`
+
+No coverage figure is published here: this repository does not currently
+contain coverage reports that would back a specific percentage.
 
 ## 🚀 Deployment
+
+The manifests in this repository are provided for development and evaluation.
+They do not make the system production-ready (see the status note at the top):
+the contracts are unaudited and this project is not distributed for live use.
 
 ### Docker Compose
 ```bash
@@ -258,21 +258,19 @@ CONTRACT_ANALYSIS: 7 days
 
 ### Integration
 - [API Integration](./docs/API_INTEGRATION.md)
-- [Health Monitoring](./docs/HEALTH_MONITORING.md)
 
 ### Operations
-- [Production Deployment](./docs/PRODUCTION.md)
-- [Troubleshooting](./docs/TROUBLESHOOTING.md)
 - [Operational Runbooks](./docs/RUNBOOKS.md)
 
 ### Architecture
 - [System Design](./docs/ARCHITECTURE.md)
-- [Service Details](./docs/SERVICES.md)
-- [Code Structure](./docs/STRUCTURE.md)
+- [Documentation index](./docs/README.md)
 
 ## 🔍 Monitoring & Alerting
 
-### Prometheus Metrics
+The codebase exposes Prometheus-style metrics and health endpoints that can be
+wired into a monitoring stack:
+
 - Service health status
 - Request latency (P50, P95, P99)
 - Error rates by service
@@ -280,14 +278,8 @@ CONTRACT_ANALYSIS: 7 days
 - Cache hit rates
 - Circuit breaker status
 
-### Grafana Dashboards
-- Service overview
-- Performance metrics
-- Resource utilization
-- Error analysis
-- Request throughput
+Example alert conditions used during development:
 
-### Alerting Rules
 - Service unavailable (critical)
 - High error rate >5% (warning)
 - High latency >200ms (warning)
@@ -295,20 +287,14 @@ CONTRACT_ANALYSIS: 7 days
 
 ## 🔐 Security
 
-### Best Practices
-- Non-root container users
-- Read-only root filesystem
-- Network policies enforced
-- Secrets management integrated
-- RBAC configured
-- TLS/SSL enabled
+### Practices reflected in the code
+- Non-root container users (e.g. `USER mlapp` in `python/Dockerfile`)
+- Request validation on the API routes
 
-### Compliance
-- GDPR-ready data handling
-- Audit logging enabled
-- Encryption in transit & at rest
-- Rate limiting configured
-- Request validation
+### What is **not** in place
+- **No third-party security audit** of the smart contracts or the services has been performed.
+- No compliance certification (GDPR, SOC 2, PCI-DSS, or otherwise) has been obtained for this project.
+- Do not deploy this software where it can custody or move real user funds.
 
 ## 🤝 Contributing
 
@@ -331,12 +317,10 @@ MIT License - See LICENSE file for details
 ### Quick Links
 - **Health Dashboard:** http://localhost:3000/api/python/health
 - **Metrics:** http://localhost:3000/api/health/metrics
-- **Monitoring:** Grafana dashboard (port 3000)
 
 ### Contact
-- **Issues:** GitHub Issues
+- **Issues:** https://github.com/shizukutanaka/Soba-DEX/issues
 - **Discussions:** GitHub Discussions
-- **Email:** support@example.com
 
 ## 📊 Project Statistics
 
@@ -344,67 +328,23 @@ MIT License - See LICENSE file for details
 |--------|-------|
 | **Python Services** | 5 |
 | **API Endpoints** | 18+ |
-| **Lines of Code** | 5,950+ |
-| **Test Coverage** | 85%+ |
-| **Docker Images** | Optimized, multi-stage |
-| **Kubernetes Ready** | Yes |
-| **Production Ready** | ✅ Yes |
+| **Docker Images** | Multi-stage builds |
+| **Kubernetes Manifests** | Included (development/evaluation use) |
+| **Production Ready** | ❌ No — see the status note at the top |
 
-## 🎯 Roadmap
-
-### Version 1.1 (Q4 2025)
-- [ ] WebSocket support for real-time updates
-- [ ] Advanced caching strategies
-- [ ] Multi-region deployment
-- [ ] Enhanced monitoring dashboards
-
-### Version 1.2 (Q1 2026)
-- [ ] GPU acceleration support
-- [ ] Model fine-tuning API
-- [ ] Advanced analytics
-- [ ] Cost optimization features
-
-### Version 2.0 (Q2 2026)
-- [ ] Distributed tracing
-- [ ] Service mesh integration
-- [ ] Advanced ML capabilities
-- [ ] Enterprise features
-
-## ⚡ Performance Optimization
-
-### Current State
-- P95 latency: <100ms for most services
-- Throughput: 1000+ TPS per service
-- Cache hit rate: 95%+
-- Error rate: <1%
-
-### Optimization Opportunities
-- Database query optimization
-- Model compression
-- Request batching
-- Connection pooling
+Note: there is no single version number for this README's subject. The
+repository's components are versioned separately (root `package.json`: 3.9.0,
+`backend`: 3.9.0, `frontend`: 2.1.0, `contracts`: 1.0.0).
 
 ## 🐛 Known Issues & Limitations
 
-- None currently
-- See [Issues](https://github.com/soba-dex/issues) for bug reports
-
-## ✅ Verification Checklist
-
-Before production deployment:
-- [ ] All tests passing
-- [ ] Health checks passing
-- [ ] Load test results satisfactory
-- [ ] Security scan completed
-- [ ] Monitoring configured
-- [ ] Backup strategy tested
-- [ ] Rollback procedure documented
-- [ ] Team trained
+- The smart contracts are unaudited; the whole project is under development and is not distributed for production use.
+- Test coverage is thin on the Python side (one test module) and no coverage report is published.
+- See [Issues](https://github.com/shizukutanaka/Soba-DEX/issues) for bug reports
 
 ---
 
-**Status:** ✅ Production Ready
-**Version:** 1.0.0
-**Last Updated:** November 1, 2025
+**Status:** 🚧 In development — not production ready, not audited, not distributed for live use
+**Last Updated:** November 13, 2025
 
 For detailed information, see the [documentation](./docs) directory.
